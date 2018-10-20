@@ -1,7 +1,8 @@
 package main.utilities.error;
 
 public enum ErrorMessage {
-    INVALID_COMMAND(0, "Invalid Command");
+    INVALID_COMMAND(0, "Invalid Command"),
+    UNKNOWN_HOST(500, "Unknown Host");
     
     private final int code;
     private final String message;
