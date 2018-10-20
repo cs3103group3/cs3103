@@ -2,86 +2,142 @@ package main.peer;
 
 import java.util.Scanner;
 
+import main.utilities.command.OfflineInterfaceCommand;
 import main.utilities.command.InterfaceCommand;
 import main.utilities.error.ErrorMessage;
 
 public class Client extends Thread {
     
-    private static String displayWelcomeMessage() {
+    private boolean isConnectedToTracker;
+    private boolean hasQuit;
+    
+    private static String displayOfflineMenu() {
         return "===============================================\n" +
                "Welcome to CS3103 P2P Client\n" +
                "Choose From the list of actions\n" +
-               "1. " + InterfaceCommand.LIST.getCommandText() +
-               "2. " + InterfaceCommand.CHANGE_DIRECTORY.getCommandText() +
-               "3. " + InterfaceCommand.SEARCH.getCommandText() +
-               "4. " + InterfaceCommand.DOWNLOAD.getCommandText() +
-               "5. " + InterfaceCommand.INFORM.getCommandText() +
-               "6. " + InterfaceCommand.QUIT.getCommandText() +
+               "1. " + OfflineInterfaceCommand.CONNECT_TO_TRACKER.getCommandText() + "\n" +
+               "2. " + OfflineInterfaceCommand.QUIT.getCommandText() + "\n" +
                "===============================================\n";
     }
+    
+    private static String displayConnectedMenu() {
+        return "===============================================\n" +
+               "Welcome to CS3103 P2P Client\n" +
+               "Choose From the list of actions\n" +
+               "1. " + InterfaceCommand.LIST.getCommandText() + "\n" +
+               "2. " + InterfaceCommand.CHANGE_DIRECTORY.getCommandText() + "\n" +
+               "3. " + InterfaceCommand.SEARCH.getCommandText() + "\n" +
+               "4. " + InterfaceCommand.DOWNLOAD.getCommandText() + "\n" +
+               "5. " + InterfaceCommand.INFORM.getCommandText() + "\n" +
+               "6. " + InterfaceCommand.QUIT.getCommandText() + "\n" +
+               "===============================================\n";
+    }
+    
+    private void connectToTracker() {
+        if (true) {
+            // if can connect to tracker via some socket
+            isConnectedToTracker = true;
+        } else {
+            isConnectedToTracker = false;
+        }
+    }
+    
+    private void executeWhenNotConnectedToTracker() {
+        displayOfflineMenu();
+        int userInput = getUserSelectedOption();
+        OfflineInterfaceCommand command = OfflineInterfaceCommand.forCode(userInput);
+        command = (command==null) ? OfflineInterfaceCommand.INVALID : command;
+        
+        hasQuit = false;
+        
+        switch(command) {
+        case CONNECT_TO_TRACKER:
+            connectToTracker();
+            return;
+        case QUIT:
+            quit();
+            return;
+        default:
+            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            return;
+        }
+    }
 
-    private void executeCommand(int input) {
-        InterfaceCommand command = InterfaceCommand.forCode(input);
+    private void executeWhenConnectedToTracker() {
+        displayConnectedMenu();
+        
+        int userInput = getUserSelectedOption();
+        InterfaceCommand command = InterfaceCommand.forCode(userInput);
+        command = (command==null) ? InterfaceCommand.INVALID : command;
+        
+        hasQuit = false;
         
         switch(command) {
         case LIST:
-            //perform list
-            break;
+            list();
+            return;
         case CHANGE_DIRECTORY:
-            //Change directory
-            break;
+            changeDirectory();
+            return;
         case SEARCH:
-            //perform search
-            break;
+            search();
+            return;
         case DOWNLOAD:
-            //perform downloading of file
-            break;
+            download();
+            return;
         case INFORM:
-            //perform downloading of file
-            break;
+            inform();
+            return;
         case QUIT:
-            //perform exit
-            break;
+            quit();
+            return;
         default:
-            //Error
             System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
             return;
         }
     }
     
-    private void list(int input) {
+    private void list() {
         
     }
     
-    private void changeDirectory(int input) {
+    private void changeDirectory() {
         
     }
     
-    private void search(int input) {
+    private void search() {
         
     }
     
-    private void download(int input) {
+    private void download() {
         
     }
     
-    private void inform(int input) {
+    private void inform() {
         
     }
     
-    private void quit(int input) {
-        
+    private void quit() {
+        hasQuit = true;
+        System.out.println("Goodbye!");
     }
     
-    private static int getUserInput() {
+    private static int getUserSelectedOption() {
         Scanner sc = new Scanner(System.in);
         return sc.nextInt();
     }
     
     public void start() {
-        displayWelcomeMessage();
-        int userInput = getUserInput();
-        executeCommand(userInput);
+        isConnectedToTracker = false;
+        hasQuit = false;
+        
+        while (!hasQuit) {
+            if (isConnectedToTracker) {
+                executeWhenConnectedToTracker();
+            } else {
+                executeWhenNotConnectedToTracker();
+            }
+        }       
     }
 
 }

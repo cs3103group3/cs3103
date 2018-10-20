@@ -1,18 +1,14 @@
 package main.utilities.command;
 
-public enum InterfaceCommand {
+public enum OfflineInterfaceCommand {
     INVALID(0, "Invalid Command. Please try again."),
-    LIST(1, "List all files"), 
-    CHANGE_DIRECTORY(2, "Change Directory"),
-    SEARCH(3, "Search for file"),
-    DOWNLOAD(4, "Download file by filename"),
-    INFORM(5, "Inform Tracker about a new available file and its chunks"),
-    QUIT(6, "Quit");
+    CONNECT_TO_TRACKER(1, "Connect to Centralised Directory Server"), 
+    QUIT(2, "Quit");
     
     private final int code;
     private final String text;
     
-    private InterfaceCommand(int code, String text) {
+    private OfflineInterfaceCommand(int code, String text) {
         this.code = code;
         this.text = text;
     }
@@ -26,8 +22,8 @@ public enum InterfaceCommand {
     }
     
     // Map a int value to its corresponding enum value
-    public static InterfaceCommand forCode(int code) {
-        for (InterfaceCommand type : InterfaceCommand.values()) {
+    public static OfflineInterfaceCommand forCode(int code) {
+        for (OfflineInterfaceCommand type : OfflineInterfaceCommand.values()) {
             if (type.getCommandCode() == code) {
                 return type;
             }
