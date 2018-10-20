@@ -22,65 +22,65 @@ public class Client extends Thread {
 
     private void executeCommand(int input) {
         InterfaceCommand command = InterfaceCommand.forCode(input);
+        command = (command==null) ? InterfaceCommand.INVALID : command;
         
         switch(command) {
         case LIST:
-            //perform list
+            list();
             break;
         case CHANGE_DIRECTORY:
-            //Change directory
+            changeDirectory();
             break;
         case SEARCH:
-            //perform search
+            search();
             break;
         case DOWNLOAD:
-            //perform downloading of file
+            download();
             break;
         case INFORM:
-            //perform downloading of file
+            inform();
             break;
         case QUIT:
-            //perform exit
+            quit();
             break;
         default:
-            //Error
             System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
             return;
         }
     }
     
-    private void list(int input) {
+    private void list() {
         
     }
     
-    private void changeDirectory(int input) {
+    private void changeDirectory() {
         
     }
     
-    private void search(int input) {
+    private void search() {
         
     }
     
-    private void download(int input) {
+    private void download() {
         
     }
     
-    private void inform(int input) {
+    private void inform() {
         
     }
     
-    private void quit(int input) {
-        
+    private void quit() {
+        System.out.println("Goodbye!");
     }
     
-    private static int getUserInput() {
+    private static int getUserSelectedOption() {
         Scanner sc = new Scanner(System.in);
         return sc.nextInt();
     }
     
     public void start() {
         displayWelcomeMessage();
-        int userInput = getUserInput();
+        int userInput = getUserSelectedOption();
         executeCommand(userInput);
     }
 

@@ -1,14 +1,13 @@
 package main.utilities.command;
 
 public enum InterfaceCommand {
-    INVALID(0, "Invalid Command. Please try again"),
+    INVALID(0, "Invalid Command. Please try again."),
     LIST(1, "List all files"), 
     CHANGE_DIRECTORY(2, "Change Directory"),
     SEARCH(3, "Search for file"),
-    DOWNLOAD(4, "Download file"),
-    INFORM(5, "Inform Tracker about new file"),
-    QUIT(6, "Goodbye!");
-    
+    DOWNLOAD(4, "Download file by filename"),
+    INFORM(5, "Inform Tracker about a new available file and its chunks"),
+    QUIT(6, "Quit");
     
     private final int code;
     private final String text;
