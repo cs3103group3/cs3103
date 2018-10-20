@@ -1,4 +1,4 @@
-package message;
+package main.message;
 
 public enum MessageType {
     CONNECTION_REQUEST,

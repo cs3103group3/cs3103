@@ -1,4 +1,4 @@
-package tracker;
+package main.tracker;
 
 public enum TrackerErrorMessage {
     INVALID_COMMAND(0, "Invalid Command");
