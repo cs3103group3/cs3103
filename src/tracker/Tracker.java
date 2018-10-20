@@ -9,7 +9,7 @@ import java.net.Socket;
  * @author cs3103 group 3
  *
  */
-public class CentralServer{
+public class Tracker{
 	
 	private final static int SERVER_LISTENING_PORT = 7878;
 	ServerSocket serverSocket;
