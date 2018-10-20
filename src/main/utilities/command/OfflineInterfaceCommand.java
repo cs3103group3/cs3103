@@ -4,6 +4,8 @@ public enum OfflineInterfaceCommand {
     INVALID(0, "Invalid Command. Please try again."),
     CONNECT_TO_TRACKER(1, "Connect to Centralised Directory Server"), 
     EMPTY_RECORD(2, "Directory List is empty"),
+    INVALID_FILENAME(3, "Unable to find file requested"),
+    VALID_FILENAME(4, "Found file requested"),
     QUIT(3, "Quit");
     
     private final int code;
