@@ -3,7 +3,8 @@ package main.utilities.command;
 public enum OfflineInterfaceCommand {
     INVALID(0, "Invalid Command. Please try again."),
     CONNECT_TO_TRACKER(1, "Connect to Centralised Directory Server"), 
-    QUIT(2, "Quit");
+    EMPTY_RECORD(2, "Directory List is empty"),
+    QUIT(3, "Quit");
     
     private final int code;
     private final String text;
