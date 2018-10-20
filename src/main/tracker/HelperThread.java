@@ -1,4 +1,4 @@
-package tracker;
+package main.tracker;
 
 import java.io.BufferedReader;
 import java.io.IOException;

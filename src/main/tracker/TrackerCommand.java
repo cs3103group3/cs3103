@@ -1,4 +1,4 @@
-package tracker;
+package main.tracker;
 
 public enum TrackerCommand {
     INVALID(0),

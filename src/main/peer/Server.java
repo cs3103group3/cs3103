@@ -1,4 +1,4 @@
-package peer;
+package main.peer;
 
 public class Server {
 
