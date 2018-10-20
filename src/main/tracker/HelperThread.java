@@ -84,7 +84,7 @@ public class HelperThread extends Thread{
 			break;
 		case SEARCH:
 			//perform search
-			searchEntry(strCommandArr);
+			searchEntry(strCommandArr, recordList);
 			break;
 		case DOWNLOAD:
 			//Finds peer to download the file requested
@@ -154,15 +154,28 @@ public class HelperThread extends Thread{
 	 * 2) Chunk Number
 	 * 
 	 * Example Input One:
-	 * 3 fileNameOne 10
+	 * 3 fileNameOne
 	 * Expected Output:
 	 * HostName/IP, FileName to be written back to the peer who requested it
 	 * 
 	 * Invalid Output:
 	 * "Invalid fileName or Chunk Number specified"
 	 */
-	private synchronized void searchEntry(String[] strCommandArr) {
-
+	private synchronized void searchEntry(String[] strCommandArr, Hashtable<String, ArrayList<Record>> currentList) {
+		String fileRequested = strCommandArr[1];
+		boolean foundFile = false;
+		Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
+		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
+			if(fileRequested.equals(entry2.getKey())) {
+				foundFile = true;
+				break;
+			}
+		}
+		if(foundFile) {
+			reply.write(OfflineInterfaceCommand.VALID_FILENAME.getCommandText());
+		} else {
+			reply.write(OfflineInterfaceCommand.INVALID_FILENAME.getCommandText());
+		}
 	}
 
 	/**
@@ -178,11 +191,29 @@ public class HelperThread extends Thread{
 	 * 1) Might need to check if IP is valid
 	 * 2) Might need to check if fileName is valid
 	 */
-	private synchronized void informServer(String[] strCommandArr) {
-
+	private synchronized void informServer(String[] strCommandArr, Hashtable<String, ArrayList<Record>> currentList) {
+		String ipBroadcasted = strCommandArr[1];
+		String fileBroadcasted = strCommandArr[2];
+		String chunkBroadcasted = strCommandArr[3];
+		
+		boolean hasExist =	checkExistFile(fileBroadcasted, currentList);
 
 	}
-
+	
+	private boolean checkExistFile(String fileBroadcasted, Hashtable<String, ArrayList<Record>> currentList) {
+		Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
+		boolean foundFile = false;
+		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
+			if(fileBroadcasted.equals(entry2.getKey())) {
+				foundFile = true;
+				break;
+			}
+		}
+		if(foundFile) {
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * Asks the server for location of file or chunk from a peer
 	 * @param strCommandArr

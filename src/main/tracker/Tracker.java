@@ -18,7 +18,7 @@ public class Tracker{
 	//ArrayList of all the files with unique names
 	public static ArrayList<Record> fileArrList = new ArrayList<>();
 
-	//To allow faster access, use a hash
+	//To allow faster access, use a hash : fileName to its associated chunks
 	public static Hashtable<String, ArrayList<Record>> recordTable = new Hashtable<>();
 	//Another Hash to pinpoint location of the record
 	
