@@ -20,6 +20,8 @@ public class Tracker{
 
 	//To allow faster access, use a hash
 	public static Hashtable<String, ArrayList<Record>> recordTable = new Hashtable<>();
+	//Another Hash to pinpoint location of the record
+	
 
 	public void main(String[] args) {
 		System.out.println("Starting Server");

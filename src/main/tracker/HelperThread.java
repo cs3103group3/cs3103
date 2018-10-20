@@ -6,8 +6,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import main.utilities.command.InterfaceCommand;
+import main.utilities.command.OfflineInterfaceCommand;
 import main.utilities.error.ErrorMessage;
 
 public class HelperThread extends Thread{
@@ -16,13 +21,17 @@ public class HelperThread extends Thread{
 	//private List<String>
 	BufferedReader in = null;
 	PrintWriter reply = null;
+
+	//Hash table of fileName to its records of users
+	private Hashtable<String, ArrayList<Record>> recordList = Tracker.recordTable;
 	public HelperThread() {
-		
+
 	}
 	public HelperThread(Socket client) {
 		clientSocket = client;
 	}
-	
+
+	@Override
 	public void run() {
 
 		boolean threadRunning = true;
@@ -30,7 +39,7 @@ public class HelperThread extends Thread{
 		try {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			reply = new PrintWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
-			
+
 			while(threadRunning) {
 				clientInput = in.readLine();
 				System.out.println("Client has entered command: " + clientInput);
@@ -38,41 +47,41 @@ public class HelperThread extends Thread{
 					break;
 				}
 			}
-			
+
 			doClientCommand(clientInput);
 		} catch (IOException e) {
 			System.out.println("Io Exception");
-			
+
 		}
 	}
-	
+
 	/**
 	 * This method executes the commands the client requested
 	 */
 	private void doClientCommand(String strCommand) {
-	    InterfaceCommand command = InterfaceCommand.INVALID;
-	    String [] strCommandArr;
-	    try {
-	    	strCommand = strCommand.trim();
-	    	strCommandArr = strCommand.split(" ");
-	        int commandCode = Integer.parseInt(strCommandArr[0]);
-	        command = InterfaceCommand.forCode(commandCode);
-	    } catch(NumberFormatException nfe) {
-	        reply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
-	        return;
-	    }
-	   
-	    
-	    //Calls method that is required to execute the user's command
+		InterfaceCommand command = InterfaceCommand.INVALID;
+		String [] strCommandArr;
+		try {
+			strCommand = strCommand.trim();
+			strCommandArr = strCommand.split(" ");
+			int commandCode = Integer.parseInt(strCommandArr[0]);
+			command = InterfaceCommand.forCode(commandCode);
+		} catch(NumberFormatException nfe) {
+			reply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+			return;
+		}
+
+
+		//Calls method that is required to execute the user's command
 		switch(command) {
 		case LIST:
 			//perform list
-			listDirectoryEntry();
+			listDirectoryEntry(recordList);
 			break;
 		case CHANGE_DIRECTORY:
-            //Change directory
+			//Change directory
 			changeDirectory(strCommandArr);
-            break;
+			break;
 		case SEARCH:
 			//perform search
 			searchEntry(strCommandArr);
@@ -82,8 +91,8 @@ public class HelperThread extends Thread{
 			findPeer(strCommandArr);
 			break;
 		case INFORM:
-            //Update the server of newly advertised chunk of file
-            informServer(strCommandArr);
+			//Update the server of newly advertised chunk of file
+			informServer(strCommandArr);
 			break;
 		case QUIT:
 			//perform exit
@@ -95,20 +104,33 @@ public class HelperThread extends Thread{
 			return;
 		}
 	}
-	
+
 
 	/**
-	 * Lists the directory Entry
+	 * Lists the directory Entry of all the files
 	 * 
 	 * Example Input:
 	 * 1
 	 * Expected Output:
 	 * Directory Entry
 	 */
-	private synchronized void listDirectoryEntry() {
-		
+	private synchronized void listDirectoryEntry(Hashtable<String, ArrayList<Record>> currentList) {
+
+		if(currentList.isEmpty()) {
+			reply.println(OfflineInterfaceCommand.EMPTY_RECORD);
+		} else {
+			String result = "";
+			Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
+			//Prints out currentList
+			for(Entry<String, ArrayList<Record>> entry1 : entrySet) {
+				result += entry1.getKey();
+				result += "\n";
+			}
+			reply.write(result);
+			
+		}
 	}
-	
+
 	/**
 	 * Changes the directory entry
 	 * @param strCommandArr: the Array of command by client that has been split
@@ -120,11 +142,11 @@ public class HelperThread extends Thread{
 	 * Then calls listDirectoryEntry again
 	 */
 	private synchronized void changeDirectory(String[] strCommandArr) {
-		
-		
+
+
 	}
-	
-	
+
+
 	/**
 	 * Search Entry by the following
 	 * @param strCommandArr:  the Array of command by client that has been split
@@ -140,9 +162,9 @@ public class HelperThread extends Thread{
 	 * "Invalid fileName or Chunk Number specified"
 	 */
 	private synchronized void searchEntry(String[] strCommandArr) {
-		
+
 	}
-	
+
 	/**
 	 * Informs the Server of the new chunk to be advertised
 	 * @param strCommandArr
@@ -157,10 +179,10 @@ public class HelperThread extends Thread{
 	 * 2) Might need to check if fileName is valid
 	 */
 	private synchronized void informServer(String[] strCommandArr) {
-		
-		
+
+
 	}
-	
+
 	/**
 	 * Asks the server for location of file or chunk from a peer
 	 * @param strCommandArr
@@ -177,10 +199,10 @@ public class HelperThread extends Thread{
 	 * 
 	 */
 	private synchronized void findPeer(String[] strCommandArr) {
-		
-		
+
+
 	}
-	
+
 	/**
 	 * Exits the server
 	 * 
@@ -194,8 +216,8 @@ public class HelperThread extends Thread{
 	 * 1) Have to delete the fileName/chunk listed in the central server
 	 */
 	private void exitServer() {
-		
-		
+
+
 	}
 
 
