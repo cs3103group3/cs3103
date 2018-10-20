@@ -8,13 +8,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class HelperThread extends Thread{
-	//Commands available for Users
-	private static final String LIST = "LIST";
-	private static final String SEARCH = "SEARCH";
-	private static final String ADVERTISE = "ADVERTISE";
-	private static final String DOWNLOAD = "DOWNLOAD";
-	private static final String EXIT = "EXIT";
-	private static final String INVALID_COMMAND = "Invalid Command";
 	//Client Socket
 	Socket clientSocket;
 	//private List<String>
@@ -30,20 +23,20 @@ public class HelperThread extends Thread{
 	public void run() {
 
 		boolean threadRunning = true;
-		String clientCommands = "";
+		String clientInput = "";
 		try {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			reply = new PrintWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
 			
 			while(threadRunning) {
-				clientCommands = in.readLine();
-				System.out.println("Client has entered command: " + clientCommands);
-				if(!clientCommands.equals("")) {
+				clientInput = in.readLine();
+				System.out.println("Client has entered command: " + clientInput);
+				if(!clientInput.equals("")) {
 					break;
 				}
 			}
 			
-			doClientCommands(clientCommands);
+			doClientCommand(clientInput);
 		} catch (IOException e) {
 			System.out.println("Io Exception");
 			
@@ -58,8 +51,17 @@ public class HelperThread extends Thread{
 	 * 4) Download File
 	 * 5) Exit
 	 */
-	private void doClientCommands(String clientCommands) {
-		switch(clientCommands) {
+	private void doClientCommand(String strCommand) {
+	    TrackerCommand command = TrackerCommand.INVALID;
+	    try {
+	        int commandCode = Integer.parseInt(strCommand);
+	        command = TrackerCommand.forCode(commandCode);
+	    } catch(NumberFormatException nfe) {
+	        reply.println(TrackerErrorMessage.INVALID_COMMAND.getErrorMessage());
+	        return;
+	    }
+	    
+		switch(command) {
 		case LIST:
 			//perform list
 			break;
@@ -77,7 +79,8 @@ public class HelperThread extends Thread{
 			break;
 		default:
 			//Error
-			reply.println(INVALID_COMMAND);
+			reply.println(TrackerErrorMessage.INVALID_COMMAND.getErrorMessage());
+			return;
 		}
 	}
 }
