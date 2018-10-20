@@ -132,12 +132,7 @@ public class HelperThread extends Thread{
 	 * 2) Chunk Number
 	 * 
 	 * Example Input One:
-	 * 3 fileNameOne
-	 * Expected Output:
-	 * HostName/IP, FileName to be written back to the peer who requested it
-	 * 
-	 * Example Input Two:
-	 * 3 chunkOne
+	 * 3 fileNameOne 10
 	 * Expected Output:
 	 * HostName/IP, FileName to be written back to the peer who requested it
 	 * 
@@ -171,10 +166,10 @@ public class HelperThread extends Thread{
 	 * @param strCommandArr
 	 * 
 	 * Format of Input:
-	 * 5 fileName/chunkNumber
+	 * 5 fileName chunkNumber
 	 * 
 	 * Example Input:
-	 * 5 example.txt
+	 * 5 example.txt 12
 	 * Expected Output:
 	 * IP address is output to user
 	 * Invalid Output:
