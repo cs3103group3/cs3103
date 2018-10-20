@@ -1,12 +1,12 @@
-package main.tracker;
+package main.utilities.error;
 
-public enum TrackerErrorMessage {
+public enum ErrorMessage {
     INVALID_COMMAND(0, "Invalid Command");
     
     private final int code;
     private final String message;
     
-    private TrackerErrorMessage(int code, String message) {
+    private ErrorMessage(int code, String message) {
         this.code = code;
         this.message = message;
     }

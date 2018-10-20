@@ -7,6 +7,9 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import main.utilities.command.InterfaceCommand;
+import main.utilities.error.ErrorMessage;
+
 public class HelperThread extends Thread{
 	//Client Socket
 	Socket clientSocket;
@@ -45,19 +48,14 @@ public class HelperThread extends Thread{
 	
 	/**
 	 * This method executes the commands the client requested
-	 * 1) List the Directory
-	 * 2) Search for intended content
-	 * 3) Advertise their chunk for sharing
-	 * 4) Download File
-	 * 5) Exit
 	 */
 	private void doClientCommand(String strCommand) {
-	    TrackerCommand command = TrackerCommand.INVALID;
+	    InterfaceCommand command = InterfaceCommand.INVALID;
 	    try {
 	        int commandCode = Integer.parseInt(strCommand);
-	        command = TrackerCommand.forCode(commandCode);
+	        command = InterfaceCommand.forCode(commandCode);
 	    } catch(NumberFormatException nfe) {
-	        reply.println(TrackerErrorMessage.INVALID_COMMAND.getErrorMessage());
+	        reply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
 	        return;
 	    }
 	    
@@ -65,21 +63,24 @@ public class HelperThread extends Thread{
 		case LIST:
 			//perform list
 			break;
+		case CHANGE_DIRECTORY:
+            //Change directory
+            break;
 		case SEARCH:
 			//perform search
-			break;
-		case ADVERTISE:
-			//perform advertise chunk
 			break;
 		case DOWNLOAD:
 			//perform downloading of file
 			break;
-		case EXIT:
+		case INFORM:
+            //perform downloading of file
+            break;
+		case QUIT:
 			//perform exit
 			break;
 		default:
 			//Error
-			reply.println(TrackerErrorMessage.INVALID_COMMAND.getErrorMessage());
+			reply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
 			return;
 		}
 	}

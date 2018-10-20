@@ -1,5 +1,5 @@
 package main.peer;
 
-public class Server {
+public class Server extends Thread {
 
 }
