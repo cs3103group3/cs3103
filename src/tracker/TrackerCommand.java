@@ -2,11 +2,11 @@ package tracker;
 
 public enum TrackerCommand {
     INVALID(0),
-    EXIT(1),
-    LIST(2), 
-    SEARCH(3),
-    ADVERTISE(4),
-    DOWNLOAD(5);
+    LIST(1), 
+    SEARCH(2),
+    ADVERTISE(3),
+    DOWNLOAD(4),
+    EXIT(5);
     
     
     private final int code;
