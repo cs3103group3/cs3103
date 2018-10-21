@@ -6,7 +6,7 @@ public enum OfflineInterfaceCommand {
     EMPTY_RECORD(2, "Directory List is empty"),
     INVALID_FILENAME(3, "Unable to find file requested"),
     VALID_FILENAME(4, "Found file requested"),
-    QUIT(3, "Quit");
+    QUIT(5, "Quit");
     
     private final int code;
     private final String text;
