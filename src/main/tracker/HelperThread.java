@@ -25,6 +25,9 @@ public class HelperThread extends Thread{
 	//Hash table of fileName to its records of users
 	//E.g. fileOne as key to ArrayList of fileOne chunks
 	private Hashtable<String, ArrayList<Record>> recordList = Tracker.recordTable;
+	
+	private static final String INVALID_CHUNK = "-1";
+	private static boolean FOUND_IP = true;
 	public HelperThread() {
 
 	}
@@ -97,7 +100,7 @@ public class HelperThread extends Thread{
 			break;
 		case QUIT:
 			//perform exit
-			exitServer();
+			exitServer(strCommandArr);
 			break;
 		default:
 			//Error
@@ -128,7 +131,8 @@ public class HelperThread extends Thread{
 				result += "\n";
 			}
 			reply.write(result);
-			
+			reply.flush();
+
 		}
 	}
 
@@ -174,8 +178,10 @@ public class HelperThread extends Thread{
 		}
 		if(foundFile) {
 			reply.write(OfflineInterfaceCommand.VALID_FILENAME.getCommandText());
+			reply.flush();
 		} else {
 			reply.write(OfflineInterfaceCommand.INVALID_FILENAME.getCommandText());
+			reply.flush();
 		}
 	}
 
@@ -196,9 +202,9 @@ public class HelperThread extends Thread{
 		String ipBroadcasted = strCommandArr[1];
 		String fileBroadcasted = strCommandArr[2];
 		String chunkBroadcasted = strCommandArr[3];
-		
+
 		boolean hasExist =	checkExistFile(fileBroadcasted);
-		
+
 		//If file already exists, simply add the chunk to it
 		if(hasExist) {
 			//Obtain the arraylist to update first
@@ -206,9 +212,12 @@ public class HelperThread extends Thread{
 			//Add new Record
 			Record addToExist = new Record(ipBroadcasted, chunkBroadcasted);
 			currArrFile.add(addToExist);
-			
+
 			//Replace the HashTable with updated data
 			recordList.replace(fileBroadcasted, currArrFile);
+
+			reply.println("File has been successfully added to Server");
+			reply.flush();
 		} else {
 			//Create a new Record
 			Record newRecord = new Record(ipBroadcasted, chunkBroadcasted);
@@ -217,10 +226,17 @@ public class HelperThread extends Thread{
 			//Add new Record
 			newArrFile.add(newRecord);
 			recordList.put(fileBroadcasted, newArrFile);
+			reply.println("New File has been successfully added to Server");
+			reply.flush();
 		}
 
 	}
-	
+
+	/**
+	 * This method checks if a file exists within the server
+	 * @param fileBroadcasted
+	 * @return
+	 */
 	private boolean checkExistFile(String fileBroadcasted) {
 		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
 		boolean foundFile = false;
@@ -240,37 +256,168 @@ public class HelperThread extends Thread{
 	 * @param strCommandArr
 	 * 
 	 * Format of Input:
-	 * 5 fileName chunkNumber
+	 * 5 fileName <optional chunk No>
 	 * 
 	 * Example Input:
-	 * 5 example.txt 12
+	 * 5 example.txt
 	 * Expected Output:
-	 * IP address is output to user
+	 * IP addresses are output to user
 	 * Invalid Output:
 	 * Unable to find specific file or chunk
 	 * 
 	 */
 	private synchronized void findPeer(String[] strCommandArr) {
+		String requestedFileName = strCommandArr[1];
 
 
+		if(strCommandArr.length <= 1) {
+			reply.print("Invalid Arguments");
+			reply.flush();
+		}
+		boolean fileExist = checkExistFile(requestedFileName);
+		
+		//If no chunk Size is Specified
+		if(strCommandArr.length < 2) {
+			if(fileExist) {
+				//Obtain the ArrayList of Entry associated with key of requestedFileName
+				ArrayList<Record> requestedChunks = recordList.get(requestedFileName);
+				
+				String requestedData = "";
+				for(int i =0 ; i < requestedChunks.size() ; i ++) {
+					requestedData += requestedChunks.get(i).getipAdd();
+					requestedData += ",";
+					requestedData += requestedChunks.get(i).getChunkNo();
+					requestedData += "\n";
+				}
+				
+				reply.write(requestedData);
+				reply.flush();
+				
+			} else {
+				reply.println("File Requested does not Exists");
+				reply.flush();
+			}
+		} else {
+			//Chunk is Specified
+			//Expected Reply is only ip address of requested chunk of file name
+			if(fileExist) {
+				String chunkNumber = strCommandArr[2];
+				
+				String requestedIP = findRequestedIP(requestedFileName, chunkNumber);
+				
+				if(requestedIP.equals(INVALID_CHUNK)) { 
+					reply.println("Chunk of File Name Specified is invalid");
+					reply.flush();
+				} else {
+					reply.write(requestedIP);
+					reply.flush();
+				}
+				
+			} else {
+				reply.println("File Requested does not Exists");
+				reply.flush();
+			}
+		}
+
+	}
+	/**
+	 * Finds the requested IP by checking with the file name and/or chunk number
+	 * @param requestedFileName: requested File Name by the user
+	 * @param chunkNumber: optional chunk number input
+	 * @return ipAddress/es of requested fileName
+	 */
+	private String findRequestedIP(String requestedFileName, String chunkNumber) {
+		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
+		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
+			//File Name Matches and chunk Number Matches
+			if(requestedFileName.equals(entry2.getKey())) {
+				boolean foundChunk = false;
+				ArrayList<Record> requestedFileArr = entry2.getValue();
+				
+				int i = 0;
+				for(i=0 ; i < requestedFileArr.size(); i ++) {
+					if(chunkNumber.equals(requestedFileArr.get(i).getChunkNo())) {
+						foundChunk = true;
+						break;
+					}
+				}
+				if(foundChunk) {
+					String requestedIP = requestedFileArr.get(i).getipAdd();
+					return requestedIP;
+				}
+				
+				return INVALID_CHUNK;
+			}
+		}
+		return INVALID_CHUNK;
 	}
 
 	/**
 	 * Exits the server
 	 * 
 	 * Example Input:
-	 * 6
+	 * 6 192.168.1.12
 	 * 
 	 * Expected Output:
 	 * You have exited the server
 	 * 
 	 * Note:
 	 * 1) Have to delete the fileName/chunk listed in the central server
+	 * @param strCommandArr 
 	 */
-	private void exitServer() {
+	private void exitServer(String[] strCommandArr) {
+		String ipAddress = strCommandArr[1];
 		
-
+		if(strCommandArr.length != 2) {
+			reply.println("Invalid Arguments");
+		} else {
+			boolean ipExists = checkIPExists(ipAddress);
+			if(ipExists) {
+				deleteAllRecords(ipAddress);
+				reply.write("Exited and Deleted Successfully");
+				reply.flush();
+			} else {
+				reply.println("Invalid IP address");
+				reply.flush();
+			}
+		}
 	}
-
-
+	
+	/**
+	 * This method checks whether the ip address exists within the central directory server
+	 * @param ipAddress: ip address to check
+	 * @return
+	 */
+	private boolean checkIPExists(String ipAddress) {
+		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
+		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
+			ArrayList<Record> currArr = entry2.getValue();
+			for(int i = 0; i < currArr.size(); i ++) {
+				if(currArr.get(i).getipAdd().equals(ipAddress)) {
+					return FOUND_IP;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * This method deletes all the relevant
+	 * records associated with the ip address that is leaving
+	 * @param ipAddress: ip address that is exiting
+	 * 
+	 */
+	private void deleteAllRecords(String ipAddress) {
+		//First find all the entries that contains the associated ip address
+		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
+		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
+			ArrayList<Record> currArr = entry2.getValue();
+			for(int i = 0; i < currArr.size(); i ++) {
+				if(currArr.get(i).getipAdd().equals(ipAddress)) {
+					//Removes the respective ip address in the respective arraylist
+					entry2.getValue().remove(i);
+				}
+			}
+		}
+	}
 }
