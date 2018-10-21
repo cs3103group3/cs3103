@@ -23,6 +23,7 @@ public class HelperThread extends Thread{
 	PrintWriter reply = null;
 
 	//Hash table of fileName to its records of users
+	//E.g. fileOne as key to ArrayList of fileOne chunks
 	private Hashtable<String, ArrayList<Record>> recordList = Tracker.recordTable;
 	public HelperThread() {
 
@@ -191,17 +192,37 @@ public class HelperThread extends Thread{
 	 * 1) Might need to check if IP is valid
 	 * 2) Might need to check if fileName is valid
 	 */
-	private synchronized void informServer(String[] strCommandArr, Hashtable<String, ArrayList<Record>> currentList) {
+	private synchronized void informServer(String[] strCommandArr) {
 		String ipBroadcasted = strCommandArr[1];
 		String fileBroadcasted = strCommandArr[2];
 		String chunkBroadcasted = strCommandArr[3];
 		
-		boolean hasExist =	checkExistFile(fileBroadcasted, currentList);
+		boolean hasExist =	checkExistFile(fileBroadcasted);
+		
+		//If file already exists, simply add the chunk to it
+		if(hasExist) {
+			//Obtain the arraylist to update first
+			ArrayList<Record> currArrFile = recordList.get(fileBroadcasted);
+			//Add new Record
+			Record addToExist = new Record(ipBroadcasted, chunkBroadcasted);
+			currArrFile.add(addToExist);
+			
+			//Replace the HashTable with updated data
+			recordList.replace(fileBroadcasted, currArrFile);
+		} else {
+			//Create a new Record
+			Record newRecord = new Record(ipBroadcasted, chunkBroadcasted);
+			//Create a new ArrayList
+			ArrayList<Record> newArrFile = new ArrayList<Record>();
+			//Add new Record
+			newArrFile.add(newRecord);
+			recordList.put(fileBroadcasted, newArrFile);
+		}
 
 	}
 	
-	private boolean checkExistFile(String fileBroadcasted, Hashtable<String, ArrayList<Record>> currentList) {
-		Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
+	private boolean checkExistFile(String fileBroadcasted) {
+		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
 		boolean foundFile = false;
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			if(fileBroadcasted.equals(entry2.getKey())) {
@@ -247,7 +268,7 @@ public class HelperThread extends Thread{
 	 * 1) Have to delete the fileName/chunk listed in the central server
 	 */
 	private void exitServer() {
-
+		
 
 	}
 
