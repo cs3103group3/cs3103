@@ -45,7 +45,7 @@ public class Client extends Thread {
         String destAddr = sc.nextLine();
         System.out.println("Enter port number:");
         int destPort = sc.nextInt();
-        sc.close();
+     
         
         try {
             DatagramSocket clientSocket = new DatagramSocket();
