@@ -25,7 +25,7 @@ public enum InterfaceCommand {
         return this.text;
     }
     
-    // Map a int value to its corresponding enum value
+    // Returns the corresponding enum value by checking the code value of type int
     public static InterfaceCommand forCode(int code) {
         for (InterfaceCommand type : InterfaceCommand.values()) {
             if (type.getCommandCode() == code) {

@@ -15,17 +15,18 @@ public class Tracker{
 
 	public final static int SERVER_LISTENING_PORT = 7878;
 	ServerSocket serverSocket;
+	
 	//ArrayList of all the files with unique names
 	public static ArrayList<Record> fileArrList = new ArrayList<>();
 
 	//To allow faster access, use a hash : fileName to its associated chunks
 	public static Hashtable<String, ArrayList<Record>> recordTable = new Hashtable<>();
-	//Another Hash to pinpoint location of the record
+	
+	//TODO: Another Hash to pinpoint location of the record
 	
 
 	public void main(String[] args) {
 		System.out.println("Starting Server");
-
 
 		//Starts new instance of server
 		try {
