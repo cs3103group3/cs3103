@@ -3,7 +3,7 @@ package test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import main.utilities.command.InterfaceCommand;;
+import main.utilities.commands.InterfaceCommand;;
 
 class InterfaceCommandTest {
 

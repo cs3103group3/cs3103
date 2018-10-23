@@ -4,10 +4,10 @@ import java.util.Scanner;
 import java.io.IOException;
 import java.net.*;
 
-import main.utilities.command.OfflineInterfaceCommand;
-import main.utilities.command.InterfaceCommand;
-import main.utilities.error.ErrorMessage;
-
+import main.utilities.commands.InterfaceCommand;
+import main.utilities.commands.OfflineInterfaceCommand;
+import main.utilities.errors.ErrorMessage;
+import main.utilities.constants.NetworkConstant;
 import main.message.*;
 
 public class Client extends Thread {
@@ -55,7 +55,7 @@ public class Client extends Thread {
             Message msg = new Message(MessageType.CONNECTION_REQUEST, "192.168.125.1", 90, destAddr, destPort, byteArr);
             
             byte[] sendData = Message.serializeMessage(msg);
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 7878);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, NetworkConstant.TRACKER_LISTENING_PORT);
             clientSocket.send(sendPacket);
             
             
