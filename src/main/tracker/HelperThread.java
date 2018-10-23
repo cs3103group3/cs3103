@@ -32,7 +32,7 @@ public class HelperThread extends Thread{
 
 	}
 	public HelperThread(Socket client) {
-		clientSocket = client;
+		this.clientSocket = client;
 	}
 
 	@Override
@@ -42,17 +42,23 @@ public class HelperThread extends Thread{
 		String clientInput = "";
 		try {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			reply = new PrintWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
+		//	reply = new PrintWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
 
+			reply = new PrintWriter(clientSocket.getOutputStream(), true);
+			
 			while(threadRunning) {
 				clientInput = in.readLine();
+
 				System.out.println("Client has entered command: " + clientInput);
+				if(clientInput.equals("Init test message")) {
+					reply.println("\tWelcome");
+				}
 				if(!clientInput.equals("")) {
 					break;
 				}
 			}
 
-			doClientCommand(clientInput);
+			doClientCommand(clientInput, reply);
 		} catch (IOException e) {
 			System.out.println("Io Exception");
 
@@ -61,8 +67,9 @@ public class HelperThread extends Thread{
 
 	/**
 	 * This method executes the commands the client requested
+	 * @param reply2 
 	 */
-	private void doClientCommand(String strCommand) {
+	private void doClientCommand(String strCommand, PrintWriter currentReply) {
 		InterfaceCommand command = InterfaceCommand.INVALID;
 		String [] strCommandArr;
 		try {
@@ -71,7 +78,7 @@ public class HelperThread extends Thread{
 			int commandCode = Integer.parseInt(strCommandArr[0]);
 			command = InterfaceCommand.forCode(commandCode);
 		} catch(NumberFormatException nfe) {
-			reply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+			currentReply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
 			return;
 		}
 
@@ -80,31 +87,31 @@ public class HelperThread extends Thread{
 		switch(command) {
 			case LIST:
 				//perform list
-				listDirectoryEntry(recordList);
+				listDirectoryEntry(recordList, currentReply);
 				break;
 			case CHANGE_DIRECTORY:
 				//Change directory
-				changeDirectory(strCommandArr);
+				changeDirectory(strCommandArr, currentReply);
 				break;
 			case SEARCH:
 				//perform search
-				searchEntry(strCommandArr, recordList);
+				searchEntry(strCommandArr, recordList, currentReply);
 				break;
 			case DOWNLOAD:
 				//Finds peer to download the file requested
-				findPeer(strCommandArr);
+				findPeer(strCommandArr, currentReply);
 				break;
 			case INFORM:
 				//Update the server of newly advertised chunk of file
-				informServer(strCommandArr);
+				informServer(strCommandArr, currentReply);
 				break;
 			case QUIT:
 				//perform exit
-				exitServer(strCommandArr);
+				exitServer(strCommandArr, currentReply);
 				break;
 			default:
 				//Error
-				reply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+				currentReply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
 				return;
 		}
 	}
@@ -118,10 +125,10 @@ public class HelperThread extends Thread{
 	 * Expected Output:
 	 * Directory Entry
 	 */
-	private synchronized void listDirectoryEntry(Hashtable<String, ArrayList<Record>> currentList) {
+	private synchronized void listDirectoryEntry(Hashtable<String, ArrayList<Record>> currentList, PrintWriter currentReply) {
 
 		if(currentList.isEmpty()) {
-			reply.println(OfflineInterfaceCommand.EMPTY_RECORD);
+			currentReply.println(OfflineInterfaceCommand.EMPTY_RECORD);
 		} else {
 			String result = "";
 			Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
@@ -130,14 +137,14 @@ public class HelperThread extends Thread{
 				result += entry1.getKey();
 				result += "\n";
 			}
-			reply.write(result);
-			reply.flush();
-
+			currentReply.write(result);
+			currentReply.flush();
 		}
 	}
 
 	/**
 	 * Changes the directory entry
+	 * @param currentReply 
 	 * @param strCommandArr: the Array of command by client that has been split
 	 * 
 	 * Example Input:
@@ -146,7 +153,7 @@ public class HelperThread extends Thread{
 	 * Directory Changed to '/FolderTwo'
 	 * Then calls listDirectoryEntry again
 	 */
-	private synchronized void changeDirectory(String[] strCommandArr) {
+	private synchronized void changeDirectory(String[] strCommandArr, PrintWriter currentReply) {
 
 
 	}
@@ -154,6 +161,7 @@ public class HelperThread extends Thread{
 
 	/**
 	 * Search Entry by the following
+	 * @param currentReply 
 	 * @param strCommandArr:  the Array of command by client that has been split
 	 * 1) FileName
 	 * 2) Chunk Number
@@ -166,7 +174,7 @@ public class HelperThread extends Thread{
 	 * Invalid Output:
 	 * "Invalid fileName or Chunk Number specified"
 	 */
-	private synchronized void searchEntry(String[] strCommandArr, Hashtable<String, ArrayList<Record>> currentList) {
+	private synchronized void searchEntry(String[] strCommandArr, Hashtable<String, ArrayList<Record>> currentList, PrintWriter currentReply) {
 		String fileRequested = strCommandArr[1];
 		boolean foundFile = false;
 		Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
@@ -177,11 +185,11 @@ public class HelperThread extends Thread{
 			}
 		}
 		if(foundFile) {
-			reply.write(OfflineInterfaceCommand.VALID_FILENAME.getCommandText());
-			reply.flush();
+			currentReply.write(OfflineInterfaceCommand.VALID_FILENAME.getCommandText());
+			currentReply.flush();
 		} else {
-			reply.write(OfflineInterfaceCommand.INVALID_FILENAME.getCommandText());
-			reply.flush();
+			currentReply.write(OfflineInterfaceCommand.INVALID_FILENAME.getCommandText());
+			currentReply.flush();
 		}
 	}
 
@@ -197,8 +205,9 @@ public class HelperThread extends Thread{
 	 * Notes:
 	 * 1) Might need to check if IP is valid
 	 * 2) Might need to check if fileName is valid
+	 * @param currentReply 
 	 */
-	private synchronized void informServer(String[] strCommandArr) {
+	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipBroadcasted = strCommandArr[1];
 		String fileBroadcasted = strCommandArr[2];
 		String chunkBroadcasted = strCommandArr[3];
@@ -216,8 +225,8 @@ public class HelperThread extends Thread{
 			//Replace the HashTable with updated data
 			recordList.replace(fileBroadcasted, currArrFile);
 
-			reply.println("File has been successfully added to Server");
-			reply.flush();
+			currentReply.println("File has been successfully added to Server");
+			currentReply.flush();
 		} else {
 			//Create a new Record
 			Record newRecord = new Record(ipBroadcasted, chunkBroadcasted);
@@ -226,8 +235,8 @@ public class HelperThread extends Thread{
 			//Add new Record
 			newArrFile.add(newRecord);
 			recordList.put(fileBroadcasted, newArrFile);
-			reply.println("New File has been successfully added to Server");
-			reply.flush();
+			currentReply.println("New File has been successfully added to Server");
+			currentReply.flush();
 		}
 
 	}
@@ -264,15 +273,16 @@ public class HelperThread extends Thread{
 	 * IP addresses are output to user
 	 * Invalid Output:
 	 * Unable to find specific file or chunk
+	 * @param currentReply 
 	 * 
 	 */
-	private synchronized void findPeer(String[] strCommandArr) {
+	private synchronized void findPeer(String[] strCommandArr, PrintWriter currentReply) {
 		String requestedFileName = strCommandArr[1];
 
 
 		if(strCommandArr.length <= 1) {
-			reply.print("Invalid Arguments");
-			reply.flush();
+			currentReply.print("Invalid Arguments");
+			currentReply.flush();
 		}
 		boolean fileExist = checkExistFile(requestedFileName);
 		
@@ -290,12 +300,12 @@ public class HelperThread extends Thread{
 					requestedData += "\n";
 				}
 				
-				reply.write(requestedData);
-				reply.flush();
+				currentReply.write(requestedData);
+				currentReply.flush();
 				
 			} else {
-				reply.println("File Requested does not Exists");
-				reply.flush();
+				currentReply.println("File Requested does not Exists");
+				currentReply.flush();
 			}
 		} else {
 			//Chunk is Specified
@@ -306,16 +316,16 @@ public class HelperThread extends Thread{
 				String requestedIP = findRequestedIP(requestedFileName, chunkNumber);
 				
 				if(requestedIP.equals(INVALID_CHUNK)) { 
-					reply.println("Chunk of File Name Specified is invalid");
-					reply.flush();
+					currentReply.println("Chunk of File Name Specified is invalid");
+					currentReply.flush();
 				} else {
-					reply.write(requestedIP);
-					reply.flush();
+					currentReply.write(requestedIP);
+					currentReply.flush();
 				}
 				
 			} else {
-				reply.println("File Requested does not Exists");
-				reply.flush();
+				currentReply.println("File Requested does not Exists");
+				currentReply.flush();
 			}
 		}
 
@@ -364,21 +374,22 @@ public class HelperThread extends Thread{
 	 * Note:
 	 * 1) Have to delete the fileName/chunk listed in the central server
 	 * @param strCommandArr 
+	 * @param currentReply 
 	 */
-	private void exitServer(String[] strCommandArr) {
+	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipAddress = strCommandArr[1];
 		
 		if(strCommandArr.length != 2) {
-			reply.println("Invalid Arguments");
+			currentReply.println("Invalid Arguments");
 		} else {
 			boolean ipExists = checkIPExists(ipAddress);
 			if(ipExists) {
 				deleteAllRecords(ipAddress);
-				reply.write("Exited and Deleted Successfully");
-				reply.flush();
+				currentReply.write("Exited and Deleted Successfully");
+				currentReply.flush();
 			} else {
-				reply.println("Invalid IP address");
-				reply.flush();
+				currentReply.println("Invalid IP address");
+				currentReply.flush();
 			}
 		}
 	}
