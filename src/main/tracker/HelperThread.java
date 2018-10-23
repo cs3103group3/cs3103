@@ -78,34 +78,34 @@ public class HelperThread extends Thread{
 
 		//Calls method that is required to execute the user's command
 		switch(command) {
-		case LIST:
-			//perform list
-			listDirectoryEntry(recordList);
-			break;
-		case CHANGE_DIRECTORY:
-			//Change directory
-			changeDirectory(strCommandArr);
-			break;
-		case SEARCH:
-			//perform search
-			searchEntry(strCommandArr, recordList);
-			break;
-		case DOWNLOAD:
-			//Finds peer to download the file requested
-			findPeer(strCommandArr);
-			break;
-		case INFORM:
-			//Update the server of newly advertised chunk of file
-			informServer(strCommandArr);
-			break;
-		case QUIT:
-			//perform exit
-			exitServer(strCommandArr);
-			break;
-		default:
-			//Error
-			reply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
-			return;
+			case LIST:
+				//perform list
+				listDirectoryEntry(recordList);
+				break;
+			case CHANGE_DIRECTORY:
+				//Change directory
+				changeDirectory(strCommandArr);
+				break;
+			case SEARCH:
+				//perform search
+				searchEntry(strCommandArr, recordList);
+				break;
+			case DOWNLOAD:
+				//Finds peer to download the file requested
+				findPeer(strCommandArr);
+				break;
+			case INFORM:
+				//Update the server of newly advertised chunk of file
+				informServer(strCommandArr);
+				break;
+			case QUIT:
+				//perform exit
+				exitServer(strCommandArr);
+				break;
+			default:
+				//Error
+				reply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+				return;
 		}
 	}
 

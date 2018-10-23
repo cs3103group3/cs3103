@@ -78,15 +78,15 @@ public class Client extends Thread {
         hasQuit = false;
         
         switch(command) {
-        case CONNECT_TO_TRACKER:
-            connectToTracker();
-            return;
-        case QUIT:
-            quit();
-            return;
-        default:
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
-            return;
+	        case CONNECT_TO_TRACKER:
+	            connectToTracker();
+	            return;
+	        case QUIT:
+	            quit();
+	            return;
+	        default:
+	            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+	            return;
         }
     }
 
@@ -100,28 +100,28 @@ public class Client extends Thread {
         hasQuit = false;
         
         switch(command) {
-        case LIST:
-            list();
-            return;
-        case CHANGE_DIRECTORY:
-            changeDirectory();
-            return;
-        case SEARCH:
-            search();
-            return;
-        case DOWNLOAD:
-            download();
-            return;
-        case INFORM:
-            inform();
-            return;
-        case QUIT:
-            quit();
-            return;
-        default:
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
-            return;
-        }
+	        case LIST:
+	            list();
+	            return;
+	        case CHANGE_DIRECTORY:
+	            changeDirectory();
+	            return;
+	        case SEARCH:
+	            search();
+	            return;
+	        case DOWNLOAD:
+	            download();
+	            return;
+	        case INFORM:
+	            inform();
+	            return;
+	        case QUIT:
+	            quit();
+	            return;
+	        default:
+	            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+	            return;
+	        }
     }
     
     private void list() {
