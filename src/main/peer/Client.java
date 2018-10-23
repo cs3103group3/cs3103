@@ -45,17 +45,17 @@ public class Client extends Thread {
         String destAddr = sc.nextLine();
         System.out.println("Enter port number:");
         int destPort = sc.nextInt();
-        sc.close();
+     
         
         try {
             DatagramSocket clientSocket = new DatagramSocket();
             InetAddress IPAddress = InetAddress.getByName(destAddr);
             
             byte[] byteArr = "PLACEHOLDER_DATA".getBytes();
-            Message msg = new Message(MessageType.CONNECTION_REQUEST, "192.168.1.6", 90, destAddr, destPort, byteArr);
+            Message msg = new Message(MessageType.CONNECTION_REQUEST, "192.168.125.1", 90, destAddr, destPort, byteArr);
             
             byte[] sendData = Message.serializeMessage(msg);
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 7878);
             clientSocket.send(sendPacket);
             
             

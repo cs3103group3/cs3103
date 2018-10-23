@@ -14,8 +14,8 @@ import java.util.Hashtable;
 public class Tracker{
 
 	public final static int SERVER_LISTENING_PORT = 7878;
-	ServerSocket serverSocket;
-	
+	static ServerSocket serverSocket;
+
 	//ArrayList of all the files with unique names
 	public static ArrayList<Record> fileArrList = new ArrayList<>();
 
@@ -25,7 +25,7 @@ public class Tracker{
 	//TODO: Another Hash to pinpoint location of the record
 	
 
-	public void main(String[] args) {
+	public static void main(String[] args) {
 		System.out.println("Starting Server");
 
 		//Starts new instance of server
@@ -39,7 +39,7 @@ public class Tracker{
 		listenRequest();
 	}
 
-	private void listenRequest() {
+	private static void listenRequest() {
 		//While server is still alive
 		while(true) {
 			try {
