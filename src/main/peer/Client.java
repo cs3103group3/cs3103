@@ -75,10 +75,10 @@ public class Client extends Thread {
     }
     
     private void list() throws UnknownHostException, IOException {
-        Socket clientSocket = new Socket("localhost", NetworkConstant.TRACKER_LISTENING_PORT);
+        Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(InterfaceCommand.LIST.toString());
+        out.println(InterfaceCommand.LIST.getCommandCode());
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -98,10 +98,10 @@ public class Client extends Thread {
         
         String filePath = userInputArr[1];
         
-        Socket clientSocket = new Socket("192.168.1.6", NetworkConstant.TRACKER_LISTENING_PORT);
+        Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(InterfaceCommand.SEARCH.toString() + " " +filePath);
+        out.println(InterfaceCommand.SEARCH.getCommandCode() + " " +filePath);
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
