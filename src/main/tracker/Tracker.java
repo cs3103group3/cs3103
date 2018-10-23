@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import main.utilities.constants.NetworkConstant;
+
 /**
  * This class acts as the main class for a central directory server
  * @author cs3103 group 3
@@ -13,7 +15,7 @@ import java.util.Hashtable;
  */
 public class Tracker{
 
-	public final static int SERVER_LISTENING_PORT = 7878;
+	public final static int TRACKER_LISTENING_PORT = 7878;
 	static ServerSocket serverSocket;
 
 	//ArrayList of all the files with unique names
@@ -30,7 +32,7 @@ public class Tracker{
 
 		//Starts new instance of server
 		try {
-			serverSocket = new ServerSocket(SERVER_LISTENING_PORT);
+			serverSocket = new ServerSocket(TRACKER_LISTENING_PORT);
 		} catch(IOException ioe) {
 			System.out.println("Unable to create Server Socket");
 			System.exit(1);

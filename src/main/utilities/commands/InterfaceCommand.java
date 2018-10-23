@@ -1,4 +1,4 @@
-package main.utilities.command;
+package main.utilities.commands;
 
 public enum InterfaceCommand {
     INVALID(0, "Invalid Command. Please try again."),

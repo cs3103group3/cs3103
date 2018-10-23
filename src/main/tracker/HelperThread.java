@@ -11,9 +11,9 @@ import java.util.Hashtable;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import main.utilities.command.InterfaceCommand;
-import main.utilities.command.OfflineInterfaceCommand;
-import main.utilities.error.ErrorMessage;
+import main.utilities.commands.InterfaceCommand;
+import main.utilities.commands.OfflineInterfaceCommand;
+import main.utilities.errors.ErrorMessage;
 
 public class HelperThread extends Thread{
 	//Client Socket
