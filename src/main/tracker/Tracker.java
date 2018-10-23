@@ -47,8 +47,9 @@ public class Tracker{
 			try {
 				Socket clientSocket = serverSocket.accept();
 
-				HelperThread helperRequest = new HelperThread(clientSocket);
-				helperRequest.run();
+				System.out.println("Accepted a client");
+				Thread helperRequest = new HelperThread(clientSocket);
+				helperRequest.start();
 			} catch(IOException ioe) {
 				System.out.println("Error in creating listening socket");
 				System.exit(1);
