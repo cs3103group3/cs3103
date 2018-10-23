@@ -2,8 +2,8 @@ package main.peer;
 
 import java.util.Scanner;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.*;
 import java.io.IOException;
 
@@ -31,7 +31,6 @@ public class Client extends Thread {
         String userInput = sc.nextLine().trim();
         String[] userInputArr = userInput.split(" ");
         String userSelectedOption = userInputArr[0];
-        String arg = userInputArr[1];
         
         InterfaceCommand command = InterfaceCommand.INVALID;
         try {
@@ -50,7 +49,7 @@ public class Client extends Thread {
                     changeDirectory();
                     return true;
                 case SEARCH:
-                    search(arg);
+                    search(userInputArr);
                     return true;
                 case DOWNLOAD:
                     download();
@@ -69,19 +68,21 @@ public class Client extends Thread {
             System.out.println(ErrorMessage.UNKNOWN_HOST.getErrorMessage());
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println(ErrorMessage.UNKNOWN_ERROR.getErrorMessage());
+            e.printStackTrace();
             return true;  // So as not to quit the program, proceed as normal
         }        
     }
     
     private void list() throws UnknownHostException, IOException {
-        Socket clientSocket = new Socket("localhost", NetworkConstant.CLIENT_LISTENING_PORT);
-        DataOutputStream os = new DataOutputStream(clientSocket.getOutputStream());
-        os.writeBytes(InterfaceCommand.LIST.toString());
-        BufferedReader is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String reply = is.readLine();
-        System.out.println(reply);
+        Socket clientSocket = new Socket("localhost", NetworkConstant.TRACKER_LISTENING_PORT);
+        
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        out.println(InterfaceCommand.LIST.toString());
+        out.flush();
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        System.out.println(in.readLine());
         clientSocket.close();
     }
     
@@ -89,13 +90,22 @@ public class Client extends Thread {
         
     }
     
-    private void search(String filepath) throws Exception {
-        Socket clientSocket = new Socket("localhost", NetworkConstant.CLIENT_LISTENING_PORT);
-        DataOutputStream os = new DataOutputStream(clientSocket.getOutputStream());
-        os.writeBytes(InterfaceCommand.SEARCH.toString());
-        BufferedReader is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String reply = is.readLine();
-        System.out.println(reply);
+    private void search(String[] userInputArr) throws Exception {
+        if (userInputArr.length != 2) {
+            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            return;
+        }
+        
+        String filePath = userInputArr[1];
+        
+        Socket clientSocket = new Socket("192.168.1.6", NetworkConstant.TRACKER_LISTENING_PORT);
+        
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        out.println(InterfaceCommand.SEARCH.toString() + " " +filePath);
+        out.flush();
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        System.out.println(in.readLine());
         clientSocket.close();
     }
     
