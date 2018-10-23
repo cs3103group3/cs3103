@@ -1,4 +1,4 @@
-package main.utilities.error;
+package main.utilities.errors;
 
 public enum ErrorMessage {
     INVALID_COMMAND(0, "Invalid Command"),
