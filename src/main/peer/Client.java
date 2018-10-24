@@ -100,7 +100,7 @@ public class Client extends Thread {
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(InterfaceCommand.SEARCH.getCommandCode() + WHITESPACE + filePath);
+        out.println(InterfaceCommand.SEARCH.getCommandCode() + Constant.WHITESPACE + filePath);
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -119,7 +119,7 @@ public class Client extends Thread {
     	Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + WHITESPACE + fileName);
+        out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + Constant.WHITESPACE + fileName);
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
