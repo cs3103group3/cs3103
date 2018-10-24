@@ -139,19 +139,27 @@ public class Client extends Thread {
         	peers.add(new Record(data[0], data[1]));
         }
         
-        downloadFromEachPeer(peers);
+        downloadFromEachPeer(peers, fileName);
     }
     
-    private void downloadFromEachPeer(ArrayList<Record> peers){
+    private void downloadFromEachPeer(ArrayList<Record> peers, String fileName){
     	System.out.println("Connecting to each P2P Server");
 
         for(int i=0;i<peers.size();i++){
         	//Starts new instance of server
     		try {
-    			Socket peerSocket = new Socket(NetworkConstant.SERVER_HOSTNAME, NetworkConstant.SERVER_LISTENING_PORT);
-    			
+    			Socket socket = new Socket(NetworkConstant.SERVER_HOSTNAME, NetworkConstant.SERVER_LISTENING_PORT);
+    	        
+    	        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+    	        out.println(fileName + "," + peers.get(i).getChunkNo());
+    	        out.flush();
+    	        
+    	        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    	        String result = in.readLine();
+    	        System.out.println(result);
+    	        socket.close();
     		} catch(IOException ioe) {
-    			System.out.println("Unable to create Server Socket");
+    			System.out.println("Unable to create Server Socket at Peer Client");
     			System.exit(1);
     		}
         }

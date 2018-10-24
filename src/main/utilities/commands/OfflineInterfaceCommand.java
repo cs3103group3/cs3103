@@ -5,6 +5,8 @@ public enum OfflineInterfaceCommand {
     CONNECT_TO_TRACKER(1, "Connect to Centralised Directory Server"), 
     EMPTY_RECORD(2, "Directory List is empty"),
     INVALID_FILENAME(3, "Unable to find file requested"),
+    VALID_DOWNLOAD(3, "Unable to download file requested"),
+    INVALID_DOWNLOAD(3, "Unable to download file requested"),
     VALID_FILENAME(4, "Found file requested"),
     QUIT(5, "Quit");
     
