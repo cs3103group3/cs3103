@@ -89,10 +89,6 @@ public class HelperThread extends Thread{
 				//perform list
 				listDirectoryEntry(recordList, currentReply);
 				break;
-			case CHANGE_DIRECTORY:
-				//Change directory
-				changeDirectory(strCommandArr, currentReply);
-				break;
 			case SEARCH:
 				//perform search
 				searchEntry(strCommandArr, recordList, currentReply);
@@ -141,23 +137,6 @@ public class HelperThread extends Thread{
 			currentReply.flush();
 		}
 	}
-
-	/**
-	 * Changes the directory entry
-	 * @param currentReply 
-	 * @param strCommandArr: the Array of command by client that has been split
-	 * 
-	 * Example Input:
-	 * 2 /FolderTwo
-	 * Expected Output:
-	 * Directory Changed to '/FolderTwo'
-	 * Then calls listDirectoryEntry again
-	 */
-	private synchronized void changeDirectory(String[] strCommandArr, PrintWriter currentReply) {
-
-
-	}
-
 
 	/**
 	 * Search Entry by the following

@@ -9,7 +9,6 @@ public class Record {
 	
 	String ipAddress;
 	String chunkNumber;
-	//TODO: Add checksum
 	
 	public Record(String ipAdd, String chunkNo) {
 		this.ipAddress = ipAdd;
