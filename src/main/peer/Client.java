@@ -29,7 +29,7 @@ public class Client extends Thread {
         Scanner sc = new Scanner(System.in);
         String userInput = sc.nextLine().trim();
         String[] userInputArr = userInput.split(" ");
-        String userSelectedOption = userInputArr[0];
+        String userSelectedOption = userInputArr[0].trim();
         
         InterfaceCommand command = InterfaceCommand.INVALID;
         try {
@@ -111,10 +111,10 @@ public class Client extends Thread {
             return;
         }
         
-        String fileName = userInputArr[0];
-        String chunkNumber = userInputArr[1];
+        String fileName = userInputArr[0].trim();
+        String chunkNumber = userInputArr[1].trim();
         
-        String sendData = InterfaceCommand.INFORM.getCommandCode() + " " + " " + fileName + " " + chunkNumber;
+        String sendData = InterfaceCommand.INFORM.getCommandCode() + " " + fileName + " " + chunkNumber;
         
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
