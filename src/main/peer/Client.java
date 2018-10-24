@@ -13,17 +13,18 @@ import main.utilities.commands.InterfaceCommand;
 import main.utilities.errors.ErrorMessage;
 import main.utilities.constants.NetworkConstant;
 
-public class Client extends Thread {        
+public class Client extends Thread {
+    public static final String WHITESPACE = " ";
+    
     private static void displayMenu() {
         System.out.println( "===============================================\n" +
                             "Welcome to CS3103 P2P Client\n" +
                             "Choose From the list of actions\n" +
                             "1. " + InterfaceCommand.LIST.getCommandText() + "\n" +
-                            "2. " + InterfaceCommand.CHANGE_DIRECTORY.getCommandText() + "\n" +
-                            "3. " + InterfaceCommand.SEARCH.getCommandText() + "\n" +
-                            "4. " + InterfaceCommand.DOWNLOAD.getCommandText() + "\n" +
-                            "5. " + InterfaceCommand.INFORM.getCommandText() + "\n" +
-                            "6. " + InterfaceCommand.QUIT.getCommandText() + "\n" +
+                            "2. " + InterfaceCommand.SEARCH.getCommandText() + "\n" +
+                            "3. " + InterfaceCommand.DOWNLOAD.getCommandText() + "\n" +
+                            "4. " + InterfaceCommand.INFORM.getCommandText() + "\n" +
+                            "5. " + InterfaceCommand.QUIT.getCommandText() + "\n" +
                             "===============================================\n" + 
                             "Enter your option: ");
     }
@@ -31,8 +32,8 @@ public class Client extends Thread {
     private boolean execute() {
         Scanner sc = new Scanner(System.in);
         String userInput = sc.nextLine().trim();
-        String[] userInputArr = userInput.split(" ");
-        String userSelectedOption = userInputArr[0];
+        String[] userInputArr = userInput.split(WHITESPACE);
+        String userSelectedOption = userInputArr[0].trim();
         
         InterfaceCommand command = InterfaceCommand.INVALID;
         try {
@@ -54,7 +55,7 @@ public class Client extends Thread {
                     download(userInputArr);
                     return true;
                 case INFORM:
-                    inform();
+                    inform(userInputArr);
                     return true;
                 case QUIT:
                     quit();
@@ -156,11 +157,39 @@ public class Client extends Thread {
         }
     }
     
-    private void inform() {
+    private void inform(String[] userInputArr) throws UnknownHostException, IOException {
+        if (userInputArr.length != 3) {
+            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            return;
+        }
         
+        String fileName = userInputArr[1].trim();
+        String chunkNumber = userInputArr[2].trim();
+        
+        String sendData = InterfaceCommand.INFORM.getCommandCode() + WHITESPACE + fileName + WHITESPACE + chunkNumber;
+        
+        Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
+        
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        out.println(sendData);
+        out.flush();
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        System.out.println(in.readLine());
+        clientSocket.close();
     }
     
-    private void quit() {
+    private void quit() throws UnknownHostException, IOException {
+    	//Inform server that it is exiting
+    	Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
+ 
+		PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+		out.println(InterfaceCommand.QUIT.getCommandCode());
+		out.flush();
+		 
+		clientSocket.close();
+         
+		//TODO: close server sockets
         System.out.println("Goodbye!");
     }
         

@@ -3,11 +3,10 @@ package main.utilities.commands;
 public enum InterfaceCommand {
     INVALID(0, "Invalid Command. Please try again."),
     LIST(1, "List all files"), 
-    CHANGE_DIRECTORY(2, "Change Directory"),
-    SEARCH(3, "Search for file"),
-    DOWNLOAD(4, "Download file by filename"),
-    INFORM(5, "Inform Tracker about a new available file and its chunks"),
-    QUIT(6, "Quit");
+    SEARCH(2, "Search for file"),
+    DOWNLOAD(3, "Download file by filename"),
+    INFORM(4, "Inform Tracker about a new available file and its chunks. Eg. 4 Filename ChunkNumber"),
+    QUIT(5, "Quit");
     
     private final int code;
     private final String text;
