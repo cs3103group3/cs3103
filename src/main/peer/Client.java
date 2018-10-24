@@ -1,5 +1,6 @@
 package main.peer;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -7,6 +8,7 @@ import java.io.PrintWriter;
 import java.net.*;
 import java.io.IOException;
 
+import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.errors.ErrorMessage;
 import main.utilities.constants.NetworkConstant;
@@ -45,14 +47,11 @@ public class Client extends Thread {
                 case LIST:
                     list();
                     return true;
-                case CHANGE_DIRECTORY:
-                    changeDirectory();
-                    return true;
                 case SEARCH:
                     search(userInputArr);
                     return true;
                 case DOWNLOAD:
-                    download();
+                    download(userInputArr);
                     return true;
                 case INFORM:
                     inform();
@@ -105,8 +104,56 @@ public class Client extends Thread {
         clientSocket.close();
     }
     
-    private void download() throws Exception {
+    private void download(String[] userInputArr) throws Exception {
+    	if (userInputArr.length != 2) {
+            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            return;
+        }
+    	
+    	String fileName = userInputArr[1];
+    	
+    	Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + " " +fileName);
+        out.flush();
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        String result = in.readLine();
+        clientSocket.close();
+        
+        if(result.equals("File Requested does not Exists")){
+        	System.out.println("File Requested does not Exists");
+        	return;
+        }
+        
+        String[] peersWithData = in.readLine().split("\n");
+        
+        ArrayList<Record> peers = new ArrayList<Record>();
+        for(int i=0;i<peersWithData.length;i++){
+        	System.out.println("I received: " + peersWithData[i]);
+        	String[] data = peersWithData[i].split(",");
+        	if(data.length != 2)
+        		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS.getErrorMessage());
+        	peers.add(new Record(data[0], data[1]));
+        }
+        
+        downloadFromEachPeer(peers);
+    }
+    
+    private void downloadFromEachPeer(ArrayList<Record> peers){
+    	System.out.println("Connecting to each P2P Server");
+
+        for(int i=0;i<peers.size();i++){
+        	//Starts new instance of server
+    		try {
+    			Socket peerSocket = new Socket(NetworkConstant.CLIENT_HOSTNAME, NetworkConstant.CLIENT_LISTENING_PORT);
+    			
+    		} catch(IOException ioe) {
+    			System.out.println("Unable to create Server Socket");
+    			System.exit(1);
+    		}
+        }
     }
     
     private void inform() {

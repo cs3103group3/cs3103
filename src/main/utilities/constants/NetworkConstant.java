@@ -11,6 +11,7 @@ public final class NetworkConstant {
     
     // Peer Client
     public static final int CLIENT_LISTENING_PORT = 2121;
+    public static final String CLIENT_HOSTNAME = "localhost";
     
     // Peer Server
 }
