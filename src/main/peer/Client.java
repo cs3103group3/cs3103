@@ -85,7 +85,13 @@ public class Client extends Thread {
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        System.out.println(in.readLine());
+        String str=in.readLine();
+        while(!str.equals(Constant.END_OF_STREAM)) {
+            System.out.println(str);
+            str=in.readLine();
+        }
+
+        in.close();
         clientSocket.close();
     }
     
