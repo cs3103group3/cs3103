@@ -55,7 +55,7 @@ public class Client extends Thread {
                     download();
                     return true;
                 case INFORM:
-                    inform();
+                    inform(userInputArr);
                     return true;
                 case QUIT:
                     quit();
@@ -109,8 +109,26 @@ public class Client extends Thread {
         
     }
     
-    private void inform() {
+    private void inform(String[] userInputArr) throws UnknownHostException, IOException {
+        if (userInputArr.length != 3) {
+            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            return;
+        }
         
+        String fileName = userInputArr[0];
+        String chunkNumber = userInputArr[1];
+        
+        String sendData = InterfaceCommand.INFORM.getCommandCode() + " " + " " + fileName + " " + chunkNumber;
+        
+        Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
+        
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        out.println(sendData);
+        out.flush();
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        System.out.println(in.readLine());
+        clientSocket.close();
     }
     
     private void quit() {
