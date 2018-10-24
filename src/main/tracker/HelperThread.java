@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commands.OfflineInterfaceCommand;
+import main.utilities.constants.Constant;
 import main.utilities.errors.ErrorMessage;
 
 public class HelperThread extends Thread{
@@ -74,7 +75,7 @@ public class HelperThread extends Thread{
 		String [] strCommandArr;
 		try {
 			strCommand = strCommand.trim();
-			strCommandArr = strCommand.split(" ");
+			strCommandArr = strCommand.split(Constant.WHITESPACE);
 			int commandCode = Integer.parseInt(strCommandArr[0]);
 			command = InterfaceCommand.forCode(commandCode);
 		} catch(NumberFormatException nfe) {
@@ -276,7 +277,7 @@ public class HelperThread extends Thread{
 				String requestedData = "";
 				for(int i =0 ; i < requestedChunks.size() ; i ++) {
 					requestedData += requestedChunks.get(i).getipAdd();
-					requestedData += ",";
+					requestedData += Constant.COMMA;
 					requestedData += requestedChunks.get(i).getChunkNo();
 					requestedData += "\n";
 				}
