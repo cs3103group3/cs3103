@@ -5,7 +5,7 @@ public enum InterfaceCommand {
     LIST(1, "List all files"), 
     SEARCH(2, "Search for file"),
     DOWNLOAD(3, "Download file by filename"),
-    INFORM(4, "Inform Tracker about a new available file and its chunks"),
+    INFORM(4, "Inform Tracker about a new available file and its chunks. Eg. 4 Filename ChunkNumber"),
     QUIT(5, "Quit");
     
     private final int code;
