@@ -14,8 +14,6 @@ import main.utilities.constants.NetworkConstant;
  *
  */
 public class Tracker{
-
-	public final static int TRACKER_LISTENING_PORT = 7878;
 	static ServerSocket serverSocket;
 
 	//ArrayList of all the files with unique names
@@ -32,7 +30,7 @@ public class Tracker{
 
 		//Starts new instance of server
 		try {
-			serverSocket = new ServerSocket(TRACKER_LISTENING_PORT);
+			serverSocket = new ServerSocket(NetworkConstant.TRACKER_LISTENING_PORT);
 		} catch(IOException ioe) {
 			System.out.println("Unable to create Server Socket");
 			System.exit(1);
