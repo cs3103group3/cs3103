@@ -134,14 +134,16 @@ public class HelperThread extends Thread{
 //		currentList.put("Test.txt", testArrList);
 		if(currentList.isEmpty()) {
 			currentReply.println(OfflineInterfaceCommand.EMPTY_RECORD);
+			currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
 		} else {
 			String result = "";
 			Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
 			//Prints out currentList
 			for(Entry<String, ArrayList<Record>> entry1 : entrySet) {
 				result += entry1.getKey();
-				result += "\n";
+				result += Constant.NEWLINE;
 			}
+			result += Constant.END_OF_STREAM + Constant.NEWLINE;
 			currentReply.write(result);
 			currentReply.flush();
 		}
@@ -216,6 +218,7 @@ public class HelperThread extends Thread{
 			recordList.replace(fileBroadcasted, currArrFile);
 
 			currentReply.println("File has been successfully added to Server");
+			currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
 			currentReply.flush();
 		} else {
 			//Create a new Record
@@ -226,6 +229,7 @@ public class HelperThread extends Thread{
 			newArrFile.add(newRecord);
 			recordList.put(fileBroadcasted, newArrFile);
 			currentReply.println("New File has been successfully added to Server");
+			currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
 			currentReply.flush();
 		}
 
