@@ -66,7 +66,8 @@ public class HelperThread extends Thread{
 	}
 
 	/**
-	 * This method executes the commands the client requested
+	 * This method executes the 
+	 * commands the client requested
 	 * @param reply2 
 	 */
 	private void doClientCommand(String strCommand, PrintWriter currentReply) {
@@ -122,7 +123,9 @@ public class HelperThread extends Thread{
 	 * Directory Entry
 	 */
 	private synchronized void listDirectoryEntry(Hashtable<String, ArrayList<Record>> currentList, PrintWriter currentReply) {
-
+//		ArrayList<Record> testArrList = new ArrayList<Record>();
+//		testArrList.add(new Record("192.128.122.211", "1"));
+//		currentList.put("Test.txt", testArrList);
 		if(currentList.isEmpty()) {
 			currentReply.println(OfflineInterfaceCommand.EMPTY_RECORD);
 		} else {
@@ -143,7 +146,6 @@ public class HelperThread extends Thread{
 	 * @param currentReply 
 	 * @param strCommandArr:  the Array of command by client that has been split
 	 * 1) FileName
-	 * 2) Chunk Number
 	 * 
 	 * Example Input One:
 	 * 3 fileNameOne
@@ -187,9 +189,10 @@ public class HelperThread extends Thread{
 	 * @param currentReply 
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
-		String ipBroadcasted = strCommandArr[1];
-		String fileBroadcasted = strCommandArr[2];
-		String chunkBroadcasted = strCommandArr[3];
+//		String ipBroadcasted = strCommandArr[1];
+		String ipBroadcasted = this.clientSocket.getLocalAddress().toString();
+		String fileBroadcasted = strCommandArr[1];
+		String chunkBroadcasted = strCommandArr[2];
 
 		boolean hasExist =	checkExistFile(fileBroadcasted);
 
@@ -345,20 +348,20 @@ public class HelperThread extends Thread{
 	 * Exits the server
 	 * 
 	 * Example Input:
-	 * 6 192.168.1.12
+	 * 6
 	 * 
 	 * Expected Output:
 	 * You have exited the server
 	 * 
 	 * Note:
 	 * 1) Have to delete the fileName/chunk listed in the central server
-	 * @param strCommandArr 
+	 * @param strCommandArr : command argument user has entered
 	 * @param currentReply 
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
-		String ipAddress = strCommandArr[1];
+		String ipAddress = this.clientSocket.getLocalAddress().toString();
 		
-		if(strCommandArr.length != 2) {
+		if(strCommandArr.length != 1) {
 			currentReply.println("Invalid Arguments");
 		} else {
 			boolean ipExists = checkIPExists(ipAddress);
@@ -366,6 +369,11 @@ public class HelperThread extends Thread{
 				deleteAllRecords(ipAddress);
 				currentReply.write("Exited and Deleted Successfully");
 				currentReply.flush();
+				try {
+					clientSocket.close();
+				} catch (IOException e) {
+					currentReply.write("Error closing socket");
+				}
 			} else {
 				currentReply.println("Invalid IP address");
 				currentReply.flush();
