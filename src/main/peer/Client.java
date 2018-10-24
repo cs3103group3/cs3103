@@ -131,7 +131,17 @@ public class Client extends Thread {
         clientSocket.close();
     }
     
-    private void quit() {
+    private void quit() throws UnknownHostException, IOException {
+    	//Inform server that it is exiting
+    	Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
+ 
+		PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+		out.println(InterfaceCommand.QUIT.getCommandCode());
+		out.flush();
+		 
+		clientSocket.close();
+         
+		//TODO: close server sockets
         System.out.println("Goodbye!");
     }
         
