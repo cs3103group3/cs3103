@@ -129,20 +129,24 @@ public class Client extends Thread {
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String result = in.readLine();
+        String results = in.readLine();
+        ArrayList<String> peersWithData = new ArrayList<String>();
+        while(!results.equals(Constant.END_OF_STREAM)) {
+            peersWithData.add(results);
+            results=in.readLine();
+        }
+        
         clientSocket.close();
         
-        if(result.equals("File Requested does not Exists")){
+        if(peersWithData.get(0).equals("File Requested does not Exists")){
         	System.out.println("File Requested does not Exists");
         	return;
         }
         
-        String[] peersWithData = result.split("\n");
-        
         ArrayList<Record> peers = new ArrayList<Record>();
-        for(int i=0;i<peersWithData.length;i++){
-        	System.out.println("I received: " + peersWithData[i]);
-        	String[] data = peersWithData[i].split(",");
+        for(int i=0;i<peersWithData.size();i++){
+        	System.out.println("I received: " + peersWithData.get(i));
+        	String[] data = peersWithData.get(i).split(",");
         	if(data.length != 2)
         		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS.getErrorMessage());
         	peers.add(new Record(data[0], data[1]));
