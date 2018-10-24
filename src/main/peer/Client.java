@@ -17,11 +17,10 @@ public class Client extends Thread {
                             "Welcome to CS3103 P2P Client\n" +
                             "Choose From the list of actions\n" +
                             "1. " + InterfaceCommand.LIST.getCommandText() + "\n" +
-                            "2. " + InterfaceCommand.CHANGE_DIRECTORY.getCommandText() + "\n" +
-                            "3. " + InterfaceCommand.SEARCH.getCommandText() + "\n" +
-                            "4. " + InterfaceCommand.DOWNLOAD.getCommandText() + "\n" +
-                            "5. " + InterfaceCommand.INFORM.getCommandText() + "\n" +
-                            "6. " + InterfaceCommand.QUIT.getCommandText() + "\n" +
+                            "2. " + InterfaceCommand.SEARCH.getCommandText() + "\n" +
+                            "3. " + InterfaceCommand.DOWNLOAD.getCommandText() + "\n" +
+                            "4. " + InterfaceCommand.INFORM.getCommandText() + "\n" +
+                            "5. " + InterfaceCommand.QUIT.getCommandText() + "\n" +
                             "===============================================\n" + 
                             "Enter your option: ");
     }
@@ -44,9 +43,6 @@ public class Client extends Thread {
             switch(command) {
                 case LIST:
                     list();
-                    return true;
-                case CHANGE_DIRECTORY:
-                    changeDirectory();
                     return true;
                 case SEARCH:
                     search(userInputArr);
