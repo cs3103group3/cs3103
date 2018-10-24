@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commands.OfflineInterfaceCommand;
+import main.utilities.constants.Constant;
 import main.utilities.errors.ErrorMessage;
 
 public class HelperThread extends Thread{
@@ -36,7 +37,13 @@ public class HelperThread extends Thread{
 
 	@Override
 	public void run() {
-
+		
+//		Creating dummy arraylist
+//		Uncomment to create
+//		ArrayList<Record> dummyList=new ArrayList<Record>();
+//		dummyList.add(new Record("192.168.1.0", "1"));
+//		recordList.put("test.txt", dummyList);
+		
 		boolean threadRunning = true;
 		String clientInput = "";
 		try {
@@ -74,7 +81,7 @@ public class HelperThread extends Thread{
 		String [] strCommandArr;
 		try {
 			strCommand = strCommand.trim();
-			strCommandArr = strCommand.split(" ");
+			strCommandArr = strCommand.split(Constant.WHITESPACE);
 			int commandCode = Integer.parseInt(strCommandArr[0]);
 			command = InterfaceCommand.forCode(commandCode);
 		} catch(NumberFormatException nfe) {
@@ -166,9 +173,11 @@ public class HelperThread extends Thread{
 		}
 		if(foundFile) {
 			currentReply.write(OfflineInterfaceCommand.VALID_FILENAME.getCommandText());
+			currentReply.write("\n");
 			currentReply.flush();
 		} else {
 			currentReply.write(OfflineInterfaceCommand.INVALID_FILENAME.getCommandText());
+			currentReply.write("\n");
 			currentReply.flush();
 		}
 	}
@@ -276,7 +285,7 @@ public class HelperThread extends Thread{
 				String requestedData = "";
 				for(int i =0 ; i < requestedChunks.size() ; i ++) {
 					requestedData += requestedChunks.get(i).getipAdd();
-					requestedData += ",";
+					requestedData += Constant.COMMA;
 					requestedData += requestedChunks.get(i).getChunkNo();
 					requestedData += "\n";
 				}

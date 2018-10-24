@@ -12,10 +12,9 @@ import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.errors.ErrorMessage;
 import main.utilities.constants.NetworkConstant;
+import main.utilities.constants.Constant;
 
-public class Client extends Thread {
-    public static final String WHITESPACE = " ";
-    
+public class Client extends Thread {    
     private static void displayMenu() {
         System.out.println( "===============================================\n" +
                             "Welcome to CS3103 P2P Client\n" +
@@ -32,7 +31,7 @@ public class Client extends Thread {
     private boolean execute() {
         Scanner sc = new Scanner(System.in);
         String userInput = sc.nextLine().trim();
-        String[] userInputArr = userInput.split(WHITESPACE);
+        String[] userInputArr = userInput.split(Constant.WHITESPACE);
         String userSelectedOption = userInputArr[0].trim();
         
         InterfaceCommand command = InterfaceCommand.INVALID;
@@ -46,7 +45,7 @@ public class Client extends Thread {
         try {
             switch(command) {
                 case LIST:
-                    list();
+                    list(userInputArr);
                     return true;
                 case SEARCH:
                     search(userInputArr);
@@ -58,7 +57,7 @@ public class Client extends Thread {
                     inform(userInputArr);
                     return true;
                 case QUIT:
-                    quit();
+                    quit(userInputArr);
                     return false;
                 default:
                     System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
@@ -74,7 +73,11 @@ public class Client extends Thread {
         }        
     }
     
-    private void list() throws UnknownHostException, IOException {
+    private void list(String[] userInputArr) throws UnknownHostException, IOException {
+        if (userInputArr.length != 1) {
+            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            return;
+        }
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -174,7 +177,7 @@ public class Client extends Thread {
         String fileName = userInputArr[1].trim();
         String chunkNumber = userInputArr[2].trim();
         
-        String sendData = InterfaceCommand.INFORM.getCommandCode() + WHITESPACE + fileName + WHITESPACE + chunkNumber;
+        String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + fileName + Constant.WHITESPACE + chunkNumber;
         
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
@@ -187,7 +190,12 @@ public class Client extends Thread {
         clientSocket.close();
     }
     
-    private void quit() throws UnknownHostException, IOException {
+    private void quit(String[] userInputArr) throws UnknownHostException, IOException {
+        if (userInputArr.length != 1) {
+            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            return;
+        }
+        
     	//Inform server that it is exiting
     	Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
  
