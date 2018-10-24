@@ -37,7 +37,13 @@ public class HelperThread extends Thread{
 
 	@Override
 	public void run() {
-
+		
+//		Creating dummy arraylist
+//		Uncomment to create
+//		ArrayList<Record> dummyList=new ArrayList<Record>();
+//		dummyList.add(new Record("192.168.1.0", "1"));
+//		recordList.put("test.txt", dummyList);
+		
 		boolean threadRunning = true;
 		String clientInput = "";
 		try {
