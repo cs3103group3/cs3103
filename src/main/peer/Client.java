@@ -114,16 +114,15 @@ public class Client extends Thread {
     }
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
-        if (userInputArr.length != 4) {
+        if (userInputArr.length != 3) {
             System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
             return;
         }
         
-        String clientIpAddress = userInputArr[0];
-        String fileName = userInputArr[1];
-        String chunkNumber = userInputArr[2];
+        String fileName = userInputArr[0];
+        String chunkNumber = userInputArr[1];
         
-        String sendData = InterfaceCommand.INFORM.getCommandCode() + " " + clientIpAddress + " " + fileName + " " + chunkNumber;
+        String sendData = InterfaceCommand.INFORM.getCommandCode() + " " + " " + fileName + " " + chunkNumber;
         
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
