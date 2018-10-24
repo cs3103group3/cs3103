@@ -11,7 +11,9 @@ import main.utilities.commands.InterfaceCommand;
 import main.utilities.errors.ErrorMessage;
 import main.utilities.constants.NetworkConstant;
 
-public class Client extends Thread {        
+public class Client extends Thread {
+    public static final String WHITESPACE = " ";
+    
     private static void displayMenu() {
         System.out.println( "===============================================\n" +
                             "Welcome to CS3103 P2P Client\n" +
@@ -28,7 +30,7 @@ public class Client extends Thread {
     private boolean execute() {
         Scanner sc = new Scanner(System.in);
         String userInput = sc.nextLine().trim();
-        String[] userInputArr = userInput.split(" ");
+        String[] userInputArr = userInput.split(WHITESPACE);
         String userSelectedOption = userInputArr[0].trim();
         
         InterfaceCommand command = InterfaceCommand.INVALID;
@@ -111,10 +113,10 @@ public class Client extends Thread {
             return;
         }
         
-        String fileName = userInputArr[0].trim();
-        String chunkNumber = userInputArr[1].trim();
+        String fileName = userInputArr[1].trim();
+        String chunkNumber = userInputArr[2].trim();
         
-        String sendData = InterfaceCommand.INFORM.getCommandCode() + " " + fileName + " " + chunkNumber;
+        String sendData = InterfaceCommand.INFORM.getCommandCode() + WHITESPACE + fileName + WHITESPACE + chunkNumber;
         
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
