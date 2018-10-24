@@ -295,6 +295,7 @@ public class HelperThread extends Thread{
 				}
 				
 				currentReply.write(requestedData);
+				currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
 				currentReply.flush();
 				
 			} else {
