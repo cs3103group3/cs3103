@@ -173,9 +173,11 @@ public class HelperThread extends Thread{
 		}
 		if(foundFile) {
 			currentReply.write(OfflineInterfaceCommand.VALID_FILENAME.getCommandText());
+			currentReply.write("\n");
 			currentReply.flush();
 		} else {
 			currentReply.write(OfflineInterfaceCommand.INVALID_FILENAME.getCommandText());
+			currentReply.write("\n");
 			currentReply.flush();
 		}
 	}
