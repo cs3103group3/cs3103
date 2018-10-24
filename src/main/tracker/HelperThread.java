@@ -198,7 +198,7 @@ public class HelperThread extends Thread{
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 //		String ipBroadcasted = strCommandArr[1];
-		String ipBroadcasted = this.clientSocket.getLocalAddress().toString();
+		String ipBroadcasted = this.clientSocket.getLocalAddress().toString().substring(1);
 		String fileBroadcasted = strCommandArr[1];
 		String chunkBroadcasted = strCommandArr[2];
 
@@ -277,7 +277,7 @@ public class HelperThread extends Thread{
 		boolean fileExist = checkExistFile(requestedFileName);
 		
 		//If no chunk Size is Specified
-		if(strCommandArr.length < 2) {
+		if(strCommandArr.length == 2) {
 			if(fileExist) {
 				//Obtain the ArrayList of Entry associated with key of requestedFileName
 				ArrayList<Record> requestedChunks = recordList.get(requestedFileName);

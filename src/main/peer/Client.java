@@ -1,5 +1,6 @@
 package main.peer;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -7,6 +8,7 @@ import java.io.PrintWriter;
 import java.net.*;
 import java.io.IOException;
 
+import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.errors.ErrorMessage;
 import main.utilities.constants.NetworkConstant;
@@ -49,7 +51,7 @@ public class Client extends Thread {
                     search(userInputArr);
                     return true;
                 case DOWNLOAD:
-                    download();
+                    download(userInputArr);
                     return true;
                 case INFORM:
                     inform(userInputArr);
@@ -98,7 +100,7 @@ public class Client extends Thread {
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(InterfaceCommand.SEARCH.getCommandCode() + " " +filePath);
+        out.println(InterfaceCommand.SEARCH.getCommandCode() + Constant.WHITESPACE + filePath);
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -106,8 +108,64 @@ public class Client extends Thread {
         clientSocket.close();
     }
     
-    private void download() throws Exception {
+    private void download(String[] userInputArr) throws Exception {
+    	if (userInputArr.length != 2) {
+            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            return;
+        }
+    	
+    	String fileName = userInputArr[1];
+    	
+    	Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + Constant.WHITESPACE + fileName);
+        out.flush();
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        String result = in.readLine();
+        clientSocket.close();
+        
+        if(result.equals("File Requested does not Exists")){
+        	System.out.println("File Requested does not Exists");
+        	return;
+        }
+        
+        String[] peersWithData = result.split("\n");
+        
+        ArrayList<Record> peers = new ArrayList<Record>();
+        for(int i=0;i<peersWithData.length;i++){
+        	System.out.println("I received: " + peersWithData[i]);
+        	String[] data = peersWithData[i].split(",");
+        	if(data.length != 2)
+        		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS.getErrorMessage());
+        	peers.add(new Record(data[0], data[1]));
+        }
+        
+        downloadFromEachPeer(peers, fileName);
+    }
+    
+    private void downloadFromEachPeer(ArrayList<Record> peers, String fileName){
+    	System.out.println("Connecting to each P2P Server");
+
+        for(int i=0;i<peers.size();i++){
+        	//Starts new instance of server
+    		try {
+    			Socket socket = new Socket(NetworkConstant.SERVER_HOSTNAME, NetworkConstant.SERVER_LISTENING_PORT);
+    	        
+    	        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+    	        out.println(fileName + "," + peers.get(i).getChunkNo());
+    	        out.flush();
+    	        
+    	        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    	        String result = in.readLine();
+    	        System.out.println(result);
+    	        socket.close();
+    		} catch(IOException ioe) {
+    			System.out.println("Unable to create Server Socket at Peer Client");
+    			System.exit(1);
+    		}
+        }
     }
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
