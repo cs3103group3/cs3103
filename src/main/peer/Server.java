@@ -37,9 +37,9 @@ public class Server extends Thread {
 				Socket clientSocket = serverSocket.accept();
 
 				BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				System.out.println("Client has entered command: " + in.readLine());
 				String result = in.readLine();
 				String resultTrimmed = result.trim();
+				System.out.println("Client has entered command: " + resultTrimmed);
 				String[] resultArr = resultTrimmed.split(",");
 				
 				PrintWriter reply = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -49,9 +49,9 @@ public class Server extends Thread {
 					System.out.println("Client wants chunk " + resultArr[1] + " from " + resultArr[0]);
 					
 
-					reply.println(OfflineInterfaceCommand.VALID_DOWNLOAD);
+					reply.println(OfflineInterfaceCommand.VALID_DOWNLOAD.getCommandText());
 				} else {
-					reply.println(OfflineInterfaceCommand.INVALID_DOWNLOAD);
+					reply.println(OfflineInterfaceCommand.INVALID_DOWNLOAD.getCommandText());
 				}
 				
 			} catch(IOException ioe) {

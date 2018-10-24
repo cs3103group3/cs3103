@@ -159,7 +159,7 @@ public class Client extends Thread {
     	        
     	        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     	        String result = in.readLine();
-    	        System.out.println(result);
+    	        System.out.println(peers.get(i).getipAdd() + Constant.WHITESPACE + result);
     	        socket.close();
     		} catch(IOException ioe) {
     			System.out.println("Unable to create Server Socket at Peer Client");
