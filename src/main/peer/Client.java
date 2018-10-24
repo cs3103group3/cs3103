@@ -97,7 +97,7 @@ public class Client extends Thread {
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(InterfaceCommand.SEARCH.getCommandCode() + " " +filePath);
+        out.println(InterfaceCommand.SEARCH.getCommandCode() + WHITESPACE + filePath);
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -116,7 +116,7 @@ public class Client extends Thread {
     	Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + " " +fileName);
+        out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + WHITESPACE + fileName);
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -128,7 +128,7 @@ public class Client extends Thread {
         	return;
         }
         
-        String[] peersWithData = in.readLine().split("\n");
+        String[] peersWithData = result.split("\n");
         
         ArrayList<Record> peers = new ArrayList<Record>();
         for(int i=0;i<peersWithData.length;i++){
@@ -148,7 +148,7 @@ public class Client extends Thread {
         for(int i=0;i<peers.size();i++){
         	//Starts new instance of server
     		try {
-    			Socket peerSocket = new Socket(NetworkConstant.CLIENT_HOSTNAME, NetworkConstant.CLIENT_LISTENING_PORT);
+    			Socket peerSocket = new Socket(NetworkConstant.SERVER_HOSTNAME, NetworkConstant.SERVER_LISTENING_PORT);
     			
     		} catch(IOException ioe) {
     			System.out.println("Unable to create Server Socket");
