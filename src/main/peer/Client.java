@@ -86,10 +86,6 @@ public class Client extends Thread {
         clientSocket.close();
     }
     
-    private void changeDirectory() throws Exception {
-        
-    }
-    
     private void search(String[] userInputArr) throws Exception {
         if (userInputArr.length != 2) {
             System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
