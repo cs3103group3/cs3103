@@ -3,6 +3,9 @@ package main.peer;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.*;
@@ -176,28 +179,62 @@ public class Client extends Thread {
     			System.exit(1);
     		}
         }
+        
+        
+//        int fileSize = (int) file.length();
+//        byte[] currentChunk;
+//        int currentChunkNum = 0;
+//        int readLength = Constant.CHUNK_SIZE;
+//        int read = 0;
+//        
+//        FileInputStream inputStream = new FileInputStream(file);
+//        while (fileSize > 0) {
+//            if (fileSize <= Constant.CHUNK_SIZE) {
+//                readLength = fileSize;
+//            }
+//            
+//            currentChunk = new byte[readLength];
+//            read = inputStream.read(currentChunk, 0, readLength);
+//            fileSize -= read;
+//            String newFileName = fileName + Constant.CHUNK_EXT + Integer.toString(currentChunkNum);
+//            currentChunkNum++;
+//            
+//            FileOutputStream filePart = new FileOutputStream(new File(newFileName));
+//            filePart.write(currentChunk);
+//            filePart.flush();
+//            filePart.close();
+//        }
+        
     }
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
-        if (userInputArr.length != 3) {
+        if (userInputArr.length != 1) {
             System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
             return;
         }
         
-        String fileName = userInputArr[1].trim();
-        String chunkNumber = userInputArr[2].trim();
+        System.out.println("Please enter your filename");
+        Scanner sc = new Scanner(System.in);
+        String fileName = sc.nextLine().trim();
         
-        String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + fileName + Constant.WHITESPACE + chunkNumber;
+        File file = new File(fileName);
+        if (!file.exists()) {
+            System.out.println(ErrorMessage.FILE_NOT_FOUND + Constant.WHITESPACE + fileName);
+            return;
+        }
         
-        Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
         
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(sendData);
-        out.flush();
         
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        System.out.println(in.readLine());
-        clientSocket.close();
+//        Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
+//        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+//        
+//        String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + fileName + Constant.WHITESPACE + chunkNumber;
+//        out.println(sendData);
+//        out.flush();
+//        
+//        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+//        System.out.println(in.readLine());
+//        clientSocket.close();
     }
     
     private void quit(String[] userInputArr) throws UnknownHostException, IOException {
