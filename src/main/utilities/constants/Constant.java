@@ -8,6 +8,6 @@ public final class Constant {
     public static final String NEWLINE = "\n";
     public static final String END_OF_STREAM = "EOS";
     
-    public static final int CHUNK_SIZE = 1028;
+    public static final int CHUNK_SIZE = 1024;
     public static final String CHUNK_EXT = ".chunk";
 }
