@@ -13,5 +13,10 @@ public final class NetworkConstant {
     
     // Peer Server
     public static final int SERVER_LISTENING_PORT = 2122;
+   
     public static final String SERVER_HOSTNAME = "localhost";
+    
+    // For testing connect();
+    public static final int SERVER_LISTENING_PORTB = 2112;
+    public static final int SERVER_LISTENING_PORTC = 2102;
 }
