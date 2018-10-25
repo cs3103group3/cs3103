@@ -200,7 +200,7 @@ public class HelperThread extends Thread{
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 //		String ipBroadcasted = strCommandArr[1];
-		String ipBroadcasted = this.clientSocket.getLocalAddress().toString().substring(1);
+		String ipBroadcasted = this.clientSocket.getInetAddress().toString();
 		String fileBroadcasted = strCommandArr[1];
 		String chunkBroadcasted = strCommandArr[2];
 
@@ -373,7 +373,7 @@ public class HelperThread extends Thread{
 	 * @param currentReply 
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
-		String ipAddress = this.clientSocket.getLocalAddress().toString();
+		String ipAddress = this.clientSocket.getInetAddress().toString();
 		
 		if(strCommandArr.length != 1) {
 			currentReply.println("Invalid Arguments");
