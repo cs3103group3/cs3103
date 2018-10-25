@@ -3,9 +3,9 @@ package main.utilities.commands;
 public enum InterfaceCommand {
     INVALID(0, "Invalid Command. Please try again."),
     LIST(1, "List all files"), 
-    SEARCH(2, "Search for file"),
-    DOWNLOAD(3, "Download file by filename"),
-    INFORM(4, "Inform Tracker about a new available file and its chunks. Eg. 4 Filename ChunkNumber"),
+    SEARCH(2, "Search for file\n   Eg. 2 Filename.txt"),
+    DOWNLOAD(3, "Download file by filename\n   Eg. 3 Filename.txt"),
+    INFORM(4, "Inform Tracker about a new available file and its chunks.\n   Eg. 4 Filename.txt"),
     QUIT(5, "Quit");
     
     private final int code;

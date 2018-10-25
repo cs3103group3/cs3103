@@ -14,8 +14,8 @@ import java.io.IOException;
 import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
-import main.utilities.errors.ErrorMessage;
 import main.utilities.constants.NetworkConstant;
+import main.utilities.feedbacks.ErrorMessage;
 import main.utilities.constants.Constant;
 
 public class Client extends Thread {    
@@ -23,6 +23,8 @@ public class Client extends Thread {
         System.out.println( "===============================================\n" +
                             "Welcome to CS3103 P2P Client\n" +
                             "Choose From the list of actions\n" +
+                            "<Command><space><arguments>\n" +
+                            "Arguments are delimited by whitespaces\n" +
                             "1. " + InterfaceCommand.LIST.getCommandText() + "\n" +
                             "2. " + InterfaceCommand.SEARCH.getCommandText() + "\n" +
                             "3. " + InterfaceCommand.DOWNLOAD.getCommandText() + "\n" +
@@ -66,14 +68,14 @@ public class Client extends Thread {
                     quit(userInputArr);
                     return false;
                 default:
-                    System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+                    System.out.println(ErrorMessage.INVALID_COMMAND + "Command entered: " + userInput);
                     return true;
             }
         } catch (UnknownHostException e) {
-            System.out.println(ErrorMessage.UNKNOWN_HOST.getErrorMessage());
+            System.out.println(ErrorMessage.UNKNOWN_HOST);
             return true;
         } catch (Exception e) {
-            System.out.println(ErrorMessage.UNKNOWN_ERROR.getErrorMessage());
+            System.out.println(ErrorMessage.UNKNOWN_ERROR);
             e.printStackTrace();
             return true;  // So as not to quit the program, proceed as normal
         }        
@@ -81,7 +83,7 @@ public class Client extends Thread {
     
     private void list(String[] userInputArr) throws UnknownHostException, IOException {
         if (userInputArr.length != 1) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS + "Please check the number of arguments required.");
             return;
         }
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
@@ -103,7 +105,7 @@ public class Client extends Thread {
     
     private void search(String[] userInputArr) throws Exception {
         if (userInputArr.length != 2) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
         }
         
@@ -122,7 +124,7 @@ public class Client extends Thread {
     
     private void download(String[] userInputArr) throws Exception {
     	if (userInputArr.length != 2) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
         }
     	
@@ -161,7 +163,7 @@ public class Client extends Thread {
     			String data = peers.get(i).trim();
     			String[] seperatedData = data.split(",");
             	if(seperatedData.length != 2) {
-            		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS.getErrorMessage());
+            		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS);
             		return;
             	}
             	
@@ -210,14 +212,12 @@ public class Client extends Thread {
     }
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
-        if (userInputArr.length != 1) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+        if (userInputArr.length != 2) {
+            System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
         }
-        
-        System.out.println("Please enter your filename");
-        Scanner sc = new Scanner(System.in);
-        String fileName = sc.nextLine().trim();
+
+        String fileName = userInputArr[1];
         
         File file = new File(fileName);
         if (!file.exists()) {
@@ -229,7 +229,11 @@ public class Client extends Thread {
         int totalNumChunk = (int) Math.ceil(fileSize*1.0/ Constant.CHUNK_SIZE);
                 
         for (int chunkNum=0; chunkNum<totalNumChunk; chunkNum++) {
-            String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + fileName + Constant.WHITESPACE + chunkNum;
+            String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
+            long checksum = CheckAccuracy.calculateChecksum(payload);
+            String data = checksum + Constant.COMMA + payload;
+            
+            String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
             Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -243,7 +247,7 @@ public class Client extends Thread {
     
     private void quit(String[] userInputArr) throws UnknownHostException, IOException {
         if (userInputArr.length != 1) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS + "Please check the number of arguments required.");
             return;
         }
         

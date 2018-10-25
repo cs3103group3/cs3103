@@ -12,8 +12,9 @@ import java.util.Map.Entry;
 
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commands.OfflineInterfaceCommand;
+import main.utilities.commons.CheckAccuracy;
 import main.utilities.constants.Constant;
-import main.utilities.errors.ErrorMessage;
+import main.utilities.feedbacks.*;
 
 public class HelperThread extends Thread{
 	//Client Socket
@@ -85,7 +86,7 @@ public class HelperThread extends Thread{
 			int commandCode = Integer.parseInt(strCommandArr[0]);
 			command = InterfaceCommand.forCode(commandCode);
 		} catch(NumberFormatException nfe) {
-			currentReply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+			currentReply.println(ErrorMessage.INVALID_COMMAND);
 			return;
 		}
 
@@ -113,7 +114,7 @@ public class HelperThread extends Thread{
 				break;
 			default:
 				//Error
-				currentReply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+				currentReply.println(ErrorMessage.INVALID_COMMAND);
 				return;
 		}
 	}
@@ -142,8 +143,8 @@ public class HelperThread extends Thread{
 				result += entry1.getKey();
 				result += Constant.NEWLINE;
 			}
-			result += Constant.END_OF_STREAM + Constant.NEWLINE;
-			currentReply.write(result);
+			result += Constant.END_OF_STREAM;
+			currentReply.println(result);
 			currentReply.flush();
 		}
 	}
@@ -173,12 +174,10 @@ public class HelperThread extends Thread{
 			}
 		}
 		if(foundFile) {
-			currentReply.write(OfflineInterfaceCommand.VALID_FILENAME.getCommandText());
-			currentReply.write("\n");
+			currentReply.println(SuccessMessage.FILE_FOUND);
 			currentReply.flush();
 		} else {
-			currentReply.write(OfflineInterfaceCommand.INVALID_FILENAME.getCommandText());
-			currentReply.write("\n");
+			currentReply.println(ErrorMessage.FILE_NOT_FOUND);
 			currentReply.flush();
 		}
 	}
@@ -198,42 +197,51 @@ public class HelperThread extends Thread{
 	 * @param currentReply 
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
-//		String ipBroadcasted = strCommandArr[1];
 		String ipBroadcasted = this.clientSocket.getInetAddress().toString();
-		String fileBroadcasted = strCommandArr[1];
-		String chunkBroadcasted = strCommandArr[2];
+		String[] recvData = strCommandArr[1].split(Constant.COMMA);
 		
-		boolean hasExist =	checkExistFile(fileBroadcasted);
+		long checksum = Long.parseLong(recvData[0]);
+		String totalNumChunk = recvData[1];
+		String chunkNum = recvData[2];
+		String fileName = recvData[3];
+		
+		String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
+		
+		if (!CheckAccuracy.isDataValid(payload, checksum)) {
+		    currentReply.println(ErrorMessage.INCONSISTENT_CHECKSUM);
+            currentReply.println(Constant.END_OF_STREAM);
+            currentReply.flush();
+		    return;
+		}
+		
+		boolean hasExist =	checkExistFile(fileName);
 
 		//If file already exists, simply add the chunk to it
 		if(hasExist) {
 			//Obtain the arraylist to update first
-			ArrayList<Record> currArrFile = recordList.get(fileBroadcasted);
+			ArrayList<Record> currArrFile = recordList.get(fileName);
 			//Add new Record
-			//TODO: NEED TO CHANGE TO ACTUAL MAX CHUNK SIZE
-			Record addToExist = new Record(ipBroadcasted, chunkBroadcasted, "99999");
+			Record addToExist = new Record(ipBroadcasted, chunkNum, totalNumChunk);
 			currArrFile.add(addToExist);
 
 			//Replace the HashTable with updated data
-			recordList.replace(fileBroadcasted, currArrFile);
+			recordList.replace(fileName, currArrFile);
 
-			currentReply.println("File has been successfully added to Server");
+			currentReply.println(SuccessMessage.NEW_CHUNK_ADDED_TO_TRACKER);
 			currentReply.println(Constant.END_OF_STREAM);
 			currentReply.flush();
 		} else {
 			//Create a new Record
-			//TODO: NEED TO CHANGE TO ACTUAL MAX CHUNK SIZE
-			Record newRecord = new Record(ipBroadcasted, chunkBroadcasted,"99999999");
+			Record newRecord = new Record(ipBroadcasted, chunkNum,totalNumChunk);
 			//Create a new ArrayList
 			ArrayList<Record> newArrFile = new ArrayList<Record>();
 			//Add new Record
 			newArrFile.add(newRecord);
-			recordList.put(fileBroadcasted, newArrFile);
-			currentReply.println("New File has been successfully added to Server");
+			recordList.put(fileName, newArrFile);
+			currentReply.println(SuccessMessage.NEW_FILE_ADDED_TO_TRACKER);
 			currentReply.println(Constant.END_OF_STREAM);
 			currentReply.flush();
 		}
-
 	}
 
 	/**
@@ -382,12 +390,12 @@ public class HelperThread extends Thread{
 			boolean ipExists = checkIPExists(ipAddress);
 			if(ipExists) {
 				deleteAllRecords(ipAddress);
-				currentReply.write("Exited and Deleted Successfully");
+				currentReply.println("Exited and Deleted Successfully");
 				currentReply.flush();
 				try {
 					clientSocket.close();
 				} catch (IOException e) {
-					currentReply.write("Error closing socket");
+					currentReply.println("Error closing socket");
 				}
 			} else {
 				currentReply.println("Invalid IP address");

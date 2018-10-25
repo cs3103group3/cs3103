@@ -6,7 +6,7 @@ import java.util.zip.Checksum;
 public class CheckAccuracy {
 	//This method check if the data received is not corrupted by comparing the 
 	//checksum value
-	public static boolean isDataValid(String data, int givenChecksum){
+	public static boolean isDataValid(String data, long givenChecksum){
 		long correctChecksum = calculateChecksum(data);
 		return correctChecksum == givenChecksum;
 	}
