@@ -89,7 +89,6 @@ public class HelperThread extends Thread{
 			return;
 		}
 
-
 		//Calls method that is required to execute the user's command
 		switch(command) {
 			case LIST:
@@ -218,7 +217,7 @@ public class HelperThread extends Thread{
 			recordList.replace(fileBroadcasted, currArrFile);
 
 			currentReply.println("File has been successfully added to Server");
-			currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
+			currentReply.println(Constant.END_OF_STREAM);
 			currentReply.flush();
 		} else {
 			//Create a new Record
@@ -229,7 +228,7 @@ public class HelperThread extends Thread{
 			newArrFile.add(newRecord);
 			recordList.put(fileBroadcasted, newArrFile);
 			currentReply.println("New File has been successfully added to Server");
-			currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
+			currentReply.println(Constant.END_OF_STREAM);
 			currentReply.flush();
 		}
 

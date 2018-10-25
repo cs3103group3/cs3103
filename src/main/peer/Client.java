@@ -223,18 +223,21 @@ public class Client extends Thread {
             return;
         }
         
+        long fileSize =  file.length();
+        int totalNumChunk = (int) Math.ceil(fileSize*1.0/ Constant.CHUNK_SIZE);
+                
+        for (int chunkNum=0; chunkNum<totalNumChunk; chunkNum++) {
+            String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + fileName + Constant.WHITESPACE + chunkNum;
+            Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out.println(sendData);
+            out.flush();
+            
+            System.out.println(in.readLine()); 
+            clientSocket.close();
+        }
         
-        
-//        Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
-//        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-//        
-//        String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + fileName + Constant.WHITESPACE + chunkNumber;
-//        out.println(sendData);
-//        out.flush();
-//        
-//        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//        System.out.println(in.readLine());
-//        clientSocket.close();
     }
     
     private void quit(String[] userInputArr) throws UnknownHostException, IOException {
