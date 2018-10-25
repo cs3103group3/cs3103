@@ -14,8 +14,8 @@ import java.io.IOException;
 import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
-import main.utilities.errors.ErrorMessage;
 import main.utilities.constants.NetworkConstant;
+import main.utilities.feedbacks.ErrorMessage;
 import main.utilities.constants.Constant;
 
 public class Client extends Thread {    
@@ -23,6 +23,8 @@ public class Client extends Thread {
         System.out.println( "===============================================\n" +
                             "Welcome to CS3103 P2P Client\n" +
                             "Choose From the list of actions\n" +
+                            "<Command><space><arguments>\n" +
+                            "Arguments are delimited by whitespaces\n" +
                             "1. " + InterfaceCommand.LIST.getCommandText() + "\n" +
                             "2. " + InterfaceCommand.SEARCH.getCommandText() + "\n" +
                             "3. " + InterfaceCommand.DOWNLOAD.getCommandText() + "\n" +
@@ -210,14 +212,12 @@ public class Client extends Thread {
     }
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
-        if (userInputArr.length != 1) {
+        if (userInputArr.length != 2) {
             System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
             return;
         }
-        
-        System.out.println("Please enter your filename");
-        Scanner sc = new Scanner(System.in);
-        String fileName = sc.nextLine().trim();
+
+        String fileName = userInputArr[1];
         
         File file = new File(fileName);
         if (!file.exists()) {
@@ -229,7 +229,11 @@ public class Client extends Thread {
         int totalNumChunk = (int) Math.ceil(fileSize*1.0/ Constant.CHUNK_SIZE);
                 
         for (int chunkNum=0; chunkNum<totalNumChunk; chunkNum++) {
-            String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + fileName + Constant.WHITESPACE + chunkNum;
+            String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
+            long checksum = CheckAccuracy.calculateChecksum(payload);
+            String data = checksum + Constant.COMMA + payload;
+            
+            String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
             Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
