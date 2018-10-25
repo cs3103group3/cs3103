@@ -55,6 +55,8 @@ public class Client extends Thread {
                     return true;
                 case DOWNLOAD:
                     download(userInputArr);
+                    //For testing
+//                	connectToServer();
                     return true;
                 case INFORM:
                     inform(userInputArr);
@@ -256,6 +258,24 @@ public class Client extends Thread {
         System.out.println("Goodbye!");
     }
         
+    private void connectToServer() throws Exception {
+		Socket clientSocket = new Socket(NetworkConstant.SERVER_HOSTNAME, NetworkConstant.SERVER_LISTENING_PORT);
+        
+		String clientName = "Client A";
+		
+		//For testing connect
+//		String clientName = "Client B";
+//		String clientName = "Client C";
+		
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        out.println("Connecting from " + clientName);
+        out.flush();
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        System.out.println(in.readLine());
+        clientSocket.close();
+    }
+    
     public void run() { 
         boolean proceed = true;
         
