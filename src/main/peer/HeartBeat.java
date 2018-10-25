@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import main.utilities.constants.Constant;
-import main.utilities.errors.ErrorMessage;
+import main.utilities.feedbacks.ErrorMessage;
 
 /**
  * This class sends a heartbeat from a client to tracker
