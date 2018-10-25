@@ -14,7 +14,7 @@ import main.utilities.commands.InterfaceCommand;
 import main.utilities.commands.OfflineInterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
 import main.utilities.constants.Constant;
-import main.utilities.feedbacks.ErrorMessage;
+import main.utilities.feedbacks.*;
 
 public class HelperThread extends Thread{
 	//Client Socket
@@ -174,10 +174,10 @@ public class HelperThread extends Thread{
 			}
 		}
 		if(foundFile) {
-			currentReply.println(OfflineInterfaceCommand.VALID_FILENAME.getCommandText());
+			currentReply.println(SuccessMessage.FILE_FOUND);
 			currentReply.flush();
 		} else {
-			currentReply.println(OfflineInterfaceCommand.INVALID_FILENAME.getCommandText());
+			currentReply.println(ErrorMessage.FILE_NOT_FOUND);
 			currentReply.flush();
 		}
 	}
@@ -227,7 +227,7 @@ public class HelperThread extends Thread{
 			//Replace the HashTable with updated data
 			recordList.replace(fileName, currArrFile);
 
-			currentReply.println("File has been successfully added to Server");
+			currentReply.println(SuccessMessage.NEW_CHUNK_ADDED_TO_TRACKER);
 			currentReply.println(Constant.END_OF_STREAM);
 			currentReply.flush();
 		} else {
@@ -238,7 +238,7 @@ public class HelperThread extends Thread{
 			//Add new Record
 			newArrFile.add(newRecord);
 			recordList.put(fileName, newArrFile);
-			currentReply.println("New File has been successfully added to Server");
+			currentReply.println(SuccessMessage.NEW_FILE_ADDED_TO_TRACKER);
 			currentReply.println(Constant.END_OF_STREAM);
 			currentReply.flush();
 		}
