@@ -68,14 +68,14 @@ public class Client extends Thread {
                     quit(userInputArr);
                     return false;
                 default:
-                    System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+                    System.out.println(ErrorMessage.INVALID_COMMAND + "Command entered: " + userInput);
                     return true;
             }
         } catch (UnknownHostException e) {
-            System.out.println(ErrorMessage.UNKNOWN_HOST.getErrorMessage());
+            System.out.println(ErrorMessage.UNKNOWN_HOST);
             return true;
         } catch (Exception e) {
-            System.out.println(ErrorMessage.UNKNOWN_ERROR.getErrorMessage());
+            System.out.println(ErrorMessage.UNKNOWN_ERROR);
             e.printStackTrace();
             return true;  // So as not to quit the program, proceed as normal
         }        
@@ -83,7 +83,7 @@ public class Client extends Thread {
     
     private void list(String[] userInputArr) throws UnknownHostException, IOException {
         if (userInputArr.length != 1) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS + "Please check the number of arguments required.");
             return;
         }
         Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
@@ -105,7 +105,7 @@ public class Client extends Thread {
     
     private void search(String[] userInputArr) throws Exception {
         if (userInputArr.length != 2) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
         }
         
@@ -124,7 +124,7 @@ public class Client extends Thread {
     
     private void download(String[] userInputArr) throws Exception {
     	if (userInputArr.length != 2) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
         }
     	
@@ -163,7 +163,7 @@ public class Client extends Thread {
     			String data = peers.get(i).trim();
     			String[] seperatedData = data.split(",");
             	if(seperatedData.length != 2) {
-            		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS.getErrorMessage());
+            		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS);
             		return;
             	}
             	
@@ -213,7 +213,7 @@ public class Client extends Thread {
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
         if (userInputArr.length != 2) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
         }
 
@@ -247,7 +247,7 @@ public class Client extends Thread {
     
     private void quit(String[] userInputArr) throws UnknownHostException, IOException {
         if (userInputArr.length != 1) {
-            System.out.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+            System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS + "Please check the number of arguments required.");
             return;
         }
         

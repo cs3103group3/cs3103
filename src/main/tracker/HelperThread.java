@@ -86,7 +86,7 @@ public class HelperThread extends Thread{
 			int commandCode = Integer.parseInt(strCommandArr[0]);
 			command = InterfaceCommand.forCode(commandCode);
 		} catch(NumberFormatException nfe) {
-			currentReply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+			currentReply.println(ErrorMessage.INVALID_COMMAND);
 			return;
 		}
 
@@ -114,7 +114,7 @@ public class HelperThread extends Thread{
 				break;
 			default:
 				//Error
-				currentReply.println(ErrorMessage.INVALID_COMMAND.getErrorMessage());
+				currentReply.println(ErrorMessage.INVALID_COMMAND);
 				return;
 		}
 	}
@@ -200,8 +200,7 @@ public class HelperThread extends Thread{
 		String ipBroadcasted = this.clientSocket.getInetAddress().toString();
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
 		
-//		long checksum = Long.parseLong(recvData[0]);
-		long checksum = 1234;
+		long checksum = Long.parseLong(recvData[0]);
 		String totalNumChunk = recvData[1];
 		String chunkNum = recvData[2];
 		String fileName = recvData[3];
