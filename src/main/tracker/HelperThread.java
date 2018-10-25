@@ -390,12 +390,12 @@ public class HelperThread extends Thread{
 			boolean ipExists = checkIPExists(ipAddress);
 			if(ipExists) {
 				deleteAllRecords(ipAddress);
-				currentReply.write("Exited and Deleted Successfully");
+				currentReply.println("Exited and Deleted Successfully");
 				currentReply.flush();
 				try {
 					clientSocket.close();
 				} catch (IOException e) {
-					currentReply.write("Error closing socket");
+					currentReply.println("Error closing socket");
 				}
 			} else {
 				currentReply.println("Invalid IP address");
