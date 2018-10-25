@@ -199,10 +199,10 @@ public class HelperThread extends Thread{
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 //		String ipBroadcasted = strCommandArr[1];
-		String ipBroadcasted = this.clientSocket.getLocalAddress().toString().substring(1);
+		String ipBroadcasted = this.clientSocket.getInetAddress().toString();
 		String fileBroadcasted = strCommandArr[1];
 		String chunkBroadcasted = strCommandArr[2];
-
+		
 		boolean hasExist =	checkExistFile(fileBroadcasted);
 
 		//If file already exists, simply add the chunk to it
@@ -210,7 +210,8 @@ public class HelperThread extends Thread{
 			//Obtain the arraylist to update first
 			ArrayList<Record> currArrFile = recordList.get(fileBroadcasted);
 			//Add new Record
-			Record addToExist = new Record(ipBroadcasted, chunkBroadcasted);
+			//TODO: NEED TO CHANGE TO ACTUAL MAX CHUNK SIZE
+			Record addToExist = new Record(ipBroadcasted, chunkBroadcasted, "99999");
 			currArrFile.add(addToExist);
 
 			//Replace the HashTable with updated data
@@ -221,7 +222,8 @@ public class HelperThread extends Thread{
 			currentReply.flush();
 		} else {
 			//Create a new Record
-			Record newRecord = new Record(ipBroadcasted, chunkBroadcasted);
+			//TODO: NEED TO CHANGE TO ACTUAL MAX CHUNK SIZE
+			Record newRecord = new Record(ipBroadcasted, chunkBroadcasted,"99999999");
 			//Create a new ArrayList
 			ArrayList<Record> newArrFile = new ArrayList<Record>();
 			//Add new Record
@@ -372,7 +374,7 @@ public class HelperThread extends Thread{
 	 * @param currentReply 
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
-		String ipAddress = this.clientSocket.getLocalAddress().toString();
+		String ipAddress = this.clientSocket.getInetAddress().toString();
 		
 		if(strCommandArr.length != 1) {
 			currentReply.println("Invalid Arguments");

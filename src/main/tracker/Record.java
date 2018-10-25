@@ -9,10 +9,12 @@ public class Record {
 	
 	String ipAddress;
 	String chunkNumber;
+	final String maxChunk;
 	
-	public Record(String ipAdd, String chunkNo) {
+	public Record(String ipAdd, String chunkNo, String maxChunk) {
 		this.ipAddress = ipAdd;
 		this.chunkNumber = chunkNo;
+		this.maxChunk = maxChunk;
 	}
 	
 	public String getipAdd() {
@@ -20,5 +22,8 @@ public class Record {
 	}
 	public String getChunkNo() {
 		return this.chunkNumber;
+	}
+	public String getMaxChunk(){
+		return this.maxChunk;
 	}
 }

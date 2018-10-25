@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
+import main.utilities.commons.CheckAccuracy;
 import main.utilities.errors.ErrorMessage;
 import main.utilities.constants.NetworkConstant;
 import main.utilities.constants.Constant;
@@ -55,6 +56,8 @@ public class Client extends Thread {
                     return true;
                 case DOWNLOAD:
                     download(userInputArr);
+                    //For testing
+//                	connectToServer();
                     return true;
                 case INFORM:
                     inform(userInputArr);
@@ -146,33 +149,32 @@ public class Client extends Thread {
         	return;
         }
         
-        ArrayList<Record> peers = new ArrayList<Record>();
-        for(int i=0;i<peersWithData.size();i++){
-        	System.out.println("I received: " + peersWithData.get(i));
-        	String[] data = peersWithData.get(i).split(",");
-        	if(data.length != 2)
-        		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS.getErrorMessage());
-        	peers.add(new Record(data[0], data[1]));
-        }
-        
-        downloadFromEachPeer(peers, fileName);
+        downloadFromEachPeer(peersWithData, fileName);
     }
     
-    private void downloadFromEachPeer(ArrayList<Record> peers, String fileName){
+    private void downloadFromEachPeer(ArrayList<String> peers, String fileName){
     	System.out.println("Connecting to each P2P Server");
 
         for(int i=0;i<peers.size();i++){
         	//Starts new instance of server
     		try {
+    			String data = peers.get(i).trim();
+    			String[] seperatedData = data.split(",");
+            	if(seperatedData.length != 2) {
+            		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS.getErrorMessage());
+            		return;
+            	}
+            	
+            	//Change to seperatedData[0]: IP Address
     			Socket socket = new Socket(NetworkConstant.SERVER_HOSTNAME, NetworkConstant.SERVER_LISTENING_PORT);
     	        
     	        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-    	        out.println(fileName + "," + peers.get(i).getChunkNo());
+    	        out.println(fileName + "," + seperatedData[1]);
     	        out.flush();
     	        
     	        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     	        String result = in.readLine();
-    	        System.out.println(peers.get(i).getipAdd() + Constant.WHITESPACE + result);
+    	        System.out.println(seperatedData[0] + Constant.WHITESPACE + result);
     	        socket.close();
     		} catch(IOException ioe) {
     			System.out.println("Unable to create Server Socket at Peer Client");
@@ -237,7 +239,6 @@ public class Client extends Thread {
             System.out.println(in.readLine()); 
             clientSocket.close();
         }
-        
     }
     
     private void quit(String[] userInputArr) throws UnknownHostException, IOException {
@@ -259,6 +260,24 @@ public class Client extends Thread {
         System.out.println("Goodbye!");
     }
         
+    private void connectToServer() throws Exception {
+		Socket clientSocket = new Socket(NetworkConstant.SERVER_HOSTNAME, NetworkConstant.SERVER_LISTENING_PORT);
+        
+		String clientName = "Client A";
+		
+		//For testing connect
+//		String clientName = "Client B";
+//		String clientName = "Client C";
+		
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        out.println("Connecting from " + clientName);
+        out.flush();
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        System.out.println(in.readLine());
+        clientSocket.close();
+    }
+    
     public void run() { 
         boolean proceed = true;
         
