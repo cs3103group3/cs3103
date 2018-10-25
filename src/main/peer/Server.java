@@ -8,6 +8,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import main.tracker.Record;
 import main.utilities.commands.OfflineInterfaceCommand;
@@ -20,43 +22,25 @@ public class Server extends Thread {
 		System.out.println("Starting P2P Server");
 
 		//Starts new instance of server
-		try {
-			serverSocket = new ServerSocket(NetworkConstant.SERVER_LISTENING_PORT);
-		} catch(IOException ioe) {
-			System.out.println("Unable to create Server Socket at Peer Server");
-			System.exit(1);
-		}
-
-		listenToDownloadRequest();
+		processConnection();
     }
-
-	private static void listenToDownloadRequest() {
+	
+	private static void processConnection() {
 		
-		while(true) {
-			try {
+		ExecutorService executor = null;
+		try {
+			executor = Executors.newFixedThreadPool(5);
+			serverSocket = new ServerSocket(NetworkConstant.SERVER_LISTENING_PORT);
+			while (true) {
 				Socket clientSocket = serverSocket.accept();
-
-				BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				System.out.println("Client has entered command: " + in.readLine());
-				String result = in.readLine();
-				String resultTrimmed = result.trim();
-				String[] resultArr = resultTrimmed.split(",");
-				
-				PrintWriter reply = new PrintWriter(clientSocket.getOutputStream(), true);
-				
-				System.out.println(resultArr.length);
-				if(resultArr.length == 2){
-					System.out.println("Client wants chunk " + resultArr[1] + " from " + resultArr[0]);
-					
-
-					reply.println(OfflineInterfaceCommand.VALID_DOWNLOAD);
-				} else {
-					reply.println(OfflineInterfaceCommand.INVALID_DOWNLOAD);
-				}
-				
-			} catch(IOException ioe) {
-				System.out.println("Error in creating listening socket");
-				System.exit(1);
+				Runnable worker = new RequestHandler(clientSocket);
+				executor.execute(worker);
+			}
+		} catch(IOException ioe) {
+			System.out.println("Exception while listening for client connection");
+		} finally {
+			if (executor != null) {
+				executor.shutdown();
 			}
 		}
 	}
