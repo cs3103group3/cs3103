@@ -168,7 +168,7 @@ public class Client extends Thread {
         
         ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
         chunkList = processPeersWithData(peersWithData);
-        for (int i = 0; i <= chunkList.size(); i++) {
+        for (int i = 1; i <= chunkList.size(); i++) {
         	for (int j = 0; j < chunkList.get(i).size(); j++) {
         		System.out.println("Client " + chunkList.get(i).get(j) + " has chunk number " + i);
         	}
@@ -340,14 +340,9 @@ public class Client extends Thread {
     	}
     	
     	for (String singlePeerData: peersWithData) {
-    		System.out.println("singlePeerData: " + singlePeerData);
     		String[] peerDataArr = singlePeerData.split(",");
     		int currChunkNumber = Integer.parseInt(peerDataArr[1]);
     		ArrayList<String> tempList = processedList.get(currChunkNumber);
-    		System.out.println("processedList.size(): " + processedList.size());
-    		System.out.println("currChunkNumber: " + currChunkNumber);
-    		System.out.println("tempList: " + tempList);
-    		System.out.println("peerDataArr[0]: " + peerDataArr[0]);
     		tempList.add(peerDataArr[0]);
     		processedList.set(currChunkNumber, tempList);
     	}
