@@ -201,7 +201,6 @@ public class HelperThread extends Thread{
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipBroadcasted = this.clientSocket.getInetAddress().toString().replaceAll("/", "").trim();
-		System.out.println("ipBroadcasted: " + ipBroadcasted);
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
 		
 		long checksum = Long.parseLong(recvData[0]);
