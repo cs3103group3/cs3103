@@ -168,7 +168,8 @@ public class Client extends Thread {
         
         ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
         chunkList = processPeersWithData(peersWithData);
-        for (int i = 1; i <= chunkList.size(); i++) {
+        System.out.println("chunklist.size(): " + chunkList.size());
+        for (int i = 1; i <= Constant.NUM_CHUNKS; i++) {
         	for (int j = 0; j < chunkList.get(i).size(); j++) {
         		System.out.println("Client " + chunkList.get(i).get(j) + " has chunk number " + i);
         	}
@@ -188,15 +189,17 @@ public class Client extends Thread {
     	FileOutputStream fos = new FileOutputStream(yourFile);
     	BufferedOutputStream bos = new BufferedOutputStream(fos);
     	
-    	for (int i = 1; i < chunkPeerList.size(); i++) {
+    	for (int i = 1; i < Constant.NUM_CHUNKS; i++) {
     		try {
     			InetAddress serverIP = null;
     			// TODO: randomly select one peer from peerlist to seed from
     			if (i%2 != 0) {
     				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(0));
+    				System.out.println("serverIP from i%2 == 1: " + serverIP);
     			}
     			else {
     				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(1));
+    				System.out.println("serverIP from i%2 == 0: " + serverIP);
     			}
     			
     			socket = new Socket(serverIP, NetworkConstant.SERVER_LISTENING_PORT);
