@@ -168,6 +168,11 @@ public class Client extends Thread {
         
         ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
         chunkList = processPeersWithData(peersWithData);
+        for (int i = 0; i <= chunkList.size(); i++) {
+        	for (int j = 0; j < chunkList.get(i).size(); j++) {
+        		System.out.println("Client " + chunkList.get(i).get(j) + " has chunk number " + i);
+        	}
+        }
         downloadFromEachPeer(chunkList, fileName);
     }
     
