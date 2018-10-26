@@ -6,7 +6,8 @@ public enum ErrorMessage {
     UNKNOWN_HOST(500, "Unknown Host. "),
     UNKNOWN_ERROR(520, "Unknown Error Occurred. "),
 	INVALID_NUMBEROFARGUMENTS(540, "Invalid number of arguments. "),
-	INCONSISTENT_CHECKSUM(555, "Your data might be corrupted. ");
+	INCONSISTENT_CHECKSUM(555, "Your data might be corrupted. "),
+	CANNOT_CLOSE_SOCKET(558, "Unable to close socket. ");
     
     private final int code;
     private final String message;

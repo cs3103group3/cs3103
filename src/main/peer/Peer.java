@@ -11,6 +11,15 @@ public class Peer {
         server.start();
         client.start();
         
-        
+        cleanUp(server, client);
+    }
+    
+    public static void cleanUp(Server server, Client client) {
+        while (client.isAlive()) {
+            if (!client.isAlive()) {
+                server.closeSockets();
+                break;
+            }
+        }
     }
 }
