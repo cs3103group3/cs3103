@@ -92,22 +92,27 @@ public class Client extends Thread {
             System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS + "Please check the number of arguments required.");
             return;
         }
-        InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
-        Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
-        
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(InterfaceCommand.LIST.getCommandCode());
-        out.flush();
-        
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String str=in.readLine();
-        while(!str.equals(Constant.END_OF_STREAM)) {
-            System.out.println(str);
-            str=in.readLine();
-        }
+        try {
+        	InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
+            Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
+            
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            out.println(InterfaceCommand.LIST.getCommandCode());
+            out.flush();
+            
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            String str=in.readLine();
+            while(!str.equals(Constant.END_OF_STREAM)) {
+                System.out.println(str);
+                str=in.readLine();
+            }
 
-        in.close();
-        clientSocket.close();
+            in.close();
+            clientSocket.close();
+        } catch(Exception e) {
+        	System.out.println("Exception while listing from server: " + e);
+        	e.printStackTrace();
+        }
     }
     
     private void search(String[] userInputArr) throws Exception {
