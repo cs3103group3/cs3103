@@ -324,6 +324,7 @@ public class Client extends Thread {
     	}
     	
     	for (String singlePeerData: peersWithData) {
+    		System.out.println("singlePeerData: " + singlePeerData);
     		String[] peerDataArr = singlePeerData.split(",");
     		int currChunkNumber = Integer.parseInt(peerDataArr[1]);
     		ArrayList<String> tempList = processedList.get(currChunkNumber);
