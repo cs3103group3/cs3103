@@ -337,6 +337,7 @@ public class Client extends Thread {
          
 		//TODO: close server sockets
         System.out.println("Goodbye!");
+        System.exit(1);
     }
     
     private ArrayList< ArrayList<String> > processPeersWithData(ArrayList<String> peersWithData) {
