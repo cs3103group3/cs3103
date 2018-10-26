@@ -185,8 +185,14 @@ public class Client extends Thread {
     	
     	for (int i = 1; i < chunkPeerList.size(); i++) {
     		try {
+    			InetAddress serverIP = null;
     			// TODO: randomly select one peer from peerlist to seed from
-    			InetAddress serverIP = InetAddress.getByName(chunkPeerList.get(i).get(0));
+    			if (i%2 != 0) {
+    				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(0));
+    			}
+    			else {
+    				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(1));
+    			}
     			
     			socket = new Socket(serverIP, NetworkConstant.SERVER_LISTENING_PORT);
     			
