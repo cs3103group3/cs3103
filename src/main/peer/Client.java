@@ -189,7 +189,7 @@ public class Client extends Thread {
     	FileOutputStream fos = new FileOutputStream(yourFile);
     	BufferedOutputStream bos = new BufferedOutputStream(fos);
     	
-    	for (int i = 1; i < Constant.NUM_CHUNKS; i++) {
+    	for (int i = 1; i <= Constant.NUM_CHUNKS; i++) {
     		try {
     			InetAddress serverIP = null;
     			// TODO: randomly select one peer from peerlist to seed from
@@ -203,7 +203,7 @@ public class Client extends Thread {
     			}
     			else {
     				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(0).replaceAll("/", ""));
-    				System.out.println("serverIP from i%2 == 1: " + serverIP);
+    				System.out.println("serverIP from: " + serverIP);
     			}
     			
     			socket = new Socket(serverIP, NetworkConstant.SERVER_LISTENING_PORT);
