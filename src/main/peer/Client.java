@@ -193,13 +193,17 @@ public class Client extends Thread {
     		try {
     			InetAddress serverIP = null;
     			// TODO: randomly select one peer from peerlist to seed from
-    			if (i%2 != 0) {
+    			if (i%2 == 1) {
     				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(0).replaceAll("/", ""));
     				System.out.println("serverIP from i%2 == 1: " + serverIP);
     			}
-    			else {
+    			else if (chunkPeerList.get(i).size() == 2) {
     				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(1).replaceAll("/", ""));
     				System.out.println("serverIP from i%2 == 0: " + serverIP);
+    			}
+    			else {
+    				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(0).replaceAll("/", ""));
+    				System.out.println("serverIP from i%2 == 1: " + serverIP);
     			}
     			
     			socket = new Socket(serverIP, NetworkConstant.SERVER_LISTENING_PORT);
