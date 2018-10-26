@@ -42,7 +42,10 @@ public class HelperThread extends Thread{
 //		Creating dummy arraylist
 //		Uncomment to create
 //		ArrayList<Record> dummyList=new ArrayList<Record>();
-//		dummyList.add(new Record("192.168.1.0", "1"));
+//		dummyList.add(new Record("127.0.0.1", "1", "4"));
+//		dummyList.add(new Record("10.0.2.5", "2", "4"));
+//		dummyList.add(new Record("127.0.0.1", "3", "4"));
+//		dummyList.add(new Record("10.0.2.5", "4", "4"));
 //		recordList.put("test.txt", dummyList);
 		
 		boolean threadRunning = true;
@@ -281,7 +284,6 @@ public class HelperThread extends Thread{
 	 */
 	private synchronized void findPeer(String[] strCommandArr, PrintWriter currentReply) {
 		String requestedFileName = strCommandArr[1];
-
 
 		if(strCommandArr.length <= 1) {
 			currentReply.print("Invalid Arguments");
