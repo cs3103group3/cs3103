@@ -189,8 +189,7 @@ public class Client extends Thread {
     	Socket socket;
 //    	String filePath = Constant.FILE_DIR + "receive.txt";
 //    	File yourFile = new File("/Users/brehmerchan/Desktop/P2p/src/main/files/receive.txt");
-    	// TODO: specify fileName and directory to download?
-    	File yourFile = new File("receive.txt");
+    	File yourFile = new File(fileName);
     	if (!yourFile.exists()) {
     		yourFile.createNewFile();
 		}
