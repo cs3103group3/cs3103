@@ -13,7 +13,7 @@ public class Peer {
         server.start();
         client.start();
         
-//        HeartBeatResponder heartbeatResponder = new HeartBeatResponder();
-//        heartbeatResponder.start();
+        HeartBeatResponder heartbeatResponder = new HeartBeatResponder();
+        heartbeatResponder.start();
     }
 }

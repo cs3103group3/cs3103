@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 
+import main.heartbeat.HeartBeatInitiator;
 import main.utilities.commons.CheckAccuracy;
 import main.utilities.constants.NetworkConstant;
 
@@ -44,20 +45,18 @@ public class Tracker{
 	}
 
 	private static void listenRequest() {
-		//While server is still alive
-	    int flag = 0;
+	    HeartBeatInitiator heartbeatInitiator = new HeartBeatInitiator(Tracker.aliveIpAddress);
+        heartbeatInitiator.start();
 	    
+		//While server is still alive
 		while(true) {
 			try {
 				Socket clientSocket = serverSocket.accept();
 
 				System.out.println("Accepted a client");
 				
-//				if (flag == 0) {
-				    Thread helperRequest = new HelperThread(clientSocket);
-	                helperRequest.start();
-	                flag = 1;
-//				}
+			    Thread helperRequest = new HelperThread(clientSocket);
+                helperRequest.start();
 				
 			} catch(IOException ioe) {
 				System.out.println("Error in creating listening socket");

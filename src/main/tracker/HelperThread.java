@@ -51,9 +51,6 @@ public class HelperThread extends Thread{
 		boolean threadRunning = true;
 		String clientInput = "";
 		try {
-		    HeartBeatInitiator heartbeatInitiator = new HeartBeatInitiator(Tracker.aliveIpAddress);
-		    heartbeatInitiator.start();
-            
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		//	reply = new PrintWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
 
