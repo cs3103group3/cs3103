@@ -106,7 +106,6 @@ public class Client extends Thread {
                 System.out.println(str);
                 str=in.readLine();
             }
-
             in.close();
             clientSocket.close();
         } catch(Exception e) {
@@ -351,6 +350,10 @@ public class Client extends Thread {
     		String[] peerDataArr = singlePeerData.split(",");
     		int currChunkNumber = Integer.parseInt(peerDataArr[1]);
     		ArrayList<String> tempList = processedList.get(currChunkNumber);
+//    		System.out.println("processedList.size(): " + processedList.size());
+//    		System.out.println("currChunkNumber: " + currChunkNumber);
+//    		System.out.println("tempList: " + tempList);
+//    		System.out.println("peerDataArr[0]: " + peerDataArr[0]);
     		tempList.add(peerDataArr[0]);
     		processedList.set(currChunkNumber, tempList);
     	}
