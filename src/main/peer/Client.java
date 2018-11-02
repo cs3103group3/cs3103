@@ -64,8 +64,6 @@ public class Client extends Thread {
                     return true;
                 case DOWNLOAD:
                     download(userInputArr);
-                    //For testing
-//                	connectToServer();
                     return true;
                 case INFORM:
                     inform(userInputArr);
@@ -235,62 +233,8 @@ public class Client extends Thread {
     			e.printStackTrace();
     		} 
     	}
-
     	fos.close();
     	bos.close();
-    	
-//        for(int i=0;i<chunkList.size();i++){
-//        	//Starts new instance of server
-//    		try {
-//    			String data = chunkList.get(i).trim();
-//    			String[] seperatedData = data.split(",");
-//            	if(seperatedData.length != 2) {
-//            		System.out.println(ErrorMessage.INVALID_NUMBEROFARGUMENTS);
-//            		return;
-//            	}
-//            	
-//            	//Change to seperatedData[0]: IP Address
-//    			Socket socket = new Socket(NetworkConstant.SERVER_HOSTNAME, NetworkConstant.SERVER_LISTENING_PORT);
-//    	        
-//    	        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-//    	        out.println(fileName + "," + seperatedData[1]);
-//    	        out.flush();
-//    	        
-//    	        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//    	        String result = in.readLine();
-//    	        System.out.println(seperatedData[0] + Constant.WHITESPACE + result);
-//    	        socket.close();
-//    		} catch(IOException ioe) {
-//    			System.out.println("Unable to create Server Socket at Peer Client");
-//    			System.exit(1);
-//    		}
-//        }
-        
-        
-//        int fileSize = (int) file.length();
-//        byte[] currentChunk;
-//        int currentChunkNum = 0;
-//        int readLength = Constant.CHUNK_SIZE;
-//        int read = 0;
-//        
-//        FileInputStream inputStream = new FileInputStream(file);
-//        while (fileSize > 0) {
-//            if (fileSize <= Constant.CHUNK_SIZE) {
-//                readLength = fileSize;
-//            }
-//            
-//            currentChunk = new byte[readLength];
-//            read = inputStream.read(currentChunk, 0, readLength);
-//            fileSize -= read;
-//            String newFileName = fileName + Constant.CHUNK_EXT + Integer.toString(currentChunkNum);
-//            currentChunkNum++;
-//            
-//            FileOutputStream filePart = new FileOutputStream(new File(newFileName));
-//            filePart.write(currentChunk);
-//            filePart.flush();
-//            filePart.close();
-//        }
-        
     }
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
@@ -371,28 +315,6 @@ public class Client extends Thread {
     	
     	return processedList;
     }
-        
-    private void requestFileFromServer() {
-    	
-    }
-    
-//    private void connectToServer() throws Exception {
-//		Socket clientSocket = new Socket(NetworkConstant.SERVER_HOSTNAME, NetworkConstant.SERVER_LISTENING_PORT);
-//        
-//		String clientName = "Client A";
-//		
-//		//For testing connect
-////		String clientName = "Client B";
-////		String clientName = "Client C";
-//		
-//        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-//        out.println("Connecting from " + clientName);
-//        out.flush();
-//        
-//        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//        System.out.println(in.readLine());
-//        clientSocket.close();
-//    }
     
     public void run() { 
         boolean proceed = true;

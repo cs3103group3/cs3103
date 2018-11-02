@@ -37,8 +37,6 @@ public class RequestHandler implements Runnable {
 		String fileName = resultArr[0];
 		int chunkNumber = Integer.parseInt(resultArr[1]);
 		
-//		PrintWriter reply = new PrintWriter(client.getOutputStream(), true);
-		
 		if (resultArr.length == 2) {
 			processDownload(fileName, chunkNumber);
 //			reply.println(OfflineInterfaceCommand.VALID_DOWNLOAD);
@@ -46,21 +44,6 @@ public class RequestHandler implements Runnable {
 		else {
 //			reply.println(OfflineInterfaceCommand.INVALID_DOWNLOAD);
 		}
-		
-		
-//		BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-//		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-//	         System.out.println("Thread started with name:" + Thread.currentThread().getName());
-//	         String userInput;
-//
-//	    while ((userInput = in.readLine()) != null) {
-//	    	//removes special character
-//	      userInput=userInput.replaceAll("[^A-Za-z0-9 ]", "");
-//          System.out.println("Received message from " + Thread.currentThread().getName() + " : " + userInput);
-//	      writer.write("You entered : " + userInput);
-//	      writer.newLine();
-//	      writer.flush();
-//	    }
 	} catch (IOException e) {
 	    System.out.println("I/O exception: " + e);
 	    e.printStackTrace();
