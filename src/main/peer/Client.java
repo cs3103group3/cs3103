@@ -171,7 +171,8 @@ public class Client extends Thread {
 	     
 	    // Inner-arrayList stores the peer IP's that are holding the specific chunk
         
-        int numChunks = Integer.parseInt(peersWithData.get(peersWithData.size()));
+        int numChunks = Integer.parseInt(peersWithData.get(peersWithData.size() - 1));
+        peersWithData.remove(peersWithData.size() - 1);
         ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
         chunkList = processPeersWithData(peersWithData, numChunks);
         System.out.println("chunklist.size(): " + chunkList.size());
