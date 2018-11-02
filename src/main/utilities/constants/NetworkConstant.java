@@ -19,4 +19,8 @@ public final class NetworkConstant {
     // For testing connect();
     public static final int SERVER_LISTENING_PORTB = 2112;
     public static final int SERVER_LISTENING_PORTC = 2102;
+    
+    // Heartbeat Port
+    public static final int HEARTBEAT_TRACKER_LISTENING_PORT = 6565;
+    public static final int HEARTBEAT_CLIENT_LISTENING_PORT = 6666;
 }

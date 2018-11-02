@@ -6,10 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import main.heartbeat.HeartBeatInitiator;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commands.OfflineInterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
@@ -26,6 +28,7 @@ public class HelperThread extends Thread{
 	//Hash table of fileName to its records of users
 	//E.g. fileOne as key to ArrayList of fileOne chunks
 	private Hashtable<String, ArrayList<Record>> recordList = Tracker.recordTable;
+//	private Set<String> aliveIpAddress = Tracker.aliveIpAddress;
 	
 	private static final String INVALID_CHUNK = "-1";
 	private static boolean FOUND_IP = true;
@@ -48,6 +51,9 @@ public class HelperThread extends Thread{
 		boolean threadRunning = true;
 		String clientInput = "";
 		try {
+		    HeartBeatInitiator heartbeatInitiator = new HeartBeatInitiator(Tracker.aliveIpAddress);
+		    heartbeatInitiator.start();
+            
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		//	reply = new PrintWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
 
@@ -213,6 +219,8 @@ public class HelperThread extends Thread{
             currentReply.flush();
 		    return;
 		}
+		
+		Tracker.aliveIpAddress.add(ipBroadcasted);
 		
 		boolean hasExist =	checkExistFile(fileName);
 

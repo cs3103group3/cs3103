@@ -216,6 +216,8 @@ public class Client extends Thread {
             System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
         }
+        
+        System.out.println("1");
 
         String fileName = userInputArr[1];
         
@@ -227,13 +229,17 @@ public class Client extends Thread {
         
         long fileSize =  file.length();
         int totalNumChunk = (int) Math.ceil(fileSize*1.0/ Constant.CHUNK_SIZE);
-                
+        
+        System.out.println("2");
         for (int chunkNum=0; chunkNum<totalNumChunk; chunkNum++) {
+            System.out.println("ChunkNum: " + chunkNum);
+            System.out.println("totalNumChunk: " + totalNumChunk);
             String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
             long checksum = CheckAccuracy.calculateChecksum(payload);
             String data = checksum + Constant.COMMA + payload;
             
             String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
+            System.out.println("SendData: " + sendData);
             Socket clientSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.TRACKER_LISTENING_PORT);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -243,6 +249,7 @@ public class Client extends Thread {
             System.out.println(in.readLine()); 
             clientSocket.close();
         }
+        System.out.println("3");
     }
     
     private void quit(String[] userInputArr) throws UnknownHostException, IOException {
