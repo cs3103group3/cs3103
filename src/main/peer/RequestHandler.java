@@ -75,10 +75,11 @@ public class RequestHandler implements Runnable {
     	try {
     		byte[] fileByteArray = null;
 //    		String filePath = Constant.FILE_DIR + fileName;
-    		FileInputStream fis = new FileInputStream("/Users/brehmerchan/Desktop/P2p/src/main/files/test.txt");
+//    		FileInputStream fis = new FileInputStream("/Users/brehmerchan/Desktop/P2p/src/main/files/test.txt");
+    		FileInputStream fis = new FileInputStream("test.txt");
     		BufferedInputStream bis = new BufferedInputStream(fis);
     		try {
-    			File fileToSeed = new File("/Users/brehmerchan/Desktop/P2p/src/main/files/test.txt");
+    			File fileToSeed = new File("test.txt");
     			int startByte = Constant.CHUNK_SIZE * (chunkNumber - 1);
     			bis.skip(startByte);
     			int chunkSize = (int) (fileToSeed.length() - startByte);
