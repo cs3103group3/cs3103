@@ -5,7 +5,7 @@ public final class NetworkConstant {
     
     // Tracker
     public static final int TRACKER_LISTENING_PORT = 7878;
-    public static final String TRACKER_HOSTNAME = "172.25.105.127";
+    public static final String TRACKER_HOSTNAME = "localhost";
     
     // Peer Client
     public static final int CLIENT_LISTENING_PORT = 2121;
