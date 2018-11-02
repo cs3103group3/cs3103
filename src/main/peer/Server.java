@@ -34,11 +34,12 @@ public class Server extends Thread {
 			serverSocket = new ServerSocket(NetworkConstant.SERVER_LISTENING_PORT);
 			while (true) {
 				Socket clientSocket = serverSocket.accept();
+				System.out.println("Accepted connection: " + clientSocket);
 				Runnable worker = new RequestHandler(clientSocket);
 				executor.execute(worker);
 			}
 		} catch(IOException ioe) {
-			System.out.println("Exception while listening for client connection");
+			System.out.println("Exception while listening for client connection: " + ioe);
 		} finally {
 			if (executor != null) {
 				executor.shutdown();

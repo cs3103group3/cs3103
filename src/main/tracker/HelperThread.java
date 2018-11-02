@@ -42,7 +42,10 @@ public class HelperThread extends Thread{
 //		Creating dummy arraylist
 //		Uncomment to create
 //		ArrayList<Record> dummyList=new ArrayList<Record>();
-//		dummyList.add(new Record("192.168.1.0", "1"));
+//		dummyList.add(new Record("127.0.0.1", "1", "4"));
+//		dummyList.add(new Record("10.0.2.5", "2", "4"));
+//		dummyList.add(new Record("127.0.0.1", "3", "4"));
+//		dummyList.add(new Record("10.0.2.5", "4", "4"));
 //		recordList.put("test.txt", dummyList);
 		
 		boolean threadRunning = true;
@@ -197,7 +200,9 @@ public class HelperThread extends Thread{
 	 * @param currentReply 
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
-		String ipBroadcasted = this.clientSocket.getInetAddress().toString();
+		String ipBroadcasted = this.clientSocket.getInetAddress().toString().replaceAll("/", "").trim();
+		
+		System.out.println("ipBroadcasted: " + ipBroadcasted);
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
 		
 		long checksum = Long.parseLong(recvData[0]);
@@ -282,7 +287,6 @@ public class HelperThread extends Thread{
 	private synchronized void findPeer(String[] strCommandArr, PrintWriter currentReply) {
 		String requestedFileName = strCommandArr[1];
 
-
 		if(strCommandArr.length <= 1) {
 			currentReply.print("Invalid Arguments");
 			currentReply.flush();
@@ -303,6 +307,8 @@ public class HelperThread extends Thread{
 					requestedData += "\n";
 				}
 				
+				requestedData += requestedChunks.get(0).getMaxChunk();
+				requestedData += "\n";
 				requestedData += Constant.END_OF_STREAM + Constant.NEWLINE;
 				currentReply.write(requestedData);
 				currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
