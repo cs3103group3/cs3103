@@ -165,14 +165,23 @@ public class Client extends Thread {
         	return;
         }
         
+	    // chunkList is an arraylist of arraylist
+	    // Outer-arrayList stores N number of arraylists, where N is the number of chunks
+	    // for a particular text file
+	     
+	    // Inner-arrayList stores the peer IP's that are holding the specific chunk
+        
         ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
         chunkList = processPeersWithData(peersWithData);
         System.out.println("chunklist.size(): " + chunkList.size());
-        for (int i = 1; i <= Constant.NUM_CHUNKS; i++) {
-        	for (int j = 0; j < chunkList.get(i).size(); j++) {
-        		System.out.println("Client " + chunkList.get(i).get(j) + " has chunk number " + i);
-        	}
-        }
+        // TODO: get number of chunks of given text file
+        
+//        For debugging purposes
+//        for (int i = 1; i <= Constant.NUM_CHUNKS; i++) {
+//        	for (int j = 0; j < chunkList.get(i).size(); j++) {
+//        		System.out.println("Client " + chunkList.get(i).get(j) + " has chunk number " + i);
+//        	}
+//        }
         downloadFromEachPeer(chunkList, fileName);
     }
     
@@ -181,6 +190,7 @@ public class Client extends Thread {
     	Socket socket;
 //    	String filePath = Constant.FILE_DIR + "receive.txt";
 //    	File yourFile = new File("/Users/brehmerchan/Desktop/P2p/src/main/files/receive.txt");
+    	// TODO: specify fileName and directory to download?
     	File yourFile = new File("receive.txt");
     	if (!yourFile.exists()) {
     		yourFile.createNewFile();
@@ -188,6 +198,7 @@ public class Client extends Thread {
     	FileOutputStream fos = new FileOutputStream(yourFile);
     	BufferedOutputStream bos = new BufferedOutputStream(fos);
     	
+    	//TODO replace Constant.NUM_CHUNKS with actual number of chunks
     	for (int i = 1; i <= Constant.NUM_CHUNKS; i++) {
     		try {
     			InetAddress serverIP = null;

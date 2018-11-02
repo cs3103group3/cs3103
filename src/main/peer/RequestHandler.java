@@ -32,6 +32,7 @@ public class RequestHandler implements Runnable {
 		String result = in.readLine();
 		String resultTrimmed = result.trim();
 		System.out.println("Received message from " + Thread.currentThread().getName() + " : " + resultTrimmed);
+		// resultArr[0] contains fileName, resultArr[1] contains chunkNumber
 		String[] resultArr = resultTrimmed.split(",");
 		String fileName = resultArr[0];
 		int chunkNumber = Integer.parseInt(resultArr[1]);
@@ -76,6 +77,7 @@ public class RequestHandler implements Runnable {
     		byte[] fileByteArray = null;
 //    		String filePath = Constant.FILE_DIR + fileName;
 //    		FileInputStream fis = new FileInputStream("/Users/brehmerchan/Desktop/P2p/src/main/files/test.txt");
+    		// TODO: specify fileName and directory to download?
     		FileInputStream fis = new FileInputStream("test.txt");
     		BufferedInputStream bis = new BufferedInputStream(fis);
     		try {
