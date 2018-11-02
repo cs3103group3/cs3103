@@ -12,7 +12,5 @@ public final class Constant {
     public static final int CHUNK_SIZE = 1024;
     public static final String CHUNK_EXT = ".chunk";
     
-    public static final int NUM_CHUNKS = 4;
-    
     public static final String FILE_DIR = "../files/";
 }

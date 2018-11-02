@@ -169,21 +169,22 @@ public class Client extends Thread {
 	     
 	    // Inner-arrayList stores the peer IP's that are holding the specific chunk
         
+        int numChunks = Integer.parseInt(peersWithData.get(peersWithData.size()));
         ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
-        chunkList = processPeersWithData(peersWithData);
+        chunkList = processPeersWithData(peersWithData, numChunks);
         System.out.println("chunklist.size(): " + chunkList.size());
-        // TODO: get number of chunks of given text file
         
 //        For debugging purposes
-//        for (int i = 1; i <= Constant.NUM_CHUNKS; i++) {
+//        for (int i = 1; i <= numChunks; i++) {
 //        	for (int j = 0; j < chunkList.get(i).size(); j++) {
 //        		System.out.println("Client " + chunkList.get(i).get(j) + " has chunk number " + i);
 //        	}
 //        }
-        downloadFromEachPeer(chunkList, fileName);
+        
+        downloadFromEachPeer(chunkList, fileName, numChunks);
     }
     
-    private void downloadFromEachPeer(ArrayList< ArrayList<String> > chunkPeerList, String fileName) throws IOException{
+    private void downloadFromEachPeer(ArrayList< ArrayList<String> > chunkPeerList, String fileName, int numChunks) throws IOException{
     	System.out.println("Connecting to P2P Server");
     	Socket socket;
 //    	String filePath = Constant.FILE_DIR + "receive.txt";
@@ -196,8 +197,7 @@ public class Client extends Thread {
     	FileOutputStream fos = new FileOutputStream(yourFile);
     	BufferedOutputStream bos = new BufferedOutputStream(fos);
     	
-    	//TODO replace Constant.NUM_CHUNKS with actual number of chunks
-    	for (int i = 1; i <= Constant.NUM_CHUNKS; i++) {
+    	for (int i = 1; i <= numChunks; i++) {
     		try {
     			InetAddress serverIP = null;
     			// TODO: randomly select one peer from peerlist to seed from
@@ -294,15 +294,18 @@ public class Client extends Thread {
         System.exit(1);
     }
     
-    private ArrayList< ArrayList<String> > processPeersWithData(ArrayList<String> peersWithData) {
+    private ArrayList< ArrayList<String> > processPeersWithData(ArrayList<String> peersWithData, int numChunks) {
     	ArrayList< ArrayList<String> > processedList = new ArrayList< ArrayList<String> >();
     	processedList.add(0, null);
-    	for (int i = 1; i <= Constant.NUM_CHUNKS; i++) {
+    	for (int i = 1; i <= numChunks; i++) {
     		processedList.add(i, new ArrayList<String>());
     	}
     	
     	for (String singlePeerData: peersWithData) {
     		String[] peerDataArr = singlePeerData.split(",");
+    		// peerDataArr[0]: ipNumber of peer's server
+    		// peerDataArr[1]: chunk number
+    		// peerDataArr[2]: number if chunk for this text file
     		int currChunkNumber = Integer.parseInt(peerDataArr[1]);
     		ArrayList<String> tempList = processedList.get(currChunkNumber);
 //    		System.out.println("processedList.size(): " + processedList.size());

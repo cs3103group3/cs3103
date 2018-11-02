@@ -307,6 +307,8 @@ public class HelperThread extends Thread{
 					requestedData += "\n";
 				}
 				
+				requestedData += requestedChunks.get(0).getMaxChunk();
+				requestedData += "\n";
 				requestedData += Constant.END_OF_STREAM + Constant.NEWLINE;
 				currentReply.write(requestedData);
 				currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
