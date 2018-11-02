@@ -2,6 +2,7 @@ package main.peer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,6 +17,7 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 
 import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
@@ -199,20 +201,7 @@ public class Client extends Thread {
     	for (int i = 1; i <= numChunks; i++) {
     		try {
     			InetAddress serverIP = null;
-    			// TODO: randomly select one peer from peerlist to seed from
-    			if (i%2 == 1) {
-    				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(0).replaceAll("/", ""));
-    				System.out.println("serverIP from i%2 == 1: " + serverIP);
-    			}
-    			else if (chunkPeerList.get(i).size() == 2) {
-    				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(1).replaceAll("/", ""));
-    				System.out.println("serverIP from i%2 == 0: " + serverIP);
-    			}
-    			else {
-    				serverIP = InetAddress.getByName(chunkPeerList.get(i).get(0).replaceAll("/", ""));
-    				System.out.println("serverIP from: " + serverIP);
-    			}
-    			
+    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
     			socket = new Socket(serverIP, NetworkConstant.SERVER_LISTENING_PORT);
     			
     			// Send fileName and chunkNum to download
@@ -317,6 +306,14 @@ public class Client extends Thread {
     	
     	return processedList;
     }
+    
+    private String getIPToConnect(ArrayList<String> ipList) {
+		Random currRan = new SecureRandom();
+		//E.g. ipList is size 3, random peer is chosen from 0 to 2 index
+		int peerChosen = currRan.nextInt(ipList.size());
+		//Return the ip address of the chosen peer
+		return ipList.get(peerChosen);
+	}
     
     public void run() { 
         boolean proceed = true;
