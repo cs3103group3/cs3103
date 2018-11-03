@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import main.utilities.constants.Constant;
 import main.utilities.constants.NetworkConstant;
 
 public class HeartBeatResponder extends Thread {
@@ -12,15 +13,16 @@ public class HeartBeatResponder extends Thread {
         ServerSocket listeningSocket;
       //Starts new instance of server
         try {
-            listeningSocket = new ServerSocket(NetworkConstant.HEARTBEAT_CLIENT_LISTENING_PORT);
+            listeningSocket = new ServerSocket(NetworkConstant.HEARTBEAT_PEER_LISTENING_PORT);
             
             while(true) {
                 try {
-                    Socket clientSocket = listeningSocket.accept();
-                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    out.println("Received a ping from Tracker");
+                    Socket incomingSocket = listeningSocket.accept();
+                    Socket outgoingSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.HEARTBEAT_TRACKER_LISTENING_PORT);
+                    PrintWriter out = new PrintWriter(outgoingSocket.getOutputStream(), true);
+                    out.println(Constant.HEARTBEAT_RESPOND);
                     out.flush();
-                    clientSocket.close();
+                    outgoingSocket.close();
                     
                 } catch(IOException ioe) {
                     System.out.println("Error in creating outgoing socket");

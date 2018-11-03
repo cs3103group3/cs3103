@@ -22,5 +22,5 @@ public final class NetworkConstant {
     
     // Heartbeat Port
     public static final int HEARTBEAT_TRACKER_LISTENING_PORT = 6565;
-    public static final int HEARTBEAT_CLIENT_LISTENING_PORT = 6666;
+    public static final int HEARTBEAT_PEER_LISTENING_PORT = 6666;
 }

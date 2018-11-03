@@ -41,7 +41,6 @@ public class HelperThread extends Thread{
 
 	@Override
 	public void run() {
-		
 //		Creating dummy arraylist
 //		Uncomment to create
 //		ArrayList<Record> dummyList=new ArrayList<Record>();
@@ -200,7 +199,7 @@ public class HelperThread extends Thread{
 	 * @param currentReply 
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
-		String ipBroadcasted = this.clientSocket.getInetAddress().toString();
+		String ipBroadcasted = this.clientSocket.getInetAddress().getHostAddress();
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
 		
 		long checksum = Long.parseLong(recvData[0]);
@@ -217,7 +216,8 @@ public class HelperThread extends Thread{
 		    return;
 		}
 		
-		Tracker.aliveIpAddress.add(ipBroadcasted);
+		System.out.println("IP_RECEIVED: " + ipBroadcasted);
+		Tracker.aliveIpAddresses.add(ipBroadcasted);
 		
 		boolean hasExist =	checkExistFile(fileName);
 

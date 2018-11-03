@@ -1,66 +1,69 @@
 package main.heartbeat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import main.peer.RequestHandler;
 import main.utilities.constants.Constant;
 import main.utilities.constants.NetworkConstant;
+import main.tracker.Tracker;
 
 public class HeartBeatInitiator extends Thread {
-    Timer timer;
-    ServerSocket listeningSocket;
+    private Timer timer;
+    private ServerSocket listeningSocket;
     
-    Set<String> ipAddressSet;
-    
-    public HeartBeatInitiator(Set<String> set) {
-        this.ipAddressSet = set;
-    }
+    private Set<String> setOfIpAddressesThatResponded = new HashSet<String>();
     
     public void run() { 
         try {
             listeningSocket = new ServerSocket(NetworkConstant.HEARTBEAT_TRACKER_LISTENING_PORT);
             timer = new Timer();
-            timer.schedule(new PingAllPeers(), 0, 10000);
+            timer.schedule(new PingAllPeers(), 0, Constant.HEARTBEAT_INTERVAL);
             
-            ExecutorService executor = null;
             try {
-                executor = Executors.newFixedThreadPool(5);
                 while (true) {
                     Socket clientSocket = listeningSocket.accept();
-//                    String ipAddress = clientSocket.getInetAddress().toString();
-                    Runnable worker = new RequestHandler(clientSocket);
-                    PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    out.println(Constant.HEARTBEAT);
-                    out.flush();
-                    executor.execute(worker);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    String cleintResponse = in.readLine();
+                    if (cleintResponse.equals(Constant.HEARTBEAT_RESPOND)) {
+                        setOfIpAddressesThatResponded.add(clientSocket.getInetAddress().getHostAddress());
+                    }
                 }
             } catch(IOException ioe) {
                 System.out.println("Exception while listening for client connection");
-            } finally {
-                if (executor != null) {
-                    executor.shutdown();
-                }
-            }
+            } 
         } catch (IOException e) {
             System.out.println("Exception while opening HeartBeat Port");
             e.printStackTrace();
         }
-        
-        
     }
     
     class PingAllPeers extends TimerTask {
         public void run() {
-            System.out.println(ipAddressSet);
+            Tracker.removeIpAddressesNoResponseFromRecord(setOfIpAddressesThatResponded);
+            
+            String currentIpAddress = "";
+            
+            try {
+                for (String ipAddressToPing : Tracker.aliveIpAddresses) {
+                    currentIpAddress = ipAddressToPing;
+                    Socket outgoingSocket = new Socket(ipAddressToPing, NetworkConstant.HEARTBEAT_PEER_LISTENING_PORT);
+                    PrintWriter out = new PrintWriter(outgoingSocket.getOutputStream(), true);
+                    out.println(Constant.HEARTBEAT_QUERY);
+                    out.flush();
+                    outgoingSocket.close();
+                }
+            } catch(IOException ioe) {
+                System.out.println("Unable to create socket to send heartbeat query. Target client may have disconnected.");
+                Tracker.removeIpAddressFromRecord(currentIpAddress);
+            }
         }
     }
     
