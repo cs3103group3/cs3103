@@ -96,6 +96,15 @@ public class Client extends Thread {
         	InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
             Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
             
+            int publicPort = clientSocket.getPort();
+			System.out.println("My Public port is " + publicPort);
+			
+			int localPort = clientSocket.getLocalPort();
+			System.out.println("My Local port is " + localPort);
+			
+			InetAddress publicAddress = clientSocket.getInetAddress();
+			System.out.println("My public IP address is " + publicAddress.toString());
+			
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             out.println(InterfaceCommand.LIST.getCommandCode());
             out.flush();
@@ -204,6 +213,7 @@ public class Client extends Thread {
     			InetAddress serverIP = null;
     			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
     			socket = new Socket(serverIP, NetworkConstant.SERVER_LISTENING_PORT);
+    			
     			
     			// Send fileName and chunkNum to download
     			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
