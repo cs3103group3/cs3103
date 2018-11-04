@@ -6,10 +6,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Set;
 
 import main.heartbeat.HeartBeatInitiator;
-import main.utilities.commons.CheckAccuracy;
 import main.utilities.constants.NetworkConstant;
 
 /**
@@ -101,12 +101,13 @@ public class Tracker{
 	            String ipAddress = record.getipAdd();
 	            if (!ipAddressesResponded.contains(ipAddress)) {
 	                recordList.remove(i);
+	                if (recordTable.get(filename) == null) {
+	                    recordTable.remove(filename);
+	                }
 	                i--;
 	            }
 	        }
 	    });
-	    
-	    System.out.println("RecordTable: " + recordTable);
 	}
 	
 	public static void removeIpAddressFromRecord(String ipAddressToRemove) {
@@ -118,9 +119,23 @@ public class Tracker{
                 String ipAddress = record.getipAdd();
                 if (ipAddress.equals(ipAddressToRemove)) {
                     recordList.remove(i);
+                    if (recordTable.get(filename) == null) {
+                        recordTable.remove(filename);
+                    }
                     i--;
                 }
             }
         });
     }
+	
+	public static void removeFileWithEmptyRecords() {
+	    Iterator<String> iterator = recordTable.keySet().iterator();
+        while (iterator.hasNext()){
+            if (recordTable.get(iterator.next()).size() < 1 ) {
+                iterator.remove();
+            }
+        }
+        
+        System.out.println("RecordTable: " + recordTable);
+	}
 }

@@ -48,6 +48,7 @@ public class HeartBeatInitiator extends Thread {
     class PingAllPeers extends TimerTask {
         public void run() {
             Tracker.removeIpAddressesNoResponseFromRecord(setOfIpAddressesThatResponded);
+            Tracker.removeFileWithEmptyRecords();
             
             String currentIpAddress = "";
             
