@@ -14,4 +14,6 @@ public final class Constant {
     public static final int HEARTBEAT_INTERVAL = 10000;
     public static final String HEARTBEAT_QUERY = "Are you alive?";
     public static final String HEARTBEAT_RESPOND = "I am alive";
+    
+    public static final String FILE_DIR = "../files/";
 }
