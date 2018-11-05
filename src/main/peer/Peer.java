@@ -1,5 +1,7 @@
 package main.peer;
 
+import main.heartbeat.HeartBeatResponder;
+
 /**
  * This class acts as the main class for a peer
  */
@@ -11,6 +13,7 @@ public class Peer {
         server.start();
         client.start();
         
-        
+        HeartBeatResponder heartbeatResponder = new HeartBeatResponder();
+        heartbeatResponder.start();
     }
 }

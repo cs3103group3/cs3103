@@ -231,7 +231,7 @@ public class Client extends Thread {
             System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
         }
-
+        
         String fileName = userInputArr[1];
         
         File file = new File(fileName);
@@ -242,7 +242,6 @@ public class Client extends Thread {
         
         long fileSize =  file.length();
         int totalNumChunk = (int) Math.ceil(fileSize*1.0/ Constant.CHUNK_SIZE);
-                
         for (int chunkNum=1; chunkNum<=totalNumChunk; chunkNum++) {
             String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
             long checksum = CheckAccuracy.calculateChecksum(payload);
