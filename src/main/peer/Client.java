@@ -184,10 +184,14 @@ public class Client extends Thread {
 //        	}
 //        }
         
-        downloadFromEachPeer(chunkList, fileName, numChunks);
+        if (downloadFromEachPeer(chunkList, fileName, numChunks)){
+        	System.out.println("Downloading of " + fileName + " was successful");
+        	String[] arguments = {"4", fileName};
+        	inform(arguments);
+        }
     }
     
-    private void downloadFromEachPeer(ArrayList< ArrayList<String> > chunkPeerList, String fileName, int numChunks) throws IOException{
+    private boolean downloadFromEachPeer(ArrayList< ArrayList<String> > chunkPeerList, String fileName, int numChunks) throws IOException{
     	System.out.println("Connecting to P2P Server");
     	Socket socket;
 //    	String filePath = Constant.FILE_DIR + "receive.txt";
@@ -220,10 +224,12 @@ public class Client extends Thread {
     		} catch (IOException e) {
     			System.out.println("Exception while downloading from peer: " + e);
     			e.printStackTrace();
+    			return false;
     		} 
     	}
     	fos.close();
     	bos.close();
+    	return true;
     }
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
