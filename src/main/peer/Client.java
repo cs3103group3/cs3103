@@ -96,14 +96,14 @@ public class Client extends Thread {
         	InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
             Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
             
-            int publicPort = clientSocket.getPort();
-			System.out.println("My Public port is " + publicPort);
+            int localPort = clientSocket.getPort();
+			System.out.println("My Public port is " + localPort);
 			
-			int localPort = clientSocket.getLocalPort();
-			System.out.println("My Local port is " + localPort);
+			int publicPort = clientSocket.getLocalPort();
+			System.out.println("My Local port is " + publicPort);
 			
 			InetAddress publicAddress = clientSocket.getInetAddress();
-			System.out.println("My public IP address is " + publicAddress.toString());
+			System.out.println("My tracker IP address is " + publicAddress.toString());
 			
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             out.println(InterfaceCommand.LIST.getCommandCode());
@@ -154,6 +154,7 @@ public class Client extends Thread {
     	InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
         Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
         
+        System.out.println("My public clientPort is" + clientSocket.getLocalPort());
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + Constant.WHITESPACE + fileName);
         out.flush();
@@ -212,7 +213,14 @@ public class Client extends Thread {
     		try {
     			InetAddress serverIP = null;
     			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
+    			
+    			System.out.println("serverIp is " + serverIP);
+    			System.out.println("Server Listening Port is : " +  NetworkConstant.SERVER_LISTENING_PORT);
+//    			System.out.println("server temp port no is : " + Server.tempPortNo);
+//    			socket = new Socket(serverIP, Server.tempPortNo);
+    			//This part needs change i.e. needs to get appropriate port number
     			socket = new Socket(serverIP, NetworkConstant.SERVER_LISTENING_PORT);
+    		
     			
     			
     			// Send fileName and chunkNum to download
