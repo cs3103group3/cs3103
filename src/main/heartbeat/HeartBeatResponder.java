@@ -7,10 +7,12 @@ import java.net.Socket;
 
 import main.utilities.constants.Constant;
 import main.utilities.constants.NetworkConstant;
+import main.utilities.feedbacks.ErrorMessage;
 
 public class HeartBeatResponder extends Thread {
+    ServerSocket listeningSocket;
+    
     public void run() { 
-        ServerSocket listeningSocket;
       //Starts new instance of server
         try {
             listeningSocket = new ServerSocket(NetworkConstant.HEARTBEAT_PEER_LISTENING_PORT);
@@ -23,6 +25,7 @@ public class HeartBeatResponder extends Thread {
                     out.println(Constant.HEARTBEAT_RESPOND);
                     out.flush();
                     outgoingSocket.close();
+                    // close incomingSocket
                     
                 } catch(IOException ioe) {
                     System.out.println("Error in creating outgoing socket");
@@ -32,6 +35,14 @@ public class HeartBeatResponder extends Thread {
         } catch(IOException ioe) {
             System.out.println("Error in creating listening socket");
             System.exit(1);
+        }
+    }
+    
+    public void closeSocket() {
+        try {
+            listeningSocket.close();
+        } catch (IOException e) {
+            System.out.println(ErrorMessage.CANNOT_CLOSE_SOCKET + "Heartbeat Peer Listening Socket not found.");
         }
     }
 }
