@@ -1,5 +1,7 @@
 package main.peer;
 
+import main.heartbeat.HeartBeatResponder;
+
 /**
  * This class acts as the main class for a peer
  */
@@ -11,13 +13,17 @@ public class Peer {
         server.start();
         client.start();
         
-        cleanUp(server, client);
+        HeartBeatResponder heartbeatResponder = new HeartBeatResponder();
+        heartbeatResponder.start();
+        
+        cleanUp(server, client, heartbeatResponder);
     }
     
-    public static void cleanUp(Server server, Client client) {
+    public static void cleanUp(Server server, Client client, HeartBeatResponder heartbeatResponder) {
         while (client.isAlive()) {
             if (!client.isAlive()) {
                 server.closeSockets();
+                heartbeatResponder.closeSocket();
                 break;
             }
         }
