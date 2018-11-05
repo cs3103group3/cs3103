@@ -1,34 +1,31 @@
 package main.peer;
 
+import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Scanner;
 
 import sun.net.www.MessageHeader;
 
 public class StunClient {
 
-	InetAddress iaddress;
-	int port;
-	
-	public StunClient(InetAddress iaddress, int port) {
-		this.iaddress = iaddress;
-		this.port = port;
+	int localPort;
+	int serverPort = StunServer.serverPort;
+	InetAddress serverAddress = StunServer.serverAddress;
+	String returnIP_Port;
+
+	public StunClient(int lPort) {
+		this.localPort = lPort;
 	}
-	
-	public StunClient(InetAddress iaddress) {
-		this.iaddress = iaddress;
-		this.port = 0;
-	}
-	
 	public void getServerResponse() {
 		try {
+			//Creates stun client socket
+			Socket stunClientSocket = new Socket(serverAddress, serverPort);
 			
-		} catch (BindException be) {
-			System.out.println(iaddress.toString() + ": " + be.getMessage());
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+		} catch (IOException e) {
+			System.err.println("Error in creating stun client socket");
+			System.exit(1);
 		}
 	}
 	

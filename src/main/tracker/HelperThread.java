@@ -60,6 +60,11 @@ public class HelperThread extends Thread{
 				clientInput = in.readLine();
 
 				System.out.println("Client has entered command: " + clientInput);
+				
+				System.out.println("At HelperThread, clientSocket public IP address seen by server is : " + clientSocket.getInetAddress());
+				System.out.println("At HelperThread, clientSocket local Port seen by server is : " + clientSocket.getPort());
+				System.out.println("At HelperThread, clientSocket local Port seen by server is : " + clientSocket.getLocalPort());
+				
 				if(clientInput.equals("Init test message")) {
 					reply.println("\tWelcome");
 				}
