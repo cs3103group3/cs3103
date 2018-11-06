@@ -397,7 +397,7 @@ public class HelperThread extends Thread{
 	 * @param currentReply 
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
-		String ipAddress = this.clientSocket.getInetAddress().toString();
+//		String ipAddress = this.clientSocket.getInetAddress().toString();
 		int clientUid = Integer.getInteger(strCommandArr[1]);
 		if(strCommandArr.length != 2) {
 			currentReply.println("Invalid Arguments");
@@ -405,6 +405,7 @@ public class HelperThread extends Thread{
 			boolean uidExists = checkUIDExists(clientUid);
 			if(uidExists) {
 				deleteAllRecords(clientUid);
+				deleteClientRecords(clientUid);
 				currentReply.println("Exited and Deleted Successfully");
 				currentReply.flush();
 				try {
@@ -437,16 +438,7 @@ public class HelperThread extends Thread{
 		return false;
 	}
 	
-//	private boolean checkUIDExists(int clientUid) {
-//		Set<Entry<Integer, PeerInfo>> uidEntry = Tracker.uidTable.entrySet();
-//		
-//		for(Entry<Integer, PeerInfo> entry2: uidEntry) {
-//			if(clientUid == entry2.getKey()) {
-//				return FOUND_UID;
-//			}
-//		}
-//		return false;
-//	}
+
 	/**
 	 * This method deletes all the relevant
 	 * records associated with the ip address that is leaving
@@ -467,7 +459,13 @@ public class HelperThread extends Thread{
 		}
 	}
 	
-	private void deleteClientRecords() {
+	private void deleteClientRecords(int clientUid) {
+		Set<Entry<Integer, PeerInfo>> uidEntry = Tracker.uidTable.entrySet();
 		
+		for(Entry<Integer, PeerInfo> entry2: uidEntry) {
+			if(clientUid == entry2.getKey()) {
+				Tracker.uidTable.remove(clientUid);
+			}
+		}
 	}
 }
