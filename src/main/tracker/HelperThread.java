@@ -395,13 +395,13 @@ public class HelperThread extends Thread{
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipAddress = this.clientSocket.getInetAddress().toString();
-		String clientPortNo = this.clientSocket.getInetAddress().getPortNo();
+		String clientPortNo = String.valueOf(this.clientSocket.getPort());
 		if(strCommandArr.length != 1) {
 			currentReply.println("Invalid Arguments");
 		} else {
-			boolean ipExists = checkIPAndPortExists(ipAddress, clientPortNo);
-			if(ipExists) {
-				deleteAllRecords(ipAddress);
+			boolean ipAndPortExists = checkIPAndPortNoExists(ipAddress, clientPortNo);
+			if(ipAndPortExists) {
+				deleteAllRecords(ipAddress, clientPortNo);
 				currentReply.println("Exited and Deleted Successfully");
 				currentReply.flush();
 				try {
@@ -426,7 +426,7 @@ public class HelperThread extends Thread{
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			ArrayList<Record> currArr = entry2.getValue();
 			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getipAdd().equals(ipAddress) && currArr.get(i).getPortNo().equals(clientPortNo)) {
+				if(currArr.get(i).getipAdd().equals(ipAddress) && currArr.get(i).getPortNumber().equals(clientPortNo)) {
 					return FOUND_IP;
 				}
 			}
@@ -440,13 +440,14 @@ public class HelperThread extends Thread{
 	 * @param ipAddress: ip address that is exiting
 	 * 
 	 */
-	private void deleteAllRecords(String ipAddress) {
+	private void deleteAllRecords(String ipAddress, String clientPortNo) {
 		//First find all the entries that contains the associated ip address
 		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			ArrayList<Record> currArr = entry2.getValue();
 			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getipAdd().equals(ipAddress)) {
+				if(currArr.get(i).getipAdd().equals(ipAddress) 
+						&& currArr.get(i).getPortNumber().equals(clientPortNo)) {
 					//Removes the respective ip address in the respective arraylist
 					entry2.getValue().remove(i);
 				}
