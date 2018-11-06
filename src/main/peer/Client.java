@@ -149,8 +149,6 @@ public class Client extends Thread {
             peersWithData.add(results);
             results=in.readLine();
         }
-        
-        
 
         if(peersWithData.get(0).equals("File Requested does not Exists") ||
         		peersWithData.get(0).equals("Chunk of File Name Specified is invalid") ||
@@ -199,23 +197,27 @@ public class Client extends Thread {
     	
     	for (int i = 1; i <= numChunks; i++) {
     		try {
-    			InetAddress serverIP = null;
-    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
-    			socket = new Socket(serverIP, NetworkConstant.SERVER_LISTENING_PORT);
+//    			InetAddress serverIP = null;
+//    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
+    			
+    			//returns a random IP and Port from list
+    			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
     			
     			// Send fileName and chunkNum to download
-    			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-    	        out.println(fileName + "," + i);
+    			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+    	        out.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.COMMA
+    	        			+ serverIPAndPort + Constant.COMMA
+    	        			+ fileName + Constant.COMMA 
+    	        			+ i);
     	        out.flush();
     			
     	        byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
-    	        InputStream is = socket.getInputStream();
+    	        InputStream is = clientSocket.getInputStream();
 	    	    int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
 	    	    byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 	    	    
 				bos.write(newFileDataBytes);
 				bos.flush();
-				socket.close();
     		} catch (IOException e) {
     			System.out.println("Exception while downloading from peer: " + e);
     			e.printStackTrace();
