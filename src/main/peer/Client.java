@@ -298,15 +298,16 @@ public class Client extends Thread {
     	for (String singlePeerData: peersWithData) {
     		String[] peerDataArr = singlePeerData.split(",");
     		// peerDataArr[0]: ipNumber of peer's server
-    		// peerDataArr[1]: chunk number
-    		// peerDataArr[2]: number if chunk for this text file
-    		int currChunkNumber = Integer.parseInt(peerDataArr[1]);
+    		// peerDataArr[1]: portNumber of peer's server
+    		// peerDataArr[2]: chunk number
+    		int currChunkNumber = Integer.parseInt(peerDataArr[2]);
     		ArrayList<String> tempList = processedList.get(currChunkNumber);
 //    		System.out.println("processedList.size(): " + processedList.size());
 //    		System.out.println("currChunkNumber: " + currChunkNumber);
 //    		System.out.println("tempList: " + tempList);
 //    		System.out.println("peerDataArr[0]: " + peerDataArr[0]);
-    		tempList.add(peerDataArr[0]);
+    		String peerServerSocket = peerDataArr[0] + "," + peerDataArr[1];
+    		tempList.add(peerServerSocket);
     		processedList.set(currChunkNumber, tempList);
     	}
     	
