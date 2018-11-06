@@ -316,7 +316,7 @@ public class HelperThread extends Thread{
 				requestedData += "\n";
 				requestedData += Constant.END_OF_STREAM + Constant.NEWLINE;
 				currentReply.write(requestedData);
-				currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
+				currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE); //TODO: remove one of these lines if can successfully close socket
 				currentReply.flush();
 				
 			} else {

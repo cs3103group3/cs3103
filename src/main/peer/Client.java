@@ -26,7 +26,9 @@ import main.utilities.constants.NetworkConstant;
 import main.utilities.feedbacks.ErrorMessage;
 import main.utilities.constants.Constant;
 
-public class Client extends Thread {    
+public class Client extends Thread {
+	private static Integer uid = null;
+	
     private static void displayMenu() {
         System.out.println( "===============================================\n" +
                             "Welcome to CS3103 P2P Client\n" +
@@ -145,14 +147,15 @@ public class Client extends Thread {
     	InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
         Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
         
+        //To find the various peers containing chunks
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-        out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + Constant.WHITESPACE + fileName);
+        out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + Constant.WHITESPACE + fileName + Constant.WHITESPACE + uid);
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String results = in.readLine();
         ArrayList<String> peersWithData = new ArrayList<String>();
-        // Format: ipAdd,chunkNumber
+        // Format: ipAdd,chunkNumber,maxChunk
         while(!results.equals(Constant.END_OF_STREAM)) {
             peersWithData.add(results);
             results=in.readLine();
@@ -160,8 +163,10 @@ public class Client extends Thread {
         
         clientSocket.close();
         
-        if(peersWithData.get(0).equals("File Requested does not Exists")){
-        	System.out.println("File Requested does not Exists");
+        if(peersWithData.get(0).equals("File Requested does not Exists") ||
+        		peersWithData.get(0).equals("Chunk of File Name Specified is invalid") ||
+        		peersWithData.get(0).equals("Invalid Arguments")){
+        	System.out.println(peersWithData.get(0));
         	return;
         }
         
@@ -171,8 +176,13 @@ public class Client extends Thread {
 	     
 	    // Inner-arrayList stores the peer IP's that are holding the specific chunk
         
-        int numChunks = Integer.parseInt(peersWithData.get(peersWithData.size() - 1));
+        //actual Data,maxChunk,uid
+        uid = Integer.parseInt(peersWithData.get(peersWithData.size() - 1)); //update uid and remove it from the results
         peersWithData.remove(peersWithData.size() - 1);
+        
+        int numChunks = Integer.parseInt(peersWithData.get(peersWithData.size() - 1)); //retrieve maxChunks and remove it from the results
+        peersWithData.remove(peersWithData.size() - 1);
+        
         ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
         chunkList = processPeersWithData(peersWithData, numChunks);
         System.out.println("chunklist.size(): " + chunkList.size());
@@ -249,7 +259,7 @@ public class Client extends Thread {
         long fileSize =  file.length();
         int totalNumChunk = (int) Math.ceil(fileSize*1.0/ Constant.CHUNK_SIZE);
         for (int chunkNum=1; chunkNum<=totalNumChunk; chunkNum++) {
-            String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
+            String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName + Constant.COMMA + uid;
             long checksum = CheckAccuracy.calculateChecksum(payload);
             String data = checksum + Constant.COMMA + payload;
             
@@ -262,7 +272,15 @@ public class Client extends Thread {
             out.println(sendData);
             out.flush();
             
-            System.out.println(in.readLine()); 
+            String temp = in.readLine();
+            ArrayList<String> results = new ArrayList<String>();
+            while(!temp.equals(Constant.END_OF_STREAM)) { //expected to receive an ACK followed by uid
+                results.add(temp);
+                temp=in.readLine();
+            }
+            
+            System.out.println(results.get(0)); //ACK
+            uid = Integer.parseInt(results.get(1)); //update UID
             clientSocket.close();
         }
     }
