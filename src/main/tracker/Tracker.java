@@ -27,6 +27,7 @@ public class Tracker{
 	public static Hashtable<String, ArrayList<Record>> recordTable = new Hashtable<>();
 	public static Set<String> aliveIpAddresses = new HashSet<String>();
 	public static Hashtable<Integer, PeerInfo> uidTable = new Hashtable<>();
+	public static int uid = 1;
 	//TODO: Another Hash to pinpoint location of the record
 	
 	public static void main(String[] args) {

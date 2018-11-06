@@ -273,7 +273,7 @@ public class HelperThread extends Thread{
 		
 		while (true) {
 			if (UIDIsFree(peerUid)) {
-				uidTable.put(peerUid, new PeerData(clientIP, clientPort));
+				uidList.put(peerUid, new PeerInfo(clientIP, clientPort));
 				break;
 			}
 			else {
