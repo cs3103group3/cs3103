@@ -262,14 +262,13 @@ public class Client extends Thread {
         
     	//Inform server that it is exiting
 		out.println(InterfaceCommand.QUIT.getCommandCode());
-		out.flush();
-		in.close();
+		//out.flush();
+		//in.close();
 		 
 		clientSocket.close();
          
-		//TODO: close server sockets
         System.out.println("Goodbye!");
-        System.exit(1);
+        //System.exit(1);
     }
     
     private ArrayList< ArrayList<String> > processPeersWithData(ArrayList<String> peersWithData, int numChunks) {
@@ -281,6 +280,7 @@ public class Client extends Thread {
     	
     	for (String singlePeerData: peersWithData) {
     		String[] peerDataArr = singlePeerData.split(",");
+    		
     		// peerDataArr[0]: ipNumber of peer's server
     		// peerDataArr[1]: portNumber of peer's server
     		// peerDataArr[2]: chunk number
