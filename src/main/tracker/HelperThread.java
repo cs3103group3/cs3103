@@ -28,8 +28,8 @@ public class HelperThread extends Thread{
 	//Hash table of fileName to its records of users
 	//E.g. fileOne as key to ArrayList of fileOne chunks
 	private Hashtable<String, ArrayList<Record>> recordList = Tracker.recordTable;
-//	private Set<String> aliveIpAddress = Tracker.aliveIpAddress;
-	
+	//	private Set<String> aliveIpAddress = Tracker.aliveIpAddress;
+
 	private static final String INVALID_CHUNK = "-1";
 	private static boolean FOUND_IP = true;
 	public HelperThread() {
@@ -41,21 +41,21 @@ public class HelperThread extends Thread{
 
 	@Override
 	public void run() {
-//		Creating dummy arraylist
-//		Uncomment to create
-//		ArrayList<Record> dummyList=new ArrayList<Record>();
-//		dummyList.add(new Record("127.0.0.1", "1", "4"));
-//		dummyList.add(new Record("10.0.2.5", "2", "4"));
-//		dummyList.add(new Record("127.0.0.1", "3", "4"));
-//		dummyList.add(new Record("10.0.2.5", "4", "4"));
-//		recordList.put("test.txt", dummyList);
-		
+		//		Creating dummy arraylist
+		//		Uncomment to create
+		//		ArrayList<Record> dummyList=new ArrayList<Record>();
+		//		dummyList.add(new Record("127.0.0.1", "1", "4"));
+		//		dummyList.add(new Record("10.0.2.5", "2", "4"));
+		//		dummyList.add(new Record("127.0.0.1", "3", "4"));
+		//		dummyList.add(new Record("10.0.2.5", "4", "4"));
+		//		recordList.put("test.txt", dummyList);
+
 		boolean threadRunning = true;
 		String clientInput = "";
 		try {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			reply = new PrintWriter(clientSocket.getOutputStream(), true);
-			
+
 			while(threadRunning) {
 				clientInput = in.readLine();
 				System.out.println("Client has entered command: " + clientInput);
@@ -87,30 +87,36 @@ public class HelperThread extends Thread{
 
 		//Calls method that is required to execute the user's command
 		switch(command) {
-			case LIST:
-				//perform list
-				listDirectoryEntry(recordList, currentReply);
-				break;
-			case SEARCH:
-				//perform search
-				searchEntry(strCommandArr, recordList, currentReply);
-				break;
-			case DOWNLOAD:
-				//Finds peer to download the file requested
-				findPeer(strCommandArr, currentReply);
-				break;
-			case INFORM:
-				//Update the server of newly advertised chunk of file
-				informServer(strCommandArr, currentReply);
-				break;
-			case QUIT:
-				//perform exit
-				exitServer(strCommandArr, currentReply);
-				break;
-			default:
-				//Error
-				currentReply.println(ErrorMessage.INVALID_COMMAND);
-				return;
+		case LIST:
+			//perform list
+			listDirectoryEntry(recordList, currentReply);
+			break;
+		case SEARCH:
+			//perform search
+			searchEntry(strCommandArr, recordList, currentReply);
+			break;
+		case DOWNLOAD:
+			//Finds peer to download the file requested
+			findPeer(strCommandArr, currentReply);
+			break;
+		case INFORM:
+			//Update the server of newly advertised chunk of file
+			informServer(strCommandArr, currentReply);
+			break;
+		case QUIT:
+			//perform exit
+			exitServer(strCommandArr, currentReply);
+			break;
+		case FORWARD:
+			forwardServer(strCommandArr, currentReply);
+			break;
+//		case REFORWARD:
+//			returnForward(strCommandArr, currentReply);
+//			break;
+		default:
+			//Error
+			currentReply.println(ErrorMessage.INVALID_COMMAND);
+			return;
 		}
 	}
 
@@ -124,9 +130,9 @@ public class HelperThread extends Thread{
 	 * Directory Entry
 	 */
 	private synchronized void listDirectoryEntry(Hashtable<String, ArrayList<Record>> currentList, PrintWriter currentReply) {
-//		ArrayList<Record> testArrList = new ArrayList<Record>();
-//		testArrList.add(new Record("192.128.122.211", "1"));
-//		currentList.put("Test.txt", testArrList);
+		//		ArrayList<Record> testArrList = new ArrayList<Record>();
+		//		testArrList.add(new Record("192.128.122.211", "1"));
+		//		currentList.put("Test.txt", testArrList);
 		if(currentList.isEmpty()) {
 			currentReply.println(OfflineInterfaceCommand.EMPTY_RECORD);
 			currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
@@ -194,27 +200,27 @@ public class HelperThread extends Thread{
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipBroadcasted = this.clientSocket.getInetAddress().toString().replaceAll("/", "").trim();
 		String portNumber = Integer.toString(this.clientSocket.getPort());
-		
+
 		System.out.println("ipBroadcasted: " + ipBroadcasted);
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
-		
+
 		long checksum = Long.parseLong(recvData[0]);
 		String totalNumChunk = recvData[1];
 		String chunkNum = recvData[2];
 		String fileName = recvData[3];
-		
+
 		String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
-		
+
 		if (!CheckAccuracy.isDataValid(payload, checksum)) {
-		    currentReply.println(ErrorMessage.INCONSISTENT_CHECKSUM);
-            currentReply.println(Constant.END_OF_STREAM);
-            currentReply.flush();
-		    return;
+			currentReply.println(ErrorMessage.INCONSISTENT_CHECKSUM);
+			currentReply.println(Constant.END_OF_STREAM);
+			currentReply.flush();
+			return;
 		}
-		
+
 		System.out.println("IP_RECEIVED: " + ipBroadcasted);
 		Tracker.aliveIpAddresses.add(ipBroadcasted);
-		
+
 		boolean hasExist =	checkExistFile(fileName);
 
 		//If file already exists, simply add the chunk to it
@@ -222,7 +228,7 @@ public class HelperThread extends Thread{
 			//Obtain the arraylist to update first
 			ArrayList<Record> currArrFile = Tracker.recordTable.get(fileName);
 			//Add new Record
-			Record addToExist = new Record(ipBroadcasted, chunkNum, totalNumChunk, portNumber);
+			Record addToExist = new Record(ipBroadcasted, portNumber, chunkNum, totalNumChunk);
 			currArrFile.add(addToExist);
 
 			//Replace the HashTable with updated data
@@ -233,7 +239,7 @@ public class HelperThread extends Thread{
 			currentReply.flush();
 		} else {
 			//Create a new Record
-			Record newRecord = new Record(ipBroadcasted, chunkNum,totalNumChunk, portNumber);
+			Record newRecord = new Record(ipBroadcasted, portNumber, chunkNum, totalNumChunk);
 			//Create a new ArrayList
 			ArrayList<Record> newArrFile = new ArrayList<Record>();
 			//Add new Record
@@ -288,28 +294,30 @@ public class HelperThread extends Thread{
 			currentReply.flush();
 		}
 		boolean fileExist = checkExistFile(requestedFileName);
-		
+
 		//If no chunk Size is Specified
 		if(strCommandArr.length == 2) {
 			if(fileExist) {
 				//Obtain the ArrayList of Entry associated with key of requestedFileName
 				ArrayList<Record> requestedChunks = Tracker.recordTable.get(requestedFileName);
-				
+
 				String requestedData = "";
 				for(int i =0 ; i < requestedChunks.size() ; i ++) {
 					requestedData += requestedChunks.get(i).getipAdd();
 					requestedData += Constant.COMMA;
+					requestedData += requestedChunks.get(i).getPortNumber();
+					requestedData += Constant.COMMA;
 					requestedData += requestedChunks.get(i).getChunkNo();
 					requestedData += "\n";
 				}
-				
+
 				requestedData += requestedChunks.get(0).getMaxChunk();
 				requestedData += "\n";
 				requestedData += Constant.END_OF_STREAM + Constant.NEWLINE;
 				currentReply.write(requestedData);
 				currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
 				currentReply.flush();
-				
+
 			} else {
 				currentReply.println("File Requested does not Exists" + Constant.END_OF_STREAM + Constant.NEWLINE);
 				currentReply.flush();
@@ -319,9 +327,9 @@ public class HelperThread extends Thread{
 			//Expected Reply is only ip address of requested chunk of file name
 			if(fileExist) {
 				String chunkNumber = strCommandArr[2];
-				
+
 				String requestedIP = findRequestedIP(requestedFileName, chunkNumber);
-				
+
 				if(requestedIP.equals(INVALID_CHUNK)) { 
 					currentReply.println("Chunk of File Name Specified is invalid" + Constant.END_OF_STREAM + Constant.NEWLINE);
 					currentReply.flush();
@@ -329,7 +337,7 @@ public class HelperThread extends Thread{
 					currentReply.write(requestedIP + Constant.END_OF_STREAM + Constant.NEWLINE);
 					currentReply.flush();
 				}
-				
+
 			} else {
 				currentReply.println("File Requested does not Exists" + Constant.END_OF_STREAM + Constant.NEWLINE);
 				currentReply.flush();
@@ -350,7 +358,7 @@ public class HelperThread extends Thread{
 			if(requestedFileName.equals(entry2.getKey())) {
 				boolean foundChunk = false;
 				ArrayList<Record> requestedFileArr = entry2.getValue();
-				
+
 				int i = 0;
 				for(i=0 ; i < requestedFileArr.size(); i ++) {
 					if(chunkNumber.equals(requestedFileArr.get(i).getChunkNo())) {
@@ -362,7 +370,7 @@ public class HelperThread extends Thread{
 					String requestedIP = requestedFileArr.get(i).getipAdd();
 					return requestedIP;
 				}
-				
+
 				return INVALID_CHUNK;
 			}
 		}
@@ -405,7 +413,7 @@ public class HelperThread extends Thread{
 			}
 		}
 	}
-	
+
 	/**
 	 * This method checks whether the ip address exists within the central directory server
 	 * @param ipAddress: ip address to check
@@ -423,7 +431,7 @@ public class HelperThread extends Thread{
 		}
 		return false;
 	}
-	
+
 	/**
 	 * This method deletes all the relevant
 	 * records associated with the ip address that is leaving
@@ -443,5 +451,76 @@ public class HelperThread extends Thread{
 				}
 			}
 		}
+	}
+	/**
+	 * This method listens and receive information about the opposing peer
+	 * then replies back with fileName + chunkNumber
+	 * 
+	 */
+	private void forwardServer(String[] clientInputArr, PrintWriter currentReply) {
+		Socket opposingSocket = null;
+		
+		//New Socket that was opened up by the client
+		Socket downloaderSocket = clientSocket;
+		//Expects to receive data from peer A
+		//String clientInput = in.readLine();
+
+		//Process the clientInput which is of the following format
+		//IPb,PortB,FileName,ChunkNumber
+		Tuple opposingPeerTuple = new Tuple(clientInputArr[1], clientInputArr[2]);
+		Set<Entry<Tuple, Socket>> entrySet = Tracker.ipPortToSocketTable.entrySet();
+		for(Entry<Tuple, Socket> entry2 : entrySet) {
+			if(opposingPeerTuple.equals(entry2.getKey())) {
+				opposingSocket = entry2.getValue();
+			}
+		} 
+		if(opposingSocket == null) {
+			System.out.println("Unable to find opposing Socket");
+			return;
+		}
+		addSocket(downloaderSocket);
+		sendOpposingPeer(opposingSocket, clientInputArr);
+	}
+
+	/**
+	 * This methods adds the newly created socket into the hashtable
+	 * @param downloaderSocket
+	 */
+	private void addSocket(Socket downloaderSocket) {
+		//Gets public ip, public port from downloader Socket
+		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
+		String downloaderPublicPort = String.valueOf(downloaderSocket.getLocalPort());
+		System.out.println("New socket is of ip : " + downloaderIP);
+		System.out.println("New Public port is : " +  downloaderPublicPort);
+		Tracker.ipPortToSocketTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
+		
+	}
+	/**
+	 * This method sends data to the opposing peer asking for fileName and chunk Number
+	 * @param opposingSocket
+	 * @param clientInputArr
+	 */
+	private void sendOpposingPeer(Socket opposingSocket, String[] clientInputArr) {
+		try {
+			//Need to find the persistent connection between tracker and opposing peer which is : opposing socket
+			
+			
+			PrintWriter out = new PrintWriter(opposingSocket.getOutputStream(), true);
+			BufferedReader in = new BufferedReader(new InputStreamReader(opposingSocket.getInputStream()));
+			
+			String fileNeeded = clientInputArr[3];
+			String chunkNumber = clientInputArr[4];
+			String dataToSend = fileNeeded + Constant.COMMA + chunkNumber;
+		
+			//Sends to request peer B of the fileName + chunk Number
+			out.println(dataToSend);
+			
+			out.flush();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

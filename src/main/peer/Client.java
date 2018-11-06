@@ -141,7 +141,6 @@ public class Client extends Thread {
             peersWithData.add(results);
             results=in.readLine();
         }
-        
         if(peersWithData.get(0).equals("File Requested does not Exists") ||
         		peersWithData.get(0).equals("Chunk of File Name Specified is invalid") ||
                 peersWithData.get(0).equals("Invalid Arguments")){
@@ -189,14 +188,22 @@ public class Client extends Thread {
     	
     	for (int i = 1; i <= numChunks; i++) {
     		try {
-    			InetAddress serverIP = null;
-    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
-    			socket = new Socket(serverIP, NetworkConstant.SERVER_LISTENING_PORT);
+//    			InetAddress serverIP = null;
+//    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
+    			
+    			//returns a random IP and Port from list
+    			socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
+    			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
+    			String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
     			
     			// Send fileName and chunkNum to download
-    			PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
-    	        outSocket.println(fileName + "," + i);
-    	        outSocket.flush();
+    			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+    	        out.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.WHITESPACE
+    	        			+ serverIPAndPortArr[0] + Constant.WHITESPACE
+    	        			+ serverIPAndPortArr[1] + Constant.WHITESPACE
+    	        			+ fileName + Constant.WHITESPACE 
+    	        			+ i);
+    	        out.flush();
     			
     	        byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
     	        InputStream is = socket.getInputStream();
@@ -205,7 +212,6 @@ public class Client extends Thread {
 	    	    
 				bos.write(newFileDataBytes);
 				bos.flush();
-				socket.close();
     		} catch (IOException e) {
     			System.out.println("Exception while downloading from peer: " + e);
     			e.printStackTrace();
@@ -276,15 +282,16 @@ public class Client extends Thread {
     	for (String singlePeerData: peersWithData) {
     		String[] peerDataArr = singlePeerData.split(",");
     		// peerDataArr[0]: ipNumber of peer's server
-    		// peerDataArr[1]: chunk number
-    		// peerDataArr[2]: number if chunk for this text file
-    		int currChunkNumber = Integer.parseInt(peerDataArr[1]);
+    		// peerDataArr[1]: portNumber of peer's server
+    		// peerDataArr[2]: chunk number
+    		int currChunkNumber = Integer.parseInt(peerDataArr[2]);
     		ArrayList<String> tempList = processedList.get(currChunkNumber);
 //    		System.out.println("processedList.size(): " + processedList.size());
 //    		System.out.println("currChunkNumber: " + currChunkNumber);
 //    		System.out.println("tempList: " + tempList);
 //    		System.out.println("peerDataArr[0]: " + peerDataArr[0]);
-    		tempList.add(peerDataArr[0]);
+    		String peerServerSocket = peerDataArr[0] + "," + peerDataArr[1];
+    		tempList.add(peerServerSocket);
     		processedList.set(currChunkNumber, tempList);
     	}
     	
