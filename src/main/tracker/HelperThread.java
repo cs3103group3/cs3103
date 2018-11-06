@@ -394,11 +394,11 @@ public class HelperThread extends Thread{
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipAddress = this.clientSocket.getInetAddress().toString();
-		
+		String clientPortNo = this.clientSocket.getInetAddress().getPortNo();
 		if(strCommandArr.length != 1) {
 			currentReply.println("Invalid Arguments");
 		} else {
-			boolean ipExists = checkIPExists(ipAddress);
+			boolean ipExists = checkIPAndPortExists(ipAddress, clientPortNo);
 			if(ipExists) {
 				deleteAllRecords(ipAddress);
 				currentReply.println("Exited and Deleted Successfully");
@@ -420,12 +420,12 @@ public class HelperThread extends Thread{
 	 * @param ipAddress: ip address to check
 	 * @return
 	 */
-	private boolean checkIPExists(String ipAddress) {
+	private boolean checkIPAndPortNoExists(String ipAddress, String clientPortNo) {
 		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			ArrayList<Record> currArr = entry2.getValue();
 			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getipAdd().equals(ipAddress)) {
+				if(currArr.get(i).getipAdd().equals(ipAddress) && currArr.get(i).getPortNo().equals(clientPortNo)) {
 					return FOUND_IP;
 				}
 			}
