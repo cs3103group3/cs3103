@@ -203,12 +203,14 @@ public class Client extends Thread {
     			//returns a random IP and Port from list
     			socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
     			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
+    			String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
     			
     			// Send fileName and chunkNum to download
     			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-    	        out.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.COMMA
-    	        			+ serverIPAndPort + Constant.COMMA
-    	        			+ fileName + Constant.COMMA 
+    	        out.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.WHITESPACE
+    	        			+ serverIPAndPortArr[0] + Constant.WHITESPACE
+    	        			+ serverIPAndPortArr[1] + Constant.WHITESPACE
+    	        			+ fileName + Constant.WHITESPACE 
     	        			+ i);
     	        out.flush();
     			
