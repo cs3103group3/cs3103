@@ -197,13 +197,12 @@ public class Client extends Thread {
     			String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
     			
     			// Send fileName and chunkNum to download
-    			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-    	        out.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.WHITESPACE
-    	        			+ serverIPAndPortArr[0] + Constant.WHITESPACE
-    	        			+ serverIPAndPortArr[1] + Constant.WHITESPACE
-    	        			+ fileName + Constant.WHITESPACE 
+    			PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
+    	        outSocket.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.COMMA
+    	        			+ serverIPAndPort + Constant.COMMA
+    	        			+ fileName + Constant.COMMA 
     	        			+ i);
-    	        out.flush();
+    	        outSocket.flush();
     			
     	        byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
     	        InputStream is = socket.getInputStream();
@@ -310,15 +309,12 @@ public class Client extends Thread {
         boolean proceed = true;
 
     	try {
-			clientSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
-			//clientSocket.setKeepAlive(true);
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		} catch (IOException e) {
 			System.out.println("Unable to create client socket");
 			e.printStackTrace();
 		}
-        
         while(proceed) {
             displayMenu();
             proceed = execute();
