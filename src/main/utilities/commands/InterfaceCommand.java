@@ -8,8 +8,9 @@ public enum InterfaceCommand {
     INFORM(4, "Inform Tracker about a new available file and its chunks.\n   Eg. 4 Filename.txt"),
     QUIT(5, "Quit"),
 	FORWARD(6, "Forward"),
-	MEDIATE(7, "Mediate");
-    
+	MEDIATE(7, "Mediate"),
+    AddListeningSocket(8, "Add Listening Socket");
+	
     private final int code;
     private final String text;
     

@@ -90,6 +90,7 @@ public class Tracker{
 
 			while(true) {
 				Socket clientSocket = serverSocket.accept();	
+				// Will be printed twice whenever new client joins (2 persistent connection, client n server)
 				System.out.println("Accepted a client");
 				Runnable worker = new HelperThread(clientSocket);
 				executor.execute(worker);

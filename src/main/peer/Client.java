@@ -28,7 +28,8 @@ import main.utilities.constants.Constant;
 
 public class Client extends Thread {
 
-    Socket clientSocket = Peer.peerSocket;
+    Socket clientSocket;
+
     PrintWriter out;
     BufferedReader in;
     
@@ -193,6 +194,7 @@ public class Client extends Thread {
     			//returns a random IP and Port from list
     			socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
     			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
+    			String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
     			
     			// Send fileName and chunkNum to download
     			PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
@@ -259,14 +261,13 @@ public class Client extends Thread {
         
     	//Inform server that it is exiting
 		out.println(InterfaceCommand.QUIT.getCommandCode());
-		out.flush();
-		in.close();
+		//out.flush();
+		//in.close();
 		 
 		clientSocket.close();
          
-		//TODO: close server sockets
         System.out.println("Goodbye!");
-        System.exit(1);
+        //System.exit(1);
     }
     
     private ArrayList< ArrayList<String> > processPeersWithData(ArrayList<String> peersWithData, int numChunks) {
@@ -278,6 +279,7 @@ public class Client extends Thread {
     	
     	for (String singlePeerData: peersWithData) {
     		String[] peerDataArr = singlePeerData.split(",");
+    		
     		// peerDataArr[0]: ipNumber of peer's server
     		// peerDataArr[1]: portNumber of peer's server
     		// peerDataArr[2]: chunk number
