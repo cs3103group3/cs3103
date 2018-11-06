@@ -309,9 +309,12 @@ public class Client extends Thread {
         boolean proceed = true;
 
     	try {
+    		clientSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
+    		
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		} catch (IOException e) {
+		
+    	} catch (IOException e) {
 			System.out.println("Unable to create client socket");
 			e.printStackTrace();
 		}
