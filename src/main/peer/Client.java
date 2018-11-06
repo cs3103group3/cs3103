@@ -60,8 +60,6 @@ public class Client extends Thread {
         }
         
         try {
-        	clientSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
-            
             switch(command) {
                 case LIST:
                     list(userInputArr);
@@ -313,6 +311,13 @@ public class Client extends Thread {
     
     public void run() { 
         boolean proceed = true;
+
+    	try {
+			clientSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
+		} catch (IOException e) {
+			System.out.println("Unable to create client socket");
+			e.printStackTrace();
+		}
         
         while(proceed) {
             displayMenu();
