@@ -237,7 +237,7 @@ public class HelperThread extends Thread{
 			//Obtain the arraylist to update first
 			ArrayList<Record> currArrFile = Tracker.recordTable.get(fileName);
 			//Add new Record
-			Record addToExist = new Record(ipBroadcasted, chunkNum, totalNumChunk, portNumber);
+			Record addToExist = new Record(ipBroadcasted, portNumber, chunkNum, totalNumChunk);
 			currArrFile.add(addToExist);
 
 			//Replace the HashTable with updated data
@@ -248,7 +248,7 @@ public class HelperThread extends Thread{
 			currentReply.flush();
 		} else {
 			//Create a new Record
-			Record newRecord = new Record(ipBroadcasted, chunkNum,totalNumChunk, portNumber);
+			Record newRecord = new Record(ipBroadcasted, portNumber, chunkNum, totalNumChunk);
 			//Create a new ArrayList
 			ArrayList<Record> newArrFile = new ArrayList<Record>();
 			//Add new Record
