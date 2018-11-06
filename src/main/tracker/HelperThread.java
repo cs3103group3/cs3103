@@ -224,6 +224,9 @@ public class HelperThread extends Thread{
 		System.out.println("IP_RECEIVED: " + ipBroadcasted);
 		Tracker.aliveIpAddresses.add(ipBroadcasted);
 		
+		//Obtain the public port number of the client socket
+		int publicPortNo = clientSocket.getPort();
+		System.out.println("Client public port No is : " + publicPortNo);
 		boolean hasExist =	checkExistFile(fileName);
 
 		//If file already exists, simply add the chunk to it
