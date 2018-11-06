@@ -29,6 +29,8 @@ public class HelperThread extends Thread{
 	//E.g. fileOne as key to ArrayList of fileOne chunks
 	private Hashtable<String, ArrayList<Record>> recordList = Tracker.recordTable;
 //	private Set<String> aliveIpAddress = Tracker.aliveIpAddress;
+
+	private boolean threadRunning = true;
 	
 	private static final String INVALID_CHUNK = "-1";
 	private static boolean FOUND_IP = true;
@@ -50,14 +52,13 @@ public class HelperThread extends Thread{
 //		dummyList.add(new Record("10.0.2.5", "4", "4"));
 //		recordList.put("test.txt", dummyList);
 		
-		boolean threadRunning = true;
 		String clientInput = "";
 		try {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			reply = new PrintWriter(clientSocket.getOutputStream(), true);
 			
 			while(threadRunning) {
-				clientInput = in.readLine();
+				clientInput = in.readLine().trim();
 				System.out.println("Client has entered command: " + clientInput);
 				doClientCommand(clientInput, reply);
 			}
@@ -72,7 +73,6 @@ public class HelperThread extends Thread{
 	 * @param reply2 
 	 */
 	private void doClientCommand(String strCommand, PrintWriter currentReply) {
-		System.out.println("strCmd: " + strCommand);
 		InterfaceCommand command = InterfaceCommand.INVALID;
 		String [] strCommandArr;
 		try {
@@ -384,25 +384,22 @@ public class HelperThread extends Thread{
 	 * @param currentReply 
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
-		String ipAddress = this.clientSocket.getInetAddress().toString();
+		threadRunning = false;
+		
+		String ipAddress = this.clientSocket.getInetAddress().getHostAddress();
 		String clientPortNo = String.valueOf(this.clientSocket.getPort());
-		if(strCommandArr.length != 1) {
-			currentReply.println("Invalid Arguments");
-		} else {
-			boolean ipAndPortExists = checkIPAndPortNoExists(ipAddress, clientPortNo);
-			if(ipAndPortExists) {
-				deleteAllRecords(ipAddress, clientPortNo);
-				currentReply.println("Exited and Deleted Successfully");
-				currentReply.flush();
-				try {
-					clientSocket.close();
-				} catch (IOException e) {
-					currentReply.println("Error closing socket");
-				}
-			} else {
-				currentReply.println("Invalid IP address");
-				currentReply.flush();
+		
+		boolean ipAndPortExists = checkIPAndPortNoExists(ipAddress, clientPortNo);
+		if(ipAndPortExists) {
+			deleteAllRecords(ipAddress, clientPortNo);
+			System.out.println("Exited and Deleted Successfully");
+			try {
+				clientSocket.close();
+			} catch (IOException e) {
+				System.out.println("Error closing socket");
 			}
+		} else {
+			System.out.println("IP address: " + ipAddress + ", port: " + clientPortNo + " does not exist.");
 		}
 	}
 	
@@ -412,15 +409,16 @@ public class HelperThread extends Thread{
 	 * @return
 	 */
 	private boolean checkIPAndPortNoExists(String ipAddress, String clientPortNo) {
-		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
-		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
-			ArrayList<Record> currArr = entry2.getValue();
+		Set<String> keys = Tracker.recordTable.keySet();
+		for(String key : keys) {
+			ArrayList<Record> currArr = Tracker.recordTable.get(key);
 			for(int i = 0; i < currArr.size(); i ++) {
 				if(currArr.get(i).getipAdd().equals(ipAddress) && currArr.get(i).getPortNumber().equals(clientPortNo)) {
 					return FOUND_IP;
 				}
 			}
 		}
+		
 		return false;
 	}
 	

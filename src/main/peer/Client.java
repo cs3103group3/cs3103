@@ -256,14 +256,13 @@ public class Client extends Thread {
         
     	//Inform server that it is exiting
 		out.println(InterfaceCommand.QUIT.getCommandCode());
-		out.flush();
-		in.close();
+		//out.flush();
+		//in.close();
 		 
 		clientSocket.close();
          
-		//TODO: close server sockets
         System.out.println("Goodbye!");
-        System.exit(1);
+        //System.exit(1);
     }
     
     private ArrayList< ArrayList<String> > processPeersWithData(ArrayList<String> peersWithData, int numChunks) {
