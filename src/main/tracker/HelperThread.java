@@ -314,6 +314,8 @@ public class HelperThread extends Thread{
 				for(int i =0 ; i < requestedChunks.size() ; i ++) {
 					requestedData += requestedChunks.get(i).getipAdd();
 					requestedData += Constant.COMMA;
+					requestedData += requestedChunks.get(i).getPortNumber();
+					requestedData += Constant.COMMA;
 					requestedData += requestedChunks.get(i).getChunkNo();
 					requestedData += "\n";
 				}

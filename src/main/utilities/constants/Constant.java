@@ -16,4 +16,5 @@ public final class Constant {
     public static final String HEARTBEAT_RESPOND = "I am alive";
     
     public static final String FILE_DIR = "../files/";
+    public static final String DOWNLOAD_FROM_PEER_COMMAND = "6";
 }
