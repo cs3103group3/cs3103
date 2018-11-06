@@ -27,7 +27,7 @@ import main.utilities.feedbacks.ErrorMessage;
 import main.utilities.constants.Constant;
 
 public class Client extends Thread {
-	private static Integer uid = null;
+	private static int uid = 0;
 	
     private static void displayMenu() {
         System.out.println( "===============================================\n" +
