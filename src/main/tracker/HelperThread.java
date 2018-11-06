@@ -54,25 +54,15 @@ public class HelperThread extends Thread{
 		String clientInput = "";
 		try {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			//	reply = new PrintWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
-
 			reply = new PrintWriter(clientSocket.getOutputStream(), true);
 
 			while(threadRunning) {
 				clientInput = in.readLine();
-
 				System.out.println("Client has entered command: " + clientInput);
-				if(clientInput.equals("Init test message")) {
-					reply.println("\tWelcome");
-				}
-				if(!clientInput.equals("")) {
-					break;
-				}
+				doClientCommand(clientInput, reply);
 			}
-			doClientCommand(clientInput, reply);
 		} catch (IOException e) {
-			System.out.println("Io Exception");
-
+			System.out.println("IOException");
 		}
 	}
 
@@ -82,6 +72,7 @@ public class HelperThread extends Thread{
 	 * @param reply2 
 	 */
 	private void doClientCommand(String strCommand, PrintWriter currentReply) {
+		System.out.println("strCmd: " + strCommand);
 		InterfaceCommand command = InterfaceCommand.INVALID;
 		String [] strCommandArr;
 		try {
