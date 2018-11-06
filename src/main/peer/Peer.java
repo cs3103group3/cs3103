@@ -11,16 +11,8 @@ import main.utilities.constants.NetworkConstant;
  * This class acts as the main class for a peer
  */
 public class Peer {
-	public static Socket peerSocket;
 	
     public static void main(String args[]) {
-    	try {
-    		peerSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), 
-    								NetworkConstant.TRACKER_LISTENING_PORT);
-		} catch (IOException e) {
-			System.out.println("Unable to create client socket");
-			e.printStackTrace();
-		}
         Server server = new Server();
         Client client = new Client();
         
