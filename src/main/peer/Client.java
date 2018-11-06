@@ -29,6 +29,8 @@ import main.utilities.constants.Constant;
 public class Client extends Thread {
 
     Socket clientSocket = Peer.peerSocket;
+    PrintWriter out;
+    BufferedReader in;
     
     private static void displayMenu() {
         System.out.println( "===============================================\n" +
@@ -96,17 +98,13 @@ public class Client extends Thread {
             return;
         }
         try {
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             out.println(InterfaceCommand.LIST.getCommandCode());
-            out.flush();
-            
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             String str=in.readLine();
+            
             while(!str.equals(Constant.END_OF_STREAM)) {
                 System.out.println(str);
                 str=in.readLine();
             }
-            in.close();
         } catch(Exception e) {
         	System.out.println("Exception while listing from server: " + e);
         	e.printStackTrace();
@@ -121,11 +119,8 @@ public class Client extends Thread {
         
         String filePath = userInputArr[1];
         
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         out.println(InterfaceCommand.SEARCH.getCommandCode() + Constant.WHITESPACE + filePath);
-        out.flush();
         
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         System.out.println(in.readLine());
     }
     
@@ -136,12 +131,8 @@ public class Client extends Thread {
         }
     	
     	String fileName = userInputArr[1];
-        
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + Constant.WHITESPACE + fileName);
-        out.flush();
         
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String results = in.readLine();
         ArrayList<String> peersWithData = new ArrayList<String>();
         // Format: ipAdd,chunkNumber
@@ -149,7 +140,6 @@ public class Client extends Thread {
             peersWithData.add(results);
             results=in.readLine();
         }
-
         if(peersWithData.get(0).equals("File Requested does not Exists") ||
         		peersWithData.get(0).equals("Chunk of File Name Specified is invalid") ||
                 peersWithData.get(0).equals("Invalid Arguments")){
@@ -205,12 +195,12 @@ public class Client extends Thread {
     			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
     			
     			// Send fileName and chunkNum to download
-    			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-    	        out.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.COMMA
+    			PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
+    	        outSocket.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.COMMA
     	        			+ serverIPAndPort + Constant.COMMA
     	        			+ fileName + Constant.COMMA 
     	        			+ i);
-    	        out.flush();
+    	        outSocket.flush();
     			
     	        byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
     	        InputStream is = socket.getInputStream();
@@ -237,7 +227,6 @@ public class Client extends Thread {
         }
         
         String fileName = userInputArr[1];
-        
         File file = new File(fileName);
         if (!file.exists()) {
             System.out.println(ErrorMessage.FILE_NOT_FOUND + Constant.WHITESPACE + fileName);
@@ -251,13 +240,14 @@ public class Client extends Thread {
             long checksum = CheckAccuracy.calculateChecksum(payload);
             String data = checksum + Constant.COMMA + payload;
             String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
-
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out.println(sendData);
-            out.flush();
-            
-            System.out.println(in.readLine());
+
+            String temp = in.readLine();
+            ArrayList<String> results = new ArrayList<String>();
+            while(!temp.equals(Constant.END_OF_STREAM)) {
+                results.add(temp);
+                temp=in.readLine();
+            }
         }
     }
     
@@ -268,9 +258,9 @@ public class Client extends Thread {
         }
         
     	//Inform server that it is exiting
-		PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 		out.println(InterfaceCommand.QUIT.getCommandCode());
 		out.flush();
+		in.close();
 		 
 		clientSocket.close();
          
@@ -315,7 +305,14 @@ public class Client extends Thread {
     
     public void run() { 
         boolean proceed = true;
-        
+
+    	try {
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		} catch (IOException e) {
+			System.out.println("Unable to create client socket");
+			e.printStackTrace();
+		}
         while(proceed) {
             displayMenu();
             proceed = execute();
