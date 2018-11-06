@@ -28,7 +28,9 @@ public class Tracker{
 	//To allow faster access, use a hash : fileName to its associated chunks
 	public static Hashtable<String, ArrayList<Record>> recordTable = new Hashtable<>();
 	public static Set<String> aliveIpAddresses = new HashSet<String>();
-
+	
+	//Tuple : 1) Ip 2) Port No.		Value = Socket
+	public static Hashtable<Tuple, Socket> ipPortToSocketTable = new Hashtable<>();
 	//TODO: Another Hash to pinpoint location of the record
 
 	public static void main(String[] args) {

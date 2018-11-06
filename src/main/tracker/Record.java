@@ -12,7 +12,7 @@ public class Record {
 	String chunkNumber;
 	final String maxChunk;
 	
-	public Record(String ipAdd, String chunkNo, String maxChunk, String portNumber) {
+	public Record(String ipAdd, String portNumber, String chunkNo, String maxChunk) {
 		this.ipAddress = ipAdd;
 		this.chunkNumber = chunkNo;
 		this.maxChunk = maxChunk;
