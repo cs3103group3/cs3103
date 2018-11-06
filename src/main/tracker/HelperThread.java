@@ -32,6 +32,7 @@ public class HelperThread extends Thread{
 	
 	private static final String INVALID_CHUNK = "-1";
 	private static boolean FOUND_IP = true;
+	private static boolean FOUND_UID = true;
 	public HelperThread() {
 
 	}
@@ -397,13 +398,13 @@ public class HelperThread extends Thread{
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipAddress = this.clientSocket.getInetAddress().toString();
-		
-		if(strCommandArr.length != 1) {
+		int clientUid = Integer.getInteger(strCommandArr[1]);
+		if(strCommandArr.length != 2) {
 			currentReply.println("Invalid Arguments");
 		} else {
-			boolean ipExists = checkIPExists(ipAddress);
-			if(ipExists) {
-				deleteAllRecords(ipAddress);
+			boolean uidExists = checkUIDExists(clientUid);
+			if(uidExists) {
+				deleteAllRecords(clientUid);
 				currentReply.println("Exited and Deleted Successfully");
 				currentReply.flush();
 				try {
@@ -412,7 +413,7 @@ public class HelperThread extends Thread{
 					currentReply.println("Error closing socket");
 				}
 			} else {
-				currentReply.println("Invalid IP address");
+				currentReply.println("Invalid UID");
 				currentReply.flush();
 			}
 		}
@@ -423,36 +424,50 @@ public class HelperThread extends Thread{
 	 * @param ipAddress: ip address to check
 	 * @return
 	 */
-	private boolean checkIPExists(String ipAddress) {
+	private boolean checkUIDExists(int clientUID) {
 		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			ArrayList<Record> currArr = entry2.getValue();
 			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getipAdd().equals(ipAddress)) {
-					return FOUND_IP;
+				if(currArr.get(i).getUid().equals(clientUID)) {
+					return FOUND_UID;
 				}
 			}
 		}
 		return false;
 	}
 	
+//	private boolean checkUIDExists(int clientUid) {
+//		Set<Entry<Integer, PeerInfo>> uidEntry = Tracker.uidTable.entrySet();
+//		
+//		for(Entry<Integer, PeerInfo> entry2: uidEntry) {
+//			if(clientUid == entry2.getKey()) {
+//				return FOUND_UID;
+//			}
+//		}
+//		return false;
+//	}
 	/**
 	 * This method deletes all the relevant
 	 * records associated with the ip address that is leaving
 	 * @param ipAddress: ip address that is exiting
 	 * 
 	 */
-	private void deleteAllRecords(String ipAddress) {
+	private void deleteAllRecords(int clientUid) {
 		//First find all the entries that contains the associated ip address
 		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			ArrayList<Record> currArr = entry2.getValue();
 			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getipAdd().equals(ipAddress)) {
+				if(currArr.get(i).getUid().equals(clientUid)) {
 					//Removes the respective ip address in the respective arraylist
 					entry2.getValue().remove(i);
 				}
 			}
 		}
+	}
+	
+	private void deleteClientRecords() {
+		
 	}
 }

@@ -21,6 +21,7 @@ import java.security.SecureRandom;
 
 import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
+import main.utilities.commands.OfflineInterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
 import main.utilities.constants.NetworkConstant;
 import main.utilities.feedbacks.ErrorMessage;
@@ -278,7 +279,7 @@ public class Client extends Thread {
         Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
  
 		PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-		out.println(InterfaceCommand.QUIT.getCommandCode());
+		out.println(InterfaceCommand.QUIT.getCommandCode() + Constant.WHITESPACE + uid);
 		out.flush();
 		 
 		clientSocket.close();
