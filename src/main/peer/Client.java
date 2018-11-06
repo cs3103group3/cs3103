@@ -26,7 +26,10 @@ import main.utilities.constants.NetworkConstant;
 import main.utilities.feedbacks.ErrorMessage;
 import main.utilities.constants.Constant;
 
-public class Client extends Thread {    
+public class Client extends Thread {
+
+    Socket clientSocket;
+    
     private static void displayMenu() {
         System.out.println( "===============================================\n" +
                             "Welcome to CS3103 P2P Client\n" +
@@ -57,6 +60,8 @@ public class Client extends Thread {
         }
         
         try {
+        	clientSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
+            
             switch(command) {
                 case LIST:
                     list(userInputArr);
@@ -93,9 +98,6 @@ public class Client extends Thread {
             return;
         }
         try {
-        	InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
-            Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
-            
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             out.println(InterfaceCommand.LIST.getCommandCode());
             out.flush();
@@ -107,7 +109,6 @@ public class Client extends Thread {
                 str=in.readLine();
             }
             in.close();
-            clientSocket.close();
         } catch(Exception e) {
         	System.out.println("Exception while listing from server: " + e);
         	e.printStackTrace();
@@ -122,16 +123,12 @@ public class Client extends Thread {
         
         String filePath = userInputArr[1];
         
-        InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
-        Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
-        
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         out.println(InterfaceCommand.SEARCH.getCommandCode() + Constant.WHITESPACE + filePath);
         out.flush();
         
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         System.out.println(in.readLine());
-        clientSocket.close();
     }
     
     private void download(String[] userInputArr) throws Exception {
@@ -141,9 +138,6 @@ public class Client extends Thread {
         }
     	
     	String fileName = userInputArr[1];
-    	
-    	InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
-        Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
         
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         out.println(InterfaceCommand.DOWNLOAD.getCommandCode() + Constant.WHITESPACE + fileName);
@@ -158,10 +152,12 @@ public class Client extends Thread {
             results=in.readLine();
         }
         
-        clientSocket.close();
         
-        if(peersWithData.get(0).equals("File Requested does not Exists")){
-        	System.out.println("File Requested does not Exists");
+
+        if(peersWithData.get(0).equals("File Requested does not Exists") ||
+        		peersWithData.get(0).equals("Chunk of File Name Specified is invalid") ||
+                peersWithData.get(0).equals("Invalid Arguments")){
+        	System.out.println(peersWithData.get(0));
         	return;
         }
         
@@ -221,6 +217,7 @@ public class Client extends Thread {
 	    	    
 				bos.write(newFileDataBytes);
 				bos.flush();
+				socket.close();
     		} catch (IOException e) {
     			System.out.println("Exception while downloading from peer: " + e);
     			e.printStackTrace();
@@ -252,18 +249,14 @@ public class Client extends Thread {
             String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
             long checksum = CheckAccuracy.calculateChecksum(payload);
             String data = checksum + Constant.COMMA + payload;
-            
             String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
-            InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
-            Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
 
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out.println(sendData);
             out.flush();
             
-            System.out.println(in.readLine()); 
-            clientSocket.close();
+            System.out.println(in.readLine());
         }
     }
     
@@ -274,9 +267,6 @@ public class Client extends Thread {
         }
         
     	//Inform server that it is exiting
-        InetAddress serverIP = InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME);
-        Socket clientSocket = new Socket(serverIP, NetworkConstant.TRACKER_LISTENING_PORT);
- 
 		PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 		out.println(InterfaceCommand.QUIT.getCommandCode());
 		out.flush();
