@@ -6,7 +6,9 @@ public enum InterfaceCommand {
     SEARCH(2, "Search for file\n   Eg. 2 Filename.txt"),
     DOWNLOAD(3, "Download file by filename\n   Eg. 3 Filename.txt"),
     INFORM(4, "Inform Tracker about a new available file and its chunks.\n   Eg. 4 Filename.txt"),
-    QUIT(5, "Quit");
+    QUIT(5, "Quit"),
+	FORWARD(6, "Forward"),
+	REFORWARD(7, "Return Forward");
     
     private final int code;
     private final String text;
