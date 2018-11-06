@@ -113,6 +113,9 @@ public class HelperThread extends Thread{
 //		case REFORWARD:
 //			returnForward(strCommandArr, currentReply);
 //			break;
+		case AddListeningSocket:
+			addSocket(this.clientSocket);
+			break;
 		default:
 			//Error
 			currentReply.println(ErrorMessage.INVALID_COMMAND);
@@ -489,12 +492,12 @@ public class HelperThread extends Thread{
 	private void addSocket(Socket downloaderSocket) {
 		//Gets public ip, public port from downloader Socket
 		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
-		String downloaderPublicPort = String.valueOf(downloaderSocket.getLocalPort());
+		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
 		System.out.println("New socket is of ip : " + downloaderIP);
 		System.out.println("New Public port is : " +  downloaderPublicPort);
 		Tracker.ipPortToSocketTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
-		
 	}
+	
 	/**
 	 * This method sends data to the opposing peer asking for fileName and chunk Number
 	 * @param opposingSocket
