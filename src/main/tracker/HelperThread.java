@@ -28,6 +28,8 @@ public class HelperThread extends Thread{
 	//Hash table of fileName to its records of users
 	//E.g. fileOne as key to ArrayList of fileOne chunks
 	private Hashtable<String, ArrayList<Record>> recordList = Tracker.recordTable;
+	private Hashtable<Integer, PeerInfo> uidList = Tracker.uidTable;
+	private int uid = Tracker.uid;
 //	private Set<String> aliveIpAddress = Tracker.aliveIpAddress;
 	
 	private static final String INVALID_CHUNK = "-1";
@@ -203,6 +205,7 @@ public class HelperThread extends Thread{
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipBroadcasted = this.clientSocket.getInetAddress().toString().replaceAll("/", "").trim();
+		int clientPort = this.clientSocket.getPort();
 		
 		System.out.println("ipBroadcasted: " + ipBroadcasted);
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
@@ -211,6 +214,8 @@ public class HelperThread extends Thread{
 		String totalNumChunk = recvData[1];
 		String chunkNum = recvData[2];
 		String fileName = recvData[3];
+		int peerUid = Integer.parseInt(recvData[4]);
+		peerUid = assignUID(peerUid, ipBroadcasted, clientPort);
 		
 		String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
 		
@@ -234,7 +239,7 @@ public class HelperThread extends Thread{
 			//Obtain the arraylist to update first
 			ArrayList<Record> currArrFile = recordList.get(fileName);
 			//Add new Record
-			Record addToExist = new Record(ipBroadcasted, chunkNum, totalNumChunk);
+			Record addToExist = new Record(ipBroadcasted, chunkNum, totalNumChunk, peerUid);
 			currArrFile.add(addToExist);
 
 			//Replace the HashTable with updated data
@@ -245,7 +250,7 @@ public class HelperThread extends Thread{
 			currentReply.flush();
 		} else {
 			//Create a new Record
-			Record newRecord = new Record(ipBroadcasted, chunkNum,totalNumChunk);
+			Record newRecord = new Record(ipBroadcasted, chunkNum,totalNumChunk, peerUid);
 			//Create a new ArrayList
 			ArrayList<Record> newArrFile = new ArrayList<Record>();
 			//Add new Record
@@ -257,6 +262,39 @@ public class HelperThread extends Thread{
 		}
 	}
 
+	private int assignUID(int peerUid, String clientIP, int clientPort) {
+		//TODO preventing race-condition of UID assignment
+		
+		// new peer, assign new uid
+		if (peerUid == 0) {
+			peerUid = uid;
+			uid++;
+		}
+		
+		while (true) {
+			if (UIDIsFree(peerUid)) {
+				uidTable.put(peerUid, new PeerData(clientIP, clientPort));
+				break;
+			}
+			else {
+				uid++;
+				peerUid = uid;
+			}
+		}
+		return peerUid;
+	}
+	
+	private boolean UIDIsFree(int peerUid) {
+		PeerInfo entry = uidList.get(peerUid);
+		
+		// uid is free and not zero
+		if (entry == null) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 	/**
 	 * This method checks if a file exists within the server
 	 * @param fileBroadcasted
