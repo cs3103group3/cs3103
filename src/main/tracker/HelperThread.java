@@ -203,6 +203,7 @@ public class HelperThread extends Thread{
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipBroadcasted = this.clientSocket.getInetAddress().toString().replaceAll("/", "").trim();
+		String portNumber = Integer.toString(this.clientSocket.getPort());
 		
 		System.out.println("ipBroadcasted: " + ipBroadcasted);
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
@@ -231,7 +232,7 @@ public class HelperThread extends Thread{
 			//Obtain the arraylist to update first
 			ArrayList<Record> currArrFile = recordList.get(fileName);
 			//Add new Record
-			Record addToExist = new Record(ipBroadcasted, chunkNum, totalNumChunk);
+			Record addToExist = new Record(ipBroadcasted, chunkNum, totalNumChunk, portNumber);
 			currArrFile.add(addToExist);
 
 			//Replace the HashTable with updated data
@@ -242,7 +243,7 @@ public class HelperThread extends Thread{
 			currentReply.flush();
 		} else {
 			//Create a new Record
-			Record newRecord = new Record(ipBroadcasted, chunkNum,totalNumChunk);
+			Record newRecord = new Record(ipBroadcasted, chunkNum,totalNumChunk, portNumber);
 			//Create a new ArrayList
 			ArrayList<Record> newArrFile = new ArrayList<Record>();
 			//Add new Record
