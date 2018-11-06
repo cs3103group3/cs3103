@@ -28,7 +28,7 @@ import main.utilities.constants.Constant;
 
 public class Client extends Thread {
 
-    Socket clientSocket;
+    Socket clientSocket = Peer.peerSocket;
     
     private static void displayMenu() {
         System.out.println( "===============================================\n" +
@@ -201,10 +201,11 @@ public class Client extends Thread {
 //    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
     			
     			//returns a random IP and Port from list
+    			socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
     			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
     			
     			// Send fileName and chunkNum to download
-    			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+    			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
     	        out.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.COMMA
     	        			+ serverIPAndPort + Constant.COMMA
     	        			+ fileName + Constant.COMMA 
@@ -212,7 +213,7 @@ public class Client extends Thread {
     	        out.flush();
     			
     	        byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
-    	        InputStream is = clientSocket.getInputStream();
+    	        InputStream is = socket.getInputStream();
 	    	    int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
 	    	    byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 	    	    
@@ -314,13 +315,6 @@ public class Client extends Thread {
     
     public void run() { 
         boolean proceed = true;
-
-    	try {
-			clientSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
-		} catch (IOException e) {
-			System.out.println("Unable to create client socket");
-			e.printStackTrace();
-		}
         
         while(proceed) {
             displayMenu();
