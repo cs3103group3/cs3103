@@ -1,11 +1,15 @@
 package main.tracker;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
@@ -112,15 +116,16 @@ public class HelperThread extends Thread{
 		case FORWARD:
 			forwardServer(strCommandArr, currentReply);
 			break;
-//		case REFORWARD:
-//			returnForward(strCommandArr, currentReply);
-//			break;
+		case MEDIATE:
+			mediate(strCommandArr, currentReply);
+			break;
 		default:
 			//Error
 			currentReply.println(ErrorMessage.INVALID_COMMAND);
 			return;
 		}
 	}
+
 
 
 	/**
@@ -505,24 +510,67 @@ public class HelperThread extends Thread{
 	private void sendOpposingPeer(Socket opposingSocket, String[] clientInputArr) {
 		try {
 			//Need to find the persistent connection between tracker and opposing peer which is : opposing socket
-			
-			
 			PrintWriter out = new PrintWriter(opposingSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(opposingSocket.getInputStream()));
-			
+
+			String ipAdd = clientInputArr[1];
+			String portNo = clientInputArr[2];
 			String fileNeeded = clientInputArr[3];
 			String chunkNumber = clientInputArr[4];
-			String dataToSend = fileNeeded + Constant.COMMA + chunkNumber;
+			String dataToSend = ipAdd + Constant.COMMA
+					+ portNo + Constant.COMMA + fileNeeded + Constant.COMMA + chunkNumber;
 		
-			//Sends to request peer B of the fileName + chunk Number
+			//Sends to request peer B of the fileName + chunk Number + ipAdd + port No
 			out.println(dataToSend);
-			
 			out.flush();
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	/**
+	 * This method mediates the transfer of files between 2 clients through their
+	 * public ip and port number
+	 * @param strCommandArr
+	 * @param currentReply
+	 */
+	private void mediate(String[] strCommandArr, PrintWriter currentReply) {
+		//strCommandArr is: 7 public address of A public port of A
+		String downloaderAddress = strCommandArr[1];
+		String downloaderPort = strCommandArr[2];
+		Tuple downloaderTuple = new Tuple(downloaderAddress, downloaderPort);
+		//Obtain the downloader's socket
+		Socket downloaderSocket = null;
+		Set<Entry<Tuple, Socket>> entrySet = Tracker.ipPortToSocketTable.entrySet();
+		for(Entry<Tuple, Socket> entry2 : entrySet) {
+			if(downloaderTuple.equals(entry2.getKey())) {
+				downloaderSocket = entry2.getValue();
+			}
+		} 
+		
+		if(downloaderSocket == null) {
+			System.out.println("Exception Obtaining downloader's Socket");
+			return;
+		}
+		Socket opposingNewSocket = clientSocket;
+		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
+        InputStream is;
+		try {
+			//Read Data from opposing new Socket
+			is = opposingNewSocket.getInputStream();
+			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
+		    byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
+	    	//Write Data to downloader Socket
 
+		    BufferedOutputStream dos
+		    = new BufferedOutputStream(downloaderSocket.getOutputStream());
+		    
+		    dos.write(newFileDataBytes);
+		    
+		    dos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Error in mediating data");
+		}
 	}
 }
