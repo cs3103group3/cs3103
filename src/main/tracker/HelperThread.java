@@ -230,13 +230,13 @@ public class HelperThread extends Thread{
 		//If file already exists, simply add the chunk to it
 		if(hasExist) {
 			//Obtain the arraylist to update first
-			ArrayList<Record> currArrFile = recordList.get(fileName);
+			ArrayList<Record> currArrFile = Tracker.recordTable.get(fileName);
 			//Add new Record
 			Record addToExist = new Record(ipBroadcasted, chunkNum, totalNumChunk, portNumber);
 			currArrFile.add(addToExist);
 
 			//Replace the HashTable with updated data
-			recordList.replace(fileName, currArrFile);
+			Tracker.recordTable.replace(fileName, currArrFile);
 
 			currentReply.println(SuccessMessage.NEW_CHUNK_ADDED_TO_TRACKER);
 			currentReply.println(Constant.END_OF_STREAM);
@@ -248,7 +248,7 @@ public class HelperThread extends Thread{
 			ArrayList<Record> newArrFile = new ArrayList<Record>();
 			//Add new Record
 			newArrFile.add(newRecord);
-			recordList.put(fileName, newArrFile);
+			Tracker.recordTable.put(fileName, newArrFile);
 			currentReply.println(SuccessMessage.NEW_FILE_ADDED_TO_TRACKER);
 			currentReply.println(Constant.END_OF_STREAM);
 			currentReply.flush();
@@ -261,7 +261,7 @@ public class HelperThread extends Thread{
 	 * @return
 	 */
 	private boolean checkExistFile(String fileBroadcasted) {
-		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
+		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
 		boolean foundFile = false;
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			if(fileBroadcasted.equals(entry2.getKey())) {
@@ -303,7 +303,7 @@ public class HelperThread extends Thread{
 		if(strCommandArr.length == 2) {
 			if(fileExist) {
 				//Obtain the ArrayList of Entry associated with key of requestedFileName
-				ArrayList<Record> requestedChunks = recordList.get(requestedFileName);
+				ArrayList<Record> requestedChunks = Tracker.recordTable.get(requestedFileName);
 				
 				String requestedData = "";
 				for(int i =0 ; i < requestedChunks.size() ; i ++) {
@@ -356,7 +356,7 @@ public class HelperThread extends Thread{
 	 * @return ipAddress/es of requested fileName
 	 */
 	private String findRequestedIP(String requestedFileName, String chunkNumber) {
-		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
+		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			//File Name Matches and chunk Number Matches
 			if(requestedFileName.equals(entry2.getKey())) {
@@ -397,13 +397,13 @@ public class HelperThread extends Thread{
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipAddress = this.clientSocket.getInetAddress().toString();
-		
+		String clientPortNo = String.valueOf(this.clientSocket.getPort());
 		if(strCommandArr.length != 1) {
 			currentReply.println("Invalid Arguments");
 		} else {
-			boolean ipExists = checkIPExists(ipAddress);
-			if(ipExists) {
-				deleteAllRecords(ipAddress);
+			boolean ipAndPortExists = checkIPAndPortNoExists(ipAddress, clientPortNo);
+			if(ipAndPortExists) {
+				deleteAllRecords(ipAddress, clientPortNo);
 				currentReply.println("Exited and Deleted Successfully");
 				currentReply.flush();
 				try {
@@ -423,12 +423,12 @@ public class HelperThread extends Thread{
 	 * @param ipAddress: ip address to check
 	 * @return
 	 */
-	private boolean checkIPExists(String ipAddress) {
-		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
+	private boolean checkIPAndPortNoExists(String ipAddress, String clientPortNo) {
+		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			ArrayList<Record> currArr = entry2.getValue();
 			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getipAdd().equals(ipAddress)) {
+				if(currArr.get(i).getipAdd().equals(ipAddress) && currArr.get(i).getPortNumber().equals(clientPortNo)) {
 					return FOUND_IP;
 				}
 			}
@@ -442,13 +442,14 @@ public class HelperThread extends Thread{
 	 * @param ipAddress: ip address that is exiting
 	 * 
 	 */
-	private void deleteAllRecords(String ipAddress) {
+	private void deleteAllRecords(String ipAddress, String clientPortNo) {
 		//First find all the entries that contains the associated ip address
-		Set<Entry<String, ArrayList<Record>>> entrySet = recordList.entrySet();
+		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			ArrayList<Record> currArr = entry2.getValue();
 			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getipAdd().equals(ipAddress)) {
+				if(currArr.get(i).getipAdd().equals(ipAddress) 
+						&& currArr.get(i).getPortNumber().equals(clientPortNo)) {
 					//Removes the respective ip address in the respective arraylist
 					entry2.getValue().remove(i);
 				}
