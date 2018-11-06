@@ -468,7 +468,7 @@ public class HelperThread extends Thread{
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			ArrayList<Record> currArr = entry2.getValue();
 			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getUid().equals(clientUID)) {
+				if(currArr.get(i).getUid() == (clientUID)) {
 					return FOUND_UID;
 				}
 			}
@@ -489,7 +489,7 @@ public class HelperThread extends Thread{
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			ArrayList<Record> currArr = entry2.getValue();
 			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getUid().equals(clientUid)) {
+				if(currArr.get(i).getUid() == (clientUid)) {
 					//Removes the respective ip address in the respective arraylist
 					entry2.getValue().remove(i);
 				}
