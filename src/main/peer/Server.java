@@ -86,9 +86,10 @@ public class Server extends Thread {
 		String requestedFile = clientInputArr[2];
 		String chunkNo = clientInputArr[3];
 		ExecutorService executor = null;
+		Socket tempSocket;
 		//Creates a new Socket for file transfer
 		try {
-			Socket tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
+			tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 			PrintWriter out = new PrintWriter(tempSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(tempSocket.getInputStream()));
 			out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort);
@@ -96,7 +97,7 @@ public class Server extends Thread {
 			executor = Executors.newFixedThreadPool(5);
 			Runnable worker = new RequestHandler(tempSocket, requestedFile, chunkNo);
 			executor.execute(worker);
-//			tempSocket.close();
+			//tempSocket.close();
 		} catch (IOException e) {
 			System.out.println("Unable to create new socket to transfer data for mediation");
 			e.printStackTrace();

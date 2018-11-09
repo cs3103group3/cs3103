@@ -578,15 +578,17 @@ public class HelperThread extends Thread{
 			System.out.println("Reading in data at helperThread");
 			//Read Data from opposing new Socket
 			is = opposingNewSocket.getInputStream();
+			System.out.println("is");
 			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
+			System.out.println("Here");
 		    byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 	    	//Write Data to downloader Socket
-
+			System.out.println("Here 2");
 		    BufferedOutputStream dos
 		    = new BufferedOutputStream(downloaderSocket.getOutputStream());
-		    
+		    System.out.println("Here 3");
 		    dos.write(newFileDataBytes);
-		    
+		    System.out.println("Here 4");
 		    dos.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
