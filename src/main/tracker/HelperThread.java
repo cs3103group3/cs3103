@@ -118,6 +118,7 @@ public class HelperThread extends Thread{
 			break;
 		case MEDIATE:
 			mediate(strCommandArr, currentReply);
+			break;
 		case AddListeningSocket:
 			addSocket(this.clientSocket);
 			break;
@@ -465,28 +466,40 @@ public class HelperThread extends Thread{
 	 * 
 	 */
 	private void forwardServer(String[] clientInputArr, PrintWriter currentReply) {
+		System.out.println("Entered ForwardServer");
 		Socket opposingSocket = null;
+		
+		//Now split by comma
+		String[] currentClientInputArr = clientInputArr[1].split(Constant.COMMA);
 		
 		//New Socket that was opened up by the client
 		Socket downloaderSocket = clientSocket;
+		System.out.println("Downloader socket is : " + downloaderSocket);
 		//Expects to receive data from peer A
 		//String clientInput = in.readLine();
 
 		//Process the clientInput which is of the following format
 		//IPb,PortB,FileName,ChunkNumber
-		Tuple opposingPeerTuple = new Tuple(clientInputArr[1], clientInputArr[2]);
+		Tuple opposingPeerTuple = new Tuple(currentClientInputArr[0], currentClientInputArr[1]);
+		System.out.println("Size of ipPortToSocket is :" + Tracker.ipPortToSocketTable.size());
 		Set<Entry<Tuple, Socket>> entrySet = Tracker.ipPortToSocketTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet) {
-			if(opposingPeerTuple.equals(entry2.getKey())) {
+			System.out.println("Current IP of tuple is : " + entry2.getKey().getIpAdd());
+			System.out.println("Current IP of tuple is : " + entry2.getKey().getPortNo());
+			System.out.println("Current Socket of tuple is " + entry2.getValue());
+			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())) {
 				opposingSocket = entry2.getValue();
 			}
 		} 
 		if(opposingSocket == null) {
 			System.out.println("Unable to find opposing Socket");
 			return;
+		} else {
+			System.out.println("Opposing Socket is : " + opposingSocket);
 		}
+
+		sendOpposingPeer(opposingSocket, currentClientInputArr, downloaderSocket);
 		addSocket(downloaderSocket);
-		sendOpposingPeer(opposingSocket, clientInputArr);
 	}
 
 	/**
@@ -507,20 +520,22 @@ public class HelperThread extends Thread{
 	 * @param opposingSocket
 	 * @param clientInputArr
 	 */
-	private void sendOpposingPeer(Socket opposingSocket, String[] clientInputArr) {
+	private void sendOpposingPeer(Socket opposingSocket, String[] clientInputArr, Socket downloaderSocket) {
 		try {
 			//Need to find the persistent connection between tracker and opposing peer which is : opposing socket
 			PrintWriter out = new PrintWriter(opposingSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(opposingSocket.getInputStream()));
 
-			String ipAdd = clientInputArr[1];
-			String portNo = clientInputArr[2];
-			String fileNeeded = clientInputArr[3];
-			String chunkNumber = clientInputArr[4];
+			String ipAdd = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
+			String portNo = String.valueOf(downloaderSocket.getPort());
+			String fileNeeded = clientInputArr[2];
+			String chunkNumber = clientInputArr[3];
 			String dataToSend = ipAdd + Constant.COMMA
 					+ portNo + Constant.COMMA + fileNeeded + Constant.COMMA + chunkNumber;
 		
 			//Sends to request peer B of the fileName + chunk Number + ipAdd + port No
+			System.out.println("Helping downloader to send information" + dataToSend);
+			
 			out.println(dataToSend);
 			out.flush();
 		} catch (IOException e) {
@@ -536,14 +551,17 @@ public class HelperThread extends Thread{
 	 */
 	private void mediate(String[] strCommandArr, PrintWriter currentReply) {
 		//strCommandArr is: 7 public address of A public port of A
-		String downloaderAddress = strCommandArr[1];
-		String downloaderPort = strCommandArr[2];
+		String [] downloaderArr = strCommandArr[1].split(Constant.COMMA);
+		String downloaderAddress = downloaderArr[0];
+		String downloaderPort = downloaderArr[1];
+		
+		System.out.println("Downloader address is " + downloaderAddress + "downloaderPort is : " + downloaderPort);
 		Tuple downloaderTuple = new Tuple(downloaderAddress, downloaderPort);
 		//Obtain the downloader's socket
 		Socket downloaderSocket = null;
 		Set<Entry<Tuple, Socket>> entrySet = Tracker.ipPortToSocketTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet) {
-			if(downloaderTuple.equals(entry2.getKey())) {
+			if(downloaderTuple.getIpAdd().equals(entry2.getKey().getIpAdd())) {
 				downloaderSocket = entry2.getValue();
 			}
 		} 
@@ -552,10 +570,12 @@ public class HelperThread extends Thread{
 			System.out.println("Exception Obtaining downloader's Socket");
 			return;
 		}
+		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
 		Socket opposingNewSocket = clientSocket;
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
         InputStream is;
 		try {
+			System.out.println("Reading in data at helperThread");
 			//Read Data from opposing new Socket
 			is = opposingNewSocket.getInputStream();
 			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
