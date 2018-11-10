@@ -287,10 +287,11 @@ public class Client extends Thread {
 		out.println(InterfaceCommand.QUIT.getCommandCode() + Constant.WHITESPACE + port);
 		//out.flush();
 		//in.close();
-		 
-		clientSocket.close();
-         
+
         System.out.println("Goodbye!");
+		
+        clientSocket.close();
+		
         System.exit(1);
     }
     

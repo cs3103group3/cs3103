@@ -59,13 +59,14 @@ public class HelperThread extends Thread{
 			//	reply = new PrintWriter( new OutputStreamWriter(clientSocket.getOutputStream()));
 			reply = new PrintWriter(clientSocket.getOutputStream(), true);
 
-			while(threadRunning) {
+			while(threadRunning && clientSocket.isConnected()) {
 				clientInput = in.readLine().trim();
 				System.out.println("Client has entered command: " + clientInput);
 				doClientCommand(clientInput, reply);
 			}
 		} catch (IOException e) {
-			System.out.println("IOException");
+//			System.out.println("IOException at Run Function in Helper Thread");
+//			e.printStackTrace();
 		}
 	}
 
@@ -89,39 +90,39 @@ public class HelperThread extends Thread{
 
 		//Calls method that is required to execute the user's command
 		switch(command) {
-		case LIST:
-			//perform list
-			listDirectoryEntry(recordList, currentReply);
-			break;
-		case SEARCH:
-			//perform search
-			searchEntry(strCommandArr, recordList, currentReply);
-			break;
-		case DOWNLOAD:
-			//Finds peer to download the file requested
-			findPeer(strCommandArr, currentReply);
-			break;
-		case INFORM:
-			//Update the server of newly advertised chunk of file
-			informServer(strCommandArr, currentReply);
-			break;
-		case QUIT:
-			//perform exit
-			exitServer(strCommandArr, currentReply);
-			break;
-		case FORWARD:
-			forwardServer(strCommandArr, currentReply);
-			break;
-		case MEDIATE:
-			mediate(strCommandArr, currentReply);
-			break;
-		case AddListeningSocket:
-			addSocket(this.clientSocket);
-			break;
-		default:
-			//Error
-			currentReply.println(ErrorMessage.INVALID_COMMAND);
-			return;
+			case LIST:
+				//perform list
+				listDirectoryEntry(recordList, currentReply);
+				break;
+			case SEARCH:
+				//perform search
+				searchEntry(strCommandArr, recordList, currentReply);
+				break;
+			case DOWNLOAD:
+				//Finds peer to download the file requested
+				findPeer(strCommandArr, currentReply);
+				break;
+			case INFORM:
+				//Update the server of newly advertised chunk of file
+				informServer(strCommandArr, currentReply);
+				break;
+			case QUIT:
+				//perform exit
+				exitServer(strCommandArr, currentReply);
+				break;
+			case FORWARD:
+				forwardServer(strCommandArr, currentReply);
+				break;
+			case MEDIATE:
+				mediate(strCommandArr, currentReply);
+				break;
+			case AddListeningSocket:
+				addSocket(this.clientSocket);
+				break;
+			default:
+				//Error
+				currentReply.println(ErrorMessage.INVALID_COMMAND);
+				return;
 		}
 	}
 
@@ -401,18 +402,19 @@ public class HelperThread extends Thread{
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
 		threadRunning = false;
-
-		String ipAddress = this.clientSocket.getInetAddress().getHostAddress();
 		String clientPortNo = strCommandArr[1];
 
-		try {
-			deleteAllRecords(ipAddress, clientPortNo);
-			clientSocket.close();
-			System.out.println("Exited and Deleted Successfully");
-		} catch (IOException e) {
-			System.out.println("Error closing socket");
+		try{
+			if(this.clientSocket != null){
+				String ipAddress = this.clientSocket.getInetAddress().getHostAddress();
+				deleteAllRecords(ipAddress, clientPortNo);
+				clientSocket.close();
+				System.out.println("Exited and Deleted Successfully");
+			}
+		}  catch (IOException e) {
+			System.out.println("IOException at Exit Server in Helper Thread");
+			e.printStackTrace();
 		}
-		
 	}
 
 	/**
