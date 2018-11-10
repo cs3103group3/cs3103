@@ -108,14 +108,15 @@ public class Tracker{
 		recordTable.forEach((filename,recordList) -> { 
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
-				String ipAddress = record.getipAdd();
-				String port = record.getPortNumber();
-				Tuple peer = new Tuple(ipAddress, port);
+				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
 				if (!listOfPeersWhoResponded.contains(peer)) {
 					recordList.remove(i);
 					if (recordTable.get(filename) == null) {
 						recordTable.remove(filename);
 					}
+					
+					ipPortToSocketTable.remove(peer);
+					
 					i--;
 				}
 			}
