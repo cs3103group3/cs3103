@@ -84,6 +84,14 @@ public class Server extends Thread {
 		String downloaderPort = clientInputArr[1];
 		String requestedFile = clientInputArr[2];
 		String chunkNo = clientInputArr[3];
+		
+		boolean isLastChunk = false;
+		
+		if(clientInputArr.length ==  5) {
+			if (clientInputArr[4].equals(Constant.LAST_CHUNK)) {
+				isLastChunk = true;
+			}
+		}
 		ExecutorService executor = null;
 		Socket tempSocket;
 		//Creates a new Socket for file transfer
@@ -91,7 +99,14 @@ public class Server extends Thread {
 			tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 			PrintWriter out = new PrintWriter(tempSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(tempSocket.getInputStream()));
-			out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort);
+			
+			if(!isLastChunk) {
+				out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort);
+			} else {
+				out.println(InterfaceCommand.MEDIATE.getCommandCode() 
+						+ Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort
+						+ Constant.COMMA + Constant.LAST_CHUNK);
+			}
 			System.out.println("tempSocket is " + tempSocket);
 			executor = Executors.newFixedThreadPool(5);
 			Runnable worker = new RequestHandler(tempSocket, requestedFile, chunkNo);

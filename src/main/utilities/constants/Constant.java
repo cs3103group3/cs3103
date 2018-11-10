@@ -10,6 +10,7 @@ public final class Constant {
     
     public static final int CHUNK_SIZE = 1024;
     public static final String CHUNK_EXT = ".chunk";
+    public static final String LAST_CHUNK = "Last";
     
     public static final int HEARTBEAT_INTERVAL = 10000;
     public static final int HEARTBEAT_TRACKER_CLEANUP_INTERVAL = HEARTBEAT_INTERVAL * 2;
