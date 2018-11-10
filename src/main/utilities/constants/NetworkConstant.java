@@ -4,7 +4,8 @@ public final class NetworkConstant {
     private NetworkConstant() {}   // Restrict initiation
     
     // Tracker
-    public static final int TRACKER_LISTENING_PORT = 7878;
+//    public static final int TRACKER_LISTENING_PORT = 7878;
+    public static final int TRACKER_LISTENING_PORT = 7879;
     public static final String TRACKER_HOSTNAME = "68.183.121.174";   //Digital Ocean
 //    public static final String TRACKER_HOSTNAME = "192.168.56.1";
     

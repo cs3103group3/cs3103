@@ -19,6 +19,7 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 
+import main.heartbeat.HeartBeatSender;
 import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
@@ -32,6 +33,12 @@ public class Client extends Thread {
 
     PrintWriter out;
     BufferedReader in;
+    
+    HeartBeatSender heartBeatSender;
+    
+    boolean hasClientInformedTracker;
+    
+    public static int port;
     
     private static void displayMenu() {
         System.out.println( "===============================================\n" +
@@ -251,6 +258,10 @@ public class Client extends Thread {
                 temp=in.readLine();
             }
         }
+        if(!hasClientInformedTracker){
+            heartBeatSender.start();
+            hasClientInformedTracker = true;
+        }
     }
     
     private void quit(String[] userInputArr) throws UnknownHostException, IOException {
@@ -313,6 +324,12 @@ public class Client extends Thread {
     		
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            
+            heartBeatSender = new HeartBeatSender();
+            
+            hasClientInformedTracker = false;
+            
+            port = clientSocket.getLocalPort();
 		
     	} catch (IOException e) {
 			System.out.println("Unable to create client socket");
