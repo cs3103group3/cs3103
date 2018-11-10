@@ -19,9 +19,6 @@ public class Peer {
         server.start();
         client.start();
         
-        HeartBeatSender heartBeatSender = new HeartBeatSender();
-        heartBeatSender.start();
-        
         cleanUp(server, client);
     }
     

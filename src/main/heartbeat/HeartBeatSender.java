@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import main.peer.Client;
 import main.tracker.Tracker;
 import main.utilities.constants.Constant;
 import main.utilities.constants.NetworkConstant;
@@ -31,7 +32,7 @@ public class HeartBeatSender extends Thread{
             try {
                 outgoingSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.HEARTBEAT_TRACKER_LISTENING_PORT);
                 PrintWriter out = new PrintWriter(outgoingSocket.getOutputStream(), true);
-                out.println(Constant.HEARTBEAT_SIGNAL);
+                out.println(Constant.HEARTBEAT_SIGNAL + Constant.COMMA + Client.port);
                 out.flush();
                 outgoingSocket.close();
             } catch(IOException ioe) {
