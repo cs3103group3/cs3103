@@ -142,7 +142,8 @@ public class HelperThread extends Thread{
 		//		currentList.put("Test.txt", testArrList);
 		if(currentList.isEmpty()) {
 			currentReply.println(OfflineInterfaceCommand.EMPTY_RECORD);
-			currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
+			currentReply.println(Constant.END_OF_STREAM);
+			currentReply.flush();
 		} else {
 			String result = "";
 			Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
@@ -206,7 +207,7 @@ public class HelperThread extends Thread{
 	 */
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipBroadcasted = this.clientSocket.getInetAddress().toString().replaceAll("/", "").trim();
-		String portNumber = Integer.toString(this.clientSocket.getPort());
+//		String portNumber = Integer.toString(this.clientSocket.getLocalPort());
 
 		System.out.println("ipBroadcasted: " + ipBroadcasted);
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
@@ -215,11 +216,12 @@ public class HelperThread extends Thread{
 		String totalNumChunk = recvData[1];
 		String chunkNum = recvData[2];
 		String fileName = recvData[3];
+		String portNumber = recvData[4];
 
-		String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
+		String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName + Constant.COMMA + portNumber;
 
 		if (!CheckAccuracy.isDataValid(payload, checksum)) {
-			currentReply.println(ErrorMessage.INCONSISTENT_CHECKSUM);
+			currentReply.println(ErrorMessage.INCONSISTENT_CHECKSUM.getErrorMessage());
 			currentReply.println(Constant.END_OF_STREAM);
 			currentReply.flush();
 			return;
