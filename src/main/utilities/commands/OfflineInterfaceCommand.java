@@ -31,4 +31,8 @@ public enum OfflineInterfaceCommand {
         }
         return null;
     }
+    
+    public String toString() {
+        return this.text;
+    }
 }

@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
@@ -67,18 +65,52 @@ public class Server extends Thread {
 		try {
 			while(threadRunning) {
 				clientInput = in.readLine();
-//				System.out.println("Client has entered command: " + clientInput);
-				System.out.println("clientInput: " + clientInput);
+				
+				if(clientInput != null) {
+					String[] clientInputArr = clientInput.split(Constant.COMMA);
+					sendMediateData(clientInputArr);
+				} else {
+					System.out.println(ErrorMessage.CANNOT_CONNECT_TO_TRACKER.getErrorMessage());
+					System.exit(1);
+				}
 			}
 		} catch (IOException e) {
 			System.out.println("IOException");
 		}
 	}
 	
+	private void sendMediateData(String [] clientInputArr) {
+		String downloaderIP = clientInputArr[0];
+		String downloaderPort = clientInputArr[1];
+		String requestedFile = clientInputArr[2];
+		String chunkNo = clientInputArr[3];
+		ExecutorService executor = null;
+		Socket tempSocket;
+		//Creates a new Socket for file transfer
+		try {
+			tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
+			PrintWriter out = new PrintWriter(tempSocket.getOutputStream(), true);
+			BufferedReader in = new BufferedReader(new InputStreamReader(tempSocket.getInputStream()));
+			out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort);
+			System.out.println("tempSocket is " + tempSocket);
+			executor = Executors.newFixedThreadPool(5);
+			Runnable worker = new RequestHandler(tempSocket, requestedFile, chunkNo);
+			executor.execute(worker);
+			//tempSocket.close();
+		} catch (IOException e) {
+			System.out.println("Unable to create new socket to transfer data for mediation");
+			e.printStackTrace();
+		}  finally {
+			if (executor != null) {
+				executor.shutdown();
+			}
+		}
+	}
+	
 	private void processConnection() {
 		
 		try {
-			serverSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
+			serverSocket = Peer.listeningSocket;
             out = new PrintWriter(serverSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 		} catch (IOException e) {

@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import main.heartbeat.HeartBeatInitiator;
+import main.heartbeat.HeartBeatListener;
 import main.utilities.constants.NetworkConstant;
 
 /**
@@ -27,12 +27,11 @@ public class Tracker{
 
 	//To allow faster access, use a hash : fileName to its associated chunks
 	public static Hashtable<String, ArrayList<Record>> recordTable = new Hashtable<>();
-	public static Set<String> aliveIpAddresses = new HashSet<String>();
 	
 	//Tuple : 1) Ip 2) Port No.		Value = Socket
 	public static Hashtable<Tuple, Socket> ipPortToSocketTable = new Hashtable<>();
-	//TODO: Another Hash to pinpoint location of the record
-
+	public static Hashtable<Tuple, Socket> dataTransferTable = new Hashtable<>();
+	
 	public static void main(String[] args) {
 		System.out.println("Starting Server");
 
@@ -76,7 +75,7 @@ public class Tracker{
 	}
 
 	private static void listenRequest() {
-		HeartBeatInitiator heartbeatInitiator = new HeartBeatInitiator();
+		HeartBeatListener heartbeatInitiator = new HeartBeatListener();
 		heartbeatInitiator.start();
 
 		ExecutorService executor= null;
@@ -102,40 +101,28 @@ public class Tracker{
 		}
 	}
 
-	public static void removeIpAddressesNoResponseFromRecord(Set<String> ipAddressesResponded) {
-		aliveIpAddresses = ipAddressesResponded;
-
+	public static void removeUnresponsivePeersFromRecord(Set<Tuple> listOfPeersWhoResponded) {
 		recordTable.forEach((filename,recordList) -> { 
+			System.out.println(filename + " and recordList size: " + recordList.size());
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
-				String ipAddress = record.getipAdd();
-				if (!ipAddressesResponded.contains(ipAddress)) {
+				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
+				if (!listOfPeersWhoResponded.contains(peer)) {
+					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " did not respond");
 					recordList.remove(i);
 					if (recordTable.get(filename) == null) {
 						recordTable.remove(filename);
 					}
+					ipPortToSocketTable.remove(peer);
 					i--;
+				} else {
+					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " responded");
 				}
 			}
 		});
-	}
-
-	public static void removeIpAddressFromRecord(String ipAddressToRemove) {
-		aliveIpAddresses.remove(ipAddressToRemove);
-
-		recordTable.forEach((filename,recordList) -> { 
-			for (int i=0; i<recordList.size(); i++ ) {
-				Record record = recordList.get(i);
-				String ipAddress = record.getipAdd();
-				if (ipAddress.equals(ipAddressToRemove)) {
-					recordList.remove(i);
-					if (recordTable.get(filename) == null) {
-						recordTable.remove(filename);
-					}
-					i--;
-				}
-			}
-		});
+		
+		removeFileWithEmptyRecords();
+		printEverythInsideRecordAndIpToSocketTable();
 	}
 
 	public static void removeFileWithEmptyRecords() {
@@ -145,7 +132,23 @@ public class Tracker{
 				iterator.remove();
 			}
 		}
-
-		System.out.println("RecordTable: " + recordTable);
+	}
+	
+	public static void printEverythInsideRecordAndIpToSocketTable(){
+		System.out.println("=====================recordTable==========================");
+		recordTable.forEach((filename,recordList) -> { 
+			for (int i=0; i<recordList.size(); i++ ) {
+				Record record = recordList.get(i);
+				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
+				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
+			}
+		});
+		System.out.println("===============================================");
+		
+		System.out.println("=====================ipPortToSocketTable==========================");
+		ipPortToSocketTable.forEach((peer,socket) -> {
+			System.out.println(peer.ipAdd + ": " +peer.portNo);
+		});
+		System.out.println("===============================================");
 	}
 }
