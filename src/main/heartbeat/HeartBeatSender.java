@@ -34,9 +34,9 @@ public class HeartBeatSender extends Thread{
 	    class PingTracker extends TimerTask {
 	        public void run() {
 	            try {
-                    Socket outgoingSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.HEARTBEAT_PEER_LISTENING_PORT);
+                    Socket outgoingSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.HEARTBEAT_TRACKER_LISTENING_PORT);
                     PrintWriter out = new PrintWriter(outgoingSocket.getOutputStream(), true);
-                    out.println(Constant.HEARTBEAT_QUERY);
+                    out.println(Constant.HEARTBEAT_SIGNAL);
                     out.flush();
                     outgoingSocket.close();
 	            } catch(IOException ioe) {
