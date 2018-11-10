@@ -228,7 +228,6 @@ public class HelperThread extends Thread{
 		}
 
 		System.out.println("IP_RECEIVED: " + ipBroadcasted);
-		Tracker.alivePeers.add(peer);
 
 		boolean hasExist =	checkExistFile(fileName);
 
@@ -446,18 +445,39 @@ public class HelperThread extends Thread{
 	 * 
 	 */
 	private void deleteAllRecords(String ipAddress, String clientPortNo) {
+		System.out.println("I am at deleteAllRecords");
 		//First find all the entries that contains the associated ip address
-		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
-		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
-			ArrayList<Record> currArr = entry2.getValue();
-			for(int i = 0; i < currArr.size(); i ++) {
-				if(currArr.get(i).getipAdd().equals(ipAddress) 
-						&& currArr.get(i).getPortNumber().equals(clientPortNo)) {
-					//Removes the respective ip address in the respective arraylist
-					entry2.getValue().remove(i);
+//		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
+//		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
+//			ArrayList<Record> currArr = entry2.getValue();
+//			for(int i = 0; i < currArr.size(); i ++) {
+//				if(currArr.get(i).getipAdd().equals(ipAddress) 
+//						&& currArr.get(i).getPortNumber().equals(clientPortNo)) {
+//					//Removes the respective ip address in the respective arraylist
+//					entry2.getValue().remove(i);
+//				}
+//			}
+//		}
+		
+		Tracker.recordTable.forEach((filename,recordList) -> {
+			System.out.println(filename + " and recordList size: " + recordList.size());
+			for (int i=0; i<recordList.size(); i++ ) {
+				System.out.println("i:" + i);
+				Record record = recordList.get(i);
+				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
+				if (peer.getIpAdd().equals(ipAddress) && peer.getPortNo().equals(clientPortNo)) {
+					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " did not respond");
+					recordList.remove(i);
+					if (Tracker.recordTable.get(filename) == null) {
+						Tracker.recordTable.remove(filename);
+					}
+					Tracker.ipPortToSocketTable.remove(peer);
+					i--;
+				} else {
+					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " responded");
 				}
 			}
-		}
+		});
 	}
 	/**
 	 * This method listens and receive information about the opposing peer
