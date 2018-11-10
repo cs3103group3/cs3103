@@ -622,10 +622,17 @@ public class HelperThread extends Thread{
 		BufferedOutputStream dos =  null;
 		try {
 			//Read Data from opposing new Socket
+			System.out.println("OpposingNewSocket is : " + opposingNewSocket);
 			is = opposingNewSocket.getInputStream();
+			System.out.println("Top");
 			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
+			System.out.println("Middle");
+
+			System.out.println("length of bytesRead " + bytesRead);
 			byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 			//Write Data to downloader Socket
+			System.out.println("Bottom");
+
 			dos = new BufferedOutputStream(downloaderSocket.getOutputStream());
 			dos.write(newFileDataBytes);
 			dos.flush();
