@@ -94,6 +94,7 @@ public class HelperThread extends Thread{
 			case LIST:
 				//perform list
 				listDirectoryEntry(recordList, currentReply);
+				printThreads();
 				break;
 			case SEARCH:
 				//perform search
@@ -503,6 +504,7 @@ public class HelperThread extends Thread{
 		} 
 		if(opposingSocket == null) {
 			System.out.println("Unable to find opposing Socket");
+//			clientRetry();
 			return;
 		} else {
 			System.out.println("Opposing Socket is : " + opposingSocket);
@@ -613,6 +615,7 @@ public class HelperThread extends Thread{
 
 		if(downloaderSocket == null) {
 			System.out.println("Exception Obtaining downloader's Socket");
+//			clientRetry();
 			return;
 		}
 		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
@@ -633,7 +636,10 @@ public class HelperThread extends Thread{
 			// TODO Auto-generated catch block
 			System.out.println("Error in mediating data");
 			e.printStackTrace();
-		} 
+		} finally {
+			if (is != null) is.close();
+		}
+
 		Set<Entry<Tuple, Socket>> entrySet1 = Tracker.dataTransferTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet1) {
 			System.out.println("Before removal dataSocket " + entry2.getKey().getIpAdd());
@@ -644,11 +650,20 @@ public class HelperThread extends Thread{
 			dos.close();
 		}
 	}
+	
 	/**
 	 * This method removes the socket that was opened up
 	 *  
 	 */
 	private void removeDataSocket(Tuple downloaderTuple, Socket downloaderSocket) {
 		Tracker.dataTransferTable.remove(downloaderTuple, downloaderSocket);
+	}
+	
+	private void printThreads() {
+		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+		System.out.println("Printing threads!");
+			for ( Thread t : threadSet){
+				System.out.println("Thread :"+t+":"+"state:"+t.getState());
+			}
 	}
 }
