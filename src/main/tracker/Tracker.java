@@ -131,7 +131,12 @@ public class Tracker{
 				iterator.remove();
 			}
 		}
-
-		System.out.println("RecordTable: " + recordTable);
+		
+		printEverythInsideRecordAndIpToSocketTable();
+	}
+	
+	public static void printEverythInsideRecordAndIpToSocketTable(){
+		System.out.println("RecordTable: " + recordTable.toString());
+		
 	}
 }
