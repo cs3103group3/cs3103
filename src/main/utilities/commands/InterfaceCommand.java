@@ -36,4 +36,8 @@ public enum InterfaceCommand {
         }
         return null;
     }
+    
+    public String toString() {
+    	return this.text;
+    }
 }

@@ -25,6 +25,7 @@ import main.utilities.commands.InterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
 import main.utilities.constants.NetworkConstant;
 import main.utilities.feedbacks.ErrorMessage;
+import main.utilities.feedbacks.SuccessMessage;
 import main.utilities.constants.Constant;
 
 public class Client extends Thread {
@@ -201,11 +202,12 @@ public class Client extends Thread {
     			//returns a random IP and Port from list
     			socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
     			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
+    			System.out.println("P2PserverIPAndPort is :" + serverIPAndPort);
     			String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
     			
     			// Send fileName and chunkNum to download
     			PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
-    	        outSocket.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.COMMA
+    	        outSocket.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.WHITESPACE
     	        			+ serverIPAndPort + Constant.COMMA
     	        			+ fileName + Constant.COMMA 
     	        			+ i);
@@ -231,6 +233,8 @@ public class Client extends Thread {
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
     	System.out.println("At inform");
+    	
+    	String confirmationString = SuccessMessage.NEW_CHUNK_ADDED_TO_TRACKER.toString();
         if (userInputArr.length != 2) {
             System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
@@ -245,8 +249,9 @@ public class Client extends Thread {
         
         long fileSize =  file.length();
         int totalNumChunk = (int) Math.ceil(fileSize*1.0/ Constant.CHUNK_SIZE);
+        String listeningPort = Integer.toString(Peer.listeningPort);
         for (int chunkNum=1; chunkNum<=totalNumChunk; chunkNum++) {
-            String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
+            String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName + Constant.COMMA + listeningPort;
             long checksum = CheckAccuracy.calculateChecksum(payload);
             String data = checksum + Constant.COMMA + payload;
             String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
@@ -254,16 +259,22 @@ public class Client extends Thread {
             out.println(sendData);
 
             String temp = in.readLine();
-            ArrayList<String> results = new ArrayList<String>();
+//            ArrayList<String> results = new ArrayList<String>();
             while(!temp.equals(Constant.END_OF_STREAM)) {
-                results.add(temp);
+//                results.add(temp);
+            	if (temp.equals(ErrorMessage.INCONSISTENT_CHECKSUM.getErrorMessage())) {
+            		confirmationString = ErrorMessage.INCONSISTENT_CHECKSUM.getErrorMessage();
+            	}
                 temp=in.readLine();
             }
         }
+
         if(!hasClientInformedTracker){
             heartBeatSender.start();
             hasClientInformedTracker = true;
         }
+        
+        System.out.println(confirmationString);
     }
     
     private void quit(String[] userInputArr) throws UnknownHostException, IOException {
@@ -303,6 +314,7 @@ public class Client extends Thread {
 //    		System.out.println("tempList: " + tempList);
 //    		System.out.println("peerDataArr[0]: " + peerDataArr[0]);
     		String peerServerSocket = peerDataArr[0] + "," + peerDataArr[1];
+    		System.out.println("Adding peerSeverSocket in processPeersWithData" + peerServerSocket);
     		tempList.add(peerServerSocket);
     		processedList.set(currChunkNumber, tempList);
     	}
@@ -331,7 +343,7 @@ public class Client extends Thread {
             
             hasClientInformedTracker = false;
             
-            port = clientSocket.getLocalPort();
+            port = Peer.listeningPort;
 		
     	} catch (IOException e) {
 			System.out.println("Unable to create client socket");
