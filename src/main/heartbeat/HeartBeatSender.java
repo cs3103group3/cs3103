@@ -32,7 +32,7 @@ public class HeartBeatSender extends Thread{
             try {
                 outgoingSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.HEARTBEAT_TRACKER_LISTENING_PORT);
                 PrintWriter out = new PrintWriter(outgoingSocket.getOutputStream(), true);
-                out.println(Constant.HEARTBEAT_SIGNAL + Constant.COMMA + Client.port);
+                out.println(Client.port);
                 out.flush();
                 outgoingSocket.close();
             } catch(IOException ioe) {
