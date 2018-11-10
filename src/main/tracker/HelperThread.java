@@ -64,7 +64,7 @@ public class HelperThread extends Thread{
 				System.out.println("Client has entered command: " + clientInput);
 				doClientCommand(clientInput, reply);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 //			System.out.println("IOException at Run Function in Helper Thread");
 //			e.printStackTrace();
 		}
