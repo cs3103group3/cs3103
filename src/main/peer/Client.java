@@ -343,7 +343,7 @@ public class Client extends Thread {
             
             hasClientInformedTracker = false;
             
-            port = clientSocket.getLocalPort();
+            port = Peer.listeningPort;
 		
     	} catch (IOException e) {
 			System.out.println("Unable to create client socket");
