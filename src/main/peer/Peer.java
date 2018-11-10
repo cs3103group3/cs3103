@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import main.heartbeat.HeartBeatResponder;
+import main.heartbeat.HeartBeatSender;
 import main.utilities.constants.NetworkConstant;
 
 /**
@@ -19,17 +19,17 @@ public class Peer {
         server.start();
         client.start();
         
-        HeartBeatResponder heartbeatResponder = new HeartBeatResponder();
-        heartbeatResponder.start();
+        HeartBeatSender heartBeatSender = new HeartBeatSender();
+        heartBeatSender.start();
         
-        cleanUp(server, client, heartbeatResponder);
+        cleanUp(server, client, heartBeatSender);
     }
     
-    public static void cleanUp(Server server, Client client, HeartBeatResponder heartbeatResponder) {
+    public static void cleanUp(Server server, Client client, HeartBeatSender heartBeatSender) {
         while (client.isAlive()) {
             if (!client.isAlive()) {
                 server.closeSockets();
-                heartbeatResponder.closeSocket();
+                heartBeatSender.closeSocket();
                 break;
             }
         }
