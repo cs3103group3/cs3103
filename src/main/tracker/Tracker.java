@@ -102,8 +102,6 @@ public class Tracker{
 	}
 
 	public static void removeUnresponsivePeersFromRecord(Set<Tuple> listOfPeersWhoResponded) {
-		System.out.println("I am at removeUnresponsivePeersFromRecord");
-
 		recordTable.forEach((filename,recordList) -> { 
 			System.out.println(filename + " and recordList size: " + recordList.size());
 			for (int i=0; i<recordList.size(); i++ ) {
@@ -131,7 +129,6 @@ public class Tracker{
 		Iterator<String> iterator = recordTable.keySet().iterator();
 		while (iterator.hasNext()){
 			if (recordTable.get(iterator.next()).size() < 1 ) {
-				System.out.println("I am removing entire empty file hash from record table");
 				iterator.remove();
 			}
 		}

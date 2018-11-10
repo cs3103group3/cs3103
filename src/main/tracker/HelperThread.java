@@ -445,7 +445,6 @@ public class HelperThread extends Thread{
 	 * 
 	 */
 	private void deleteAllRecords(String ipAddress, String clientPortNo) {
-		System.out.println("I am at deleteAllRecords");
 		//First find all the entries that contains the associated ip address
 //		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
 //		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
@@ -460,9 +459,7 @@ public class HelperThread extends Thread{
 //		}
 		
 		Tracker.recordTable.forEach((filename,recordList) -> {
-			System.out.println(filename + " and recordList size: " + recordList.size());
 			for (int i=0; i<recordList.size(); i++ ) {
-				System.out.println("i:" + i);
 				Record record = recordList.get(i);
 				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
 				if (peer.getIpAdd().equals(ipAddress) && peer.getPortNo().equals(clientPortNo)) {
