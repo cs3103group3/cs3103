@@ -40,44 +40,12 @@ public class RequestHandler implements Runnable {
 			e.printStackTrace();
 		}
     }
-    
-//    @Override
-//    public void run() {
-//	try {
-//		
-//		BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-//		System.out.println("Thread started with name:" + Thread.currentThread().getName());
-//		String result = in.readLine();
-//		String resultTrimmed = result.trim();
-//		System.out.println("Received message from " + Thread.currentThread().getName() + " : " + resultTrimmed);
-//		// resultArr[0] contains fileName, resultArr[1] contains chunkNumber
-//		String[] resultArr = resultTrimmed.split(",");
-//		String fileName = resultArr[0];
-//		int chunkNumber = Integer.parseInt(resultArr[1]);
-//		
-//		if (resultArr.length == 2) {
-//			processDownload(fileName, chunkNumber);
-////			reply.println(OfflineInterfaceCommand.VALID_DOWNLOAD);
-//		}
-//		else {
-////			reply.println(OfflineInterfaceCommand.INVALID_DOWNLOAD);
-//		}
-//	} catch (IOException e) {
-//	    System.out.println("I/O exception: " + e);
-//	    e.printStackTrace();
-//	  } catch (Exception ex) {
-//	    System.out.println("Exception in Thread Run. Exception : " + ex);
-//	    ex.printStackTrace();
-//	  }
-//    }
 
     private void processDownload(String fileName, int chunkNumber) throws IOException {
     	OutputStream os = null;
     	// TODO: append EOF char when sending last chunk
     	try {
     		byte[] fileByteArray = null;
-//    		String filePath = Constant.FILE_DIR + fileName;
-//    		FileInputStream fis = new FileInputStream("/Users/brehmerchan/Desktop/P2p/src/main/files/test.txt");
     		FileInputStream fis = new FileInputStream(fileName);
     		BufferedInputStream bis = new BufferedInputStream(fis);
     		try {

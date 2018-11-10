@@ -132,24 +132,5 @@ public class Server extends Thread {
 			System.out.println("Unable to create client socket");
 			e.printStackTrace();
 		}
-		
-//		ExecutorService executor = null;
-//		try {
-//			executor = Executors.newFixedThreadPool(5);
-//			serverSocket = new ServerSocket(NetworkConstant.SERVER_LISTENING_PORT);
-//			while (true) {
-//				Socket clientSocket = serverSocket.accept();
-//				clientSocketList.add(clientSocket);
-//				System.out.println("Accepted connection: " + clientSocket);
-//				Runnable worker = new RequestHandler(clientSocket);
-//				executor.execute(worker);
-//			}
-//		} catch(IOException ioe) {
-//			System.out.println("Exception while listening for client connection: " + ioe);
-//		} finally {
-//			if (executor != null) {
-//				executor.shutdown();
-//			}
-//		}
 	}
 }
