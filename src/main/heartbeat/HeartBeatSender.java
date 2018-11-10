@@ -24,7 +24,7 @@ public class HeartBeatSender extends Thread{
 	    
     public void run() { 
     	timer = new Timer();
-        timer.schedule(new PingTracker(), 5000, Constant.HEARTBEAT_INTERVAL);
+        timer.schedule(new PingTracker(), 0, Constant.HEARTBEAT_INTERVAL);
     }
     
     class PingTracker extends TimerTask {

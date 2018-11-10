@@ -123,6 +123,7 @@ public class Tracker{
 		});
 		
 		removeFileWithEmptyRecords();
+		printEverythInsideRecordAndIpToSocketTable();
 	}
 
 	public static void removeFileWithEmptyRecords() {
@@ -132,12 +133,16 @@ public class Tracker{
 				iterator.remove();
 			}
 		}
-		
-		printEverythInsideRecordAndIpToSocketTable();
 	}
 	
 	public static void printEverythInsideRecordAndIpToSocketTable(){
-		System.out.println("RecordTable: " + recordTable.toString());
+		recordTable.forEach((filename,recordList) -> { 
+			for (int i=0; i<recordList.size(); i++ ) {
+				Record record = recordList.get(i);
+				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
+				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
+			}
+		});
 		
 	}
 }
