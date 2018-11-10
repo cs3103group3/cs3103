@@ -322,10 +322,10 @@ public class HelperThread extends Thread{
 				}
 
 				requestedData += requestedChunks.get(0).getMaxChunk();
-				requestedData += "\n";
-				requestedData += Constant.END_OF_STREAM + Constant.NEWLINE;
-				currentReply.write(requestedData);
-				currentReply.println(Constant.END_OF_STREAM + Constant.NEWLINE);
+				requestedData += Constant.NEWLINE;
+//				requestedData += Constant.END_OF_STREAM + Constant.NEWLINE;
+//				currentReply.write(requestedData);
+				currentReply.println(requestedData + Constant.END_OF_STREAM);
 				currentReply.flush();
 
 			} else {
@@ -344,7 +344,7 @@ public class HelperThread extends Thread{
 					currentReply.println("Chunk of File Name Specified is invalid" + Constant.END_OF_STREAM + Constant.NEWLINE);
 					currentReply.flush();
 				} else {
-					currentReply.write(requestedIP + Constant.END_OF_STREAM + Constant.NEWLINE);
+					currentReply.println(requestedIP + Constant.END_OF_STREAM);
 					currentReply.flush();
 				}
 
