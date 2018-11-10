@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
@@ -67,7 +65,6 @@ public class Server extends Thread {
 		try {
 			while(threadRunning) {
 				clientInput = in.readLine();
-//				System.out.println("Client has entered command: " + clientInput);
 				System.out.println("clientInput: " + clientInput);
 				
 				if(clientInput != null) {

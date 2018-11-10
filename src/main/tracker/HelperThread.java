@@ -2,7 +2,6 @@ package main.tracker;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,12 +9,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import main.heartbeat.HeartBeatInitiator;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commands.OfflineInterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
@@ -32,7 +29,7 @@ public class HelperThread extends Thread{
 	//Hash table of fileName to its records of users
 	//E.g. fileOne as key to ArrayList of fileOne chunks
 	private Hashtable<String, ArrayList<Record>> recordList = Tracker.recordTable;
-	
+
 	private boolean threadRunning = true;
 
 	private static final String INVALID_CHUNK = "-1";
@@ -403,10 +400,10 @@ public class HelperThread extends Thread{
 	 */
 	private void exitServer(String[] strCommandArr, PrintWriter currentReply) {
 		threadRunning = false;
-		
+
 		String ipAddress = this.clientSocket.getInetAddress().getHostAddress();
 		String clientPortNo = String.valueOf(this.clientSocket.getPort());
-		
+
 		boolean ipAndPortExists = checkIPAndPortNoExists(ipAddress, clientPortNo);
 		if(ipAndPortExists) {
 			deleteAllRecords(ipAddress, clientPortNo);
@@ -436,7 +433,7 @@ public class HelperThread extends Thread{
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -468,10 +465,10 @@ public class HelperThread extends Thread{
 	private void forwardServer(String[] clientInputArr, PrintWriter currentReply) {
 		System.out.println("Entered ForwardServer");
 		Socket opposingSocket = null;
-		
+
 		//Now split by comma
 		String[] currentClientInputArr = clientInputArr[1].split(Constant.COMMA);
-		
+
 		//New Socket that was opened up by the client
 		Socket downloaderSocket = clientSocket;
 		System.out.println("Downloader socket is : " + downloaderSocket);
@@ -499,9 +496,17 @@ public class HelperThread extends Thread{
 		}
 
 		sendOpposingPeer(opposingSocket, currentClientInputArr, downloaderSocket);
-		addSocket(downloaderSocket);
+		addDataSocket(downloaderSocket);
 	}
 
+	private void addDataSocket(Socket downloaderSocket) {
+		//Gets public ip, public port from downloader Socket
+		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
+		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
+		System.out.println("New socket is of ip : " + downloaderIP);
+		System.out.println("New Public port is : " +  downloaderPublicPort);
+		Tracker.dataTransferTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
+	}
 	/**
 	 * This methods adds the newly created socket into the hashtable
 	 * @param downloaderSocket
@@ -514,7 +519,7 @@ public class HelperThread extends Thread{
 		System.out.println("New Public port is : " +  downloaderPublicPort);
 		Tracker.ipPortToSocketTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
 	}
-	
+
 	/**
 	 * This method sends data to the opposing peer asking for fileName and chunk Number
 	 * @param opposingSocket
@@ -532,10 +537,10 @@ public class HelperThread extends Thread{
 			String chunkNumber = clientInputArr[3];
 			String dataToSend = ipAdd + Constant.COMMA
 					+ portNo + Constant.COMMA + fileNeeded + Constant.COMMA + chunkNumber;
-		
+
 			//Sends to request peer B of the fileName + chunk Number + ipAdd + port No
 			System.out.println("Helping downloader to send information" + dataToSend);
-			
+
 			out.println(dataToSend);
 			out.flush();
 		} catch (IOException e) {
@@ -554,18 +559,18 @@ public class HelperThread extends Thread{
 		String [] downloaderArr = strCommandArr[1].split(Constant.COMMA);
 		String downloaderAddress = downloaderArr[0];
 		String downloaderPort = downloaderArr[1];
-		
+
 		System.out.println("Downloader address is " + downloaderAddress + "downloaderPort is : " + downloaderPort);
 		Tuple downloaderTuple = new Tuple(downloaderAddress, downloaderPort);
 		//Obtain the downloader's socket
 		Socket downloaderSocket = null;
-		Set<Entry<Tuple, Socket>> entrySet = Tracker.ipPortToSocketTable.entrySet();
+		Set<Entry<Tuple, Socket>> entrySet = Tracker.dataTransferTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet) {
 			if(downloaderTuple.getIpAdd().equals(entry2.getKey().getIpAdd())) {
 				downloaderSocket = entry2.getValue();
 			}
 		} 
-		
+
 		if(downloaderSocket == null) {
 			System.out.println("Exception Obtaining downloader's Socket");
 			return;
@@ -573,7 +578,7 @@ public class HelperThread extends Thread{
 		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
 		Socket opposingNewSocket = clientSocket;
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
-        InputStream is;
+		InputStream is;
 		try {
 			System.out.println("Reading in data at helperThread");
 			//Read Data from opposing new Socket
@@ -581,15 +586,15 @@ public class HelperThread extends Thread{
 			System.out.println("is");
 			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
 			System.out.println("Here");
-		    byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
-	    	//Write Data to downloader Socket
+			byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
+			//Write Data to downloader Socket
 			System.out.println("Here 2");
-		    BufferedOutputStream dos
-		    = new BufferedOutputStream(downloaderSocket.getOutputStream());
-		    System.out.println("Here 3");
-		    dos.write(newFileDataBytes);
-		    System.out.println("Here 4");
-		    dos.close();
+			BufferedOutputStream dos
+			= new BufferedOutputStream(downloaderSocket.getOutputStream());
+			System.out.println("Here 3");
+			dos.write(newFileDataBytes);
+			System.out.println("Here 4");
+			dos.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error in mediating data");
