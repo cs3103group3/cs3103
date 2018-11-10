@@ -210,7 +210,7 @@ public class HelperThread extends Thread{
 		String portNumber = Integer.toString(this.clientSocket.getPort());
 		Tuple peer = new Tuple(ipBroadcasted, portNumber);
 
-		System.out.println("ipBroadcasted: " + ipBroadcasted);
+		System.out.println("ipBroadcasted=> " + ipBroadcasted + ": " + portNumber);
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
 
 		long checksum = Long.parseLong(recvData[0]);
@@ -463,7 +463,7 @@ public class HelperThread extends Thread{
 				Record record = recordList.get(i);
 				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
 				if (peer.getIpAdd().equals(ipAddress) && peer.getPortNo().equals(clientPortNo)) {
-					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " did not respond");
+					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " did not respond at HelperThread deleteAllRecords");
 					recordList.remove(i);
 					if (Tracker.recordTable.get(filename) == null) {
 						Tracker.recordTable.remove(filename);
@@ -471,7 +471,7 @@ public class HelperThread extends Thread{
 					Tracker.ipPortToSocketTable.remove(peer);
 					i--;
 				} else {
-					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " responded");
+					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " responded at HelperThread deleteAllRecords");
 				}
 			}
 		});

@@ -230,6 +230,7 @@ public class Client extends Thread {
     }
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
+    	System.out.println("At inform");
         if (userInputArr.length != 2) {
             System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
@@ -249,6 +250,7 @@ public class Client extends Thread {
             long checksum = CheckAccuracy.calculateChecksum(payload);
             String data = checksum + Constant.COMMA + payload;
             String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
+            System.out.println(sendData);
             out.println(sendData);
 
             String temp = in.readLine();

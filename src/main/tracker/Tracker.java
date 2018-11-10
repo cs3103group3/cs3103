@@ -102,6 +102,17 @@ public class Tracker{
 	}
 
 	public static void removeUnresponsivePeersFromRecord(Set<Tuple> listOfPeersWhoResponded) {
+		System.out.println("ORIGINAL RECORD TABLE");
+		Tracker.recordTable.forEach((filename,recordList) -> {
+			for (int i=0; i<recordList.size(); i++ ) {
+				Record record = recordList.get(i);
+				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
+				System.out.println(filename +"=> " + record.getipAdd() + ":" + record.getPortNumber());			
+			}
+		});
+		
+		System.out.println("I am at removeUnresponsivePeersFromRecord");
+		
 		recordTable.forEach((filename,recordList) -> { 
 			System.out.println(filename + " and recordList size: " + recordList.size());
 			for (int i=0; i<recordList.size(); i++ ) {
@@ -126,6 +137,7 @@ public class Tracker{
 	}
 
 	public static void removeFileWithEmptyRecords() {
+		System.out.println("I am at removeFileWithEmptyRecords");
 		Iterator<String> iterator = recordTable.keySet().iterator();
 		while (iterator.hasNext()){
 			if (recordTable.get(iterator.next()).size() < 1 ) {
@@ -136,6 +148,7 @@ public class Tracker{
 	
 	public static void printEverythInsideRecordAndIpToSocketTable(){
 		System.out.println("=====================recordTable==========================");
+		System.out.println("RecordTable: " + recordTable);
 		recordTable.forEach((filename,recordList) -> { 
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
