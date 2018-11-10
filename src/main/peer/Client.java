@@ -291,7 +291,7 @@ public class Client extends Thread {
 		clientSocket.close();
          
         System.out.println("Goodbye!");
-        //System.exit(1);
+        System.exit(1);
     }
     
     private ArrayList< ArrayList<String> > processPeersWithData(ArrayList<String> peersWithData, int numChunks) {
