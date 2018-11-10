@@ -479,7 +479,7 @@ public class HelperThread extends Thread{
 		System.out.println("Entered ForwardServer");
 		Socket opposingSocket = null;
 
-		//Now split by comma
+		//
 		String[] currentClientInputArr = clientInputArr[1].split(Constant.COMMA);
 
 		//New Socket that was opened up by the client
@@ -521,8 +521,8 @@ public class HelperThread extends Thread{
 		//Gets public ip, public port from downloader Socket
 		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
 		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
-		System.out.println("New socket is of ip : " + downloaderIP);
-		System.out.println("New Public port is : " +  downloaderPublicPort);
+		System.out.println("data socket to be added is of ip : " + downloaderIP);
+		System.out.println("data socket to be added is of port is : " +  downloaderPublicPort);
 		Tracker.dataTransferTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
 	}
 	/**
@@ -553,8 +553,16 @@ public class HelperThread extends Thread{
 			String portNo = String.valueOf(downloaderSocket.getPort());
 			String fileNeeded = clientInputArr[2];
 			String chunkNumber = clientInputArr[3];
-			String dataToSend = ipAdd + Constant.COMMA
-					+ portNo + Constant.COMMA + fileNeeded + Constant.COMMA + chunkNumber;
+			String dataToSend = "";
+			//Implies that not the last
+			if(clientInputArr.length != 5) {
+				dataToSend = ipAdd + Constant.COMMA
+						+ portNo + Constant.COMMA + fileNeeded + Constant.COMMA + chunkNumber;
+			} else {
+				dataToSend = ipAdd + Constant.COMMA
+						+ portNo + Constant.COMMA + fileNeeded + Constant.COMMA + chunkNumber
+						+ Constant.COMMA + Constant.LAST_CHUNK;
+			}
 
 			//Sends to request peer B of the fileName + chunk Number + ipAdd + port No
 			System.out.println("Helping downloader to send information" + dataToSend);
@@ -578,16 +586,28 @@ public class HelperThread extends Thread{
 		String [] downloaderArr = strCommandArr[1].split(Constant.COMMA);
 		String downloaderAddress = downloaderArr[0];
 		String downloaderPort = downloaderArr[1];
-
-		System.out.println("Downloader address is: " + downloaderAddress);
-		System.out.println("Downloader Port is: " + downloaderPort);
+		
+		boolean isLast = false;
+		
+		System.out.println("downloadArr size is " + downloaderArr.length);
+		for(int i=0; i < downloaderArr.length ; i ++) {
+			System.out.println("At mediate, Printing out downloadArr" + downloaderArr[i]);
+		}
+		
+		if(downloaderArr.length == 3) {
+			System.out.println("downloaderArr[2] " + downloaderArr[2]);
+			isLast = true;
+		}
 		Tuple downloaderTuple = new Tuple(downloaderAddress, downloaderPort);
+		Tuple finalTuple = new Tuple("empty", "empty");
 		//Obtain the downloader's socket
 		Socket downloaderSocket = null;
 		Set<Entry<Tuple, Socket>> entrySet = Tracker.dataTransferTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet) {
-			if(downloaderTuple.getIpAdd().equals(entry2.getKey().getIpAdd())) {
+			if(downloaderTuple.getIpAdd().equals(entry2.getKey().getIpAdd())
+					&& downloaderTuple.getPortNo().equals(entry2.getKey().getPortNo())) {
 				downloaderSocket = entry2.getValue();
+				finalTuple = entry2.getKey();
 			}
 		} 
 
@@ -601,24 +621,34 @@ public class HelperThread extends Thread{
 		InputStream is = null;
 		BufferedOutputStream dos =  null;
 		try {
-			System.out.println("Reading in data at helperThread");
 			//Read Data from opposing new Socket
 			is = opposingNewSocket.getInputStream();
-			System.out.println("is");
 			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
-			System.out.println("Here");
 			byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 			//Write Data to downloader Socket
-			System.out.println("Here 2");
 			dos = new BufferedOutputStream(downloaderSocket.getOutputStream());
-			System.out.println("Here 3");
 			dos.write(newFileDataBytes);
-			System.out.println("Here 4");
 			dos.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error in mediating data");
 			e.printStackTrace();
 		} 
+		Set<Entry<Tuple, Socket>> entrySet1 = Tracker.dataTransferTable.entrySet();
+		for(Entry<Tuple, Socket> entry2 : entrySet1) {
+			System.out.println("Before removal dataSocket " + entry2.getKey().getIpAdd());
+			System.out.println("Before removal dataSocket " + entry2.getValue());
+		} 
+		if(isLast) {
+			removeDataSocket(finalTuple, downloaderSocket);
+			dos.close();
+		}
+	}
+	/**
+	 * This method removes the socket that was opened up
+	 *  
+	 */
+	private void removeDataSocket(Tuple downloaderTuple, Socket downloaderSocket) {
+		Tracker.dataTransferTable.remove(downloaderTuple, downloaderSocket);
 	}
 }
