@@ -22,14 +22,13 @@ public class Peer {
         HeartBeatSender heartBeatSender = new HeartBeatSender();
         heartBeatSender.start();
         
-        cleanUp(server, client, heartBeatSender);
+        cleanUp(server, client);
     }
     
-    public static void cleanUp(Server server, Client client, HeartBeatSender heartBeatSender) {
+    public static void cleanUp(Server server, Client client) {
         while (client.isAlive()) {
             if (!client.isAlive()) {
                 server.closeSockets();
-                heartBeatSender.closeSocket();
                 break;
             }
         }

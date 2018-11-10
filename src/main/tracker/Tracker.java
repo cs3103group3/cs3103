@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import main.heartbeat.HeartBeatInitiator;
+import main.heartbeat.HeartBeatListener;
 import main.utilities.constants.NetworkConstant;
 
 /**
@@ -27,7 +27,7 @@ public class Tracker{
 
 	//To allow faster access, use a hash : fileName to its associated chunks
 	public static Hashtable<String, ArrayList<Record>> recordTable = new Hashtable<>();
-	public static Set<String> aliveIpAddresses = new HashSet<String>();
+	public static Set<Tuple> alivePeers = new HashSet<Tuple>();
 	
 	//Tuple : 1) Ip 2) Port No.		Value = Socket
 	public static Hashtable<Tuple, Socket> ipPortToSocketTable = new Hashtable<>();
@@ -76,7 +76,7 @@ public class Tracker{
 	}
 
 	private static void listenRequest() {
-		HeartBeatInitiator heartbeatInitiator = new HeartBeatInitiator();
+		HeartBeatListener heartbeatInitiator = new HeartBeatListener();
 		heartbeatInitiator.start();
 
 		ExecutorService executor= null;
@@ -102,14 +102,16 @@ public class Tracker{
 		}
 	}
 
-	public static void removeIpAddressesNoResponseFromRecord(Set<String> ipAddressesResponded) {
-		aliveIpAddresses = ipAddressesResponded;
+	public static void removeUnresponsivePeersFromRecord(Set<Tuple> listOfPeersWhoResponded) {
+		alivePeers = listOfPeersWhoResponded;
 
 		recordTable.forEach((filename,recordList) -> { 
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
 				String ipAddress = record.getipAdd();
-				if (!ipAddressesResponded.contains(ipAddress)) {
+				String port = record.getPortNumber();
+				Tuple peer = new Tuple(ipAddress, port);
+				if (!listOfPeersWhoResponded.contains(peer)) {
 					recordList.remove(i);
 					if (recordTable.get(filename) == null) {
 						recordTable.remove(filename);
@@ -118,24 +120,8 @@ public class Tracker{
 				}
 			}
 		});
-	}
-
-	public static void removeIpAddressFromRecord(String ipAddressToRemove) {
-		aliveIpAddresses.remove(ipAddressToRemove);
-
-		recordTable.forEach((filename,recordList) -> { 
-			for (int i=0; i<recordList.size(); i++ ) {
-				Record record = recordList.get(i);
-				String ipAddress = record.getipAdd();
-				if (ipAddress.equals(ipAddressToRemove)) {
-					recordList.remove(i);
-					if (recordTable.get(filename) == null) {
-						recordTable.remove(filename);
-					}
-					i--;
-				}
-			}
-		});
+		
+		removeFileWithEmptyRecords();
 	}
 
 	public static void removeFileWithEmptyRecords() {
