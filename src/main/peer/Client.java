@@ -24,6 +24,7 @@ import main.utilities.commands.InterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
 import main.utilities.constants.NetworkConstant;
 import main.utilities.feedbacks.ErrorMessage;
+import main.utilities.feedbacks.SuccessMessage;
 import main.utilities.constants.Constant;
 
 public class Client extends Thread {
@@ -224,6 +225,9 @@ public class Client extends Thread {
     }
     
     private void inform(String[] userInputArr) throws UnknownHostException, IOException {
+    	
+    	String confirmationString = SuccessMessage.NEW_CHUNK_ADDED_TO_TRACKER.toString();
+    	
         if (userInputArr.length != 2) {
             System.out.println(ErrorMessage.INVALID_COMMAND);
             return;
@@ -238,20 +242,25 @@ public class Client extends Thread {
         
         long fileSize =  file.length();
         int totalNumChunk = (int) Math.ceil(fileSize*1.0/ Constant.CHUNK_SIZE);
+        String listeningPort = Integer.toString(Peer.listeningPort);
         for (int chunkNum=1; chunkNum<=totalNumChunk; chunkNum++) {
-            String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName;
+            String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName + Constant.COMMA + listeningPort;
             long checksum = CheckAccuracy.calculateChecksum(payload);
             String data = checksum + Constant.COMMA + payload;
             String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
             out.println(sendData);
 
             String temp = in.readLine();
-            ArrayList<String> results = new ArrayList<String>();
+//            ArrayList<String> results = new ArrayList<String>();
             while(!temp.equals(Constant.END_OF_STREAM)) {
-                results.add(temp);
+//                results.add(temp);
+            	if (temp.equals(ErrorMessage.INCONSISTENT_CHECKSUM.getErrorMessage())) {
+            		confirmationString = ErrorMessage.INCONSISTENT_CHECKSUM.getErrorMessage();
+            	}
                 temp=in.readLine();
             }
         }
+        System.out.println(confirmationString);
     }
     
     private void quit(String[] userInputArr) throws UnknownHostException, IOException {
