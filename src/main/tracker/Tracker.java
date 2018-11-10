@@ -31,8 +31,8 @@ public class Tracker{
 	
 	//Tuple : 1) Ip 2) Port No.		Value = Socket
 	public static Hashtable<Tuple, Socket> ipPortToSocketTable = new Hashtable<>();
-	//TODO: Another Hash to pinpoint location of the record
-
+	public static Hashtable<Tuple, Socket> dataTransferTable = new Hashtable<>();
+	
 	public static void main(String[] args) {
 		System.out.println("Starting Server");
 

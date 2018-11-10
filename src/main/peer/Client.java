@@ -194,11 +194,12 @@ public class Client extends Thread {
     			//returns a random IP and Port from list
     			socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
     			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
+    			System.out.println("P2PserverIPAndPort is :" + serverIPAndPort);
     			String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
     			
     			// Send fileName and chunkNum to download
     			PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
-    	        outSocket.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.COMMA
+    	        outSocket.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.WHITESPACE
     	        			+ serverIPAndPort + Constant.COMMA
     	        			+ fileName + Constant.COMMA 
     	        			+ i);
@@ -290,6 +291,7 @@ public class Client extends Thread {
 //    		System.out.println("tempList: " + tempList);
 //    		System.out.println("peerDataArr[0]: " + peerDataArr[0]);
     		String peerServerSocket = peerDataArr[0] + "," + peerDataArr[1];
+    		System.out.println("Adding peerSeverSocket in processPeersWithData" + peerServerSocket);
     		tempList.add(peerServerSocket);
     		processedList.set(currChunkNumber, tempList);
     	}

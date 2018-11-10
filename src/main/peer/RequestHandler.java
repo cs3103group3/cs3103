@@ -12,46 +12,64 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
+
 import main.utilities.commands.OfflineInterfaceCommand;
 import main.utilities.constants.Constant;
 
 public class RequestHandler implements Runnable {
   private final Socket client;
   ServerSocket serverSocket = null;
-
+  String requestedFileName = "";
+  String requestedChunkNo = "";
     public RequestHandler(Socket client) {
       this.client = client;
+    }
+    public RequestHandler(Socket client, String requestedFile, String chunkNo) {
+        this.client = client;
+        this.requestedFileName = requestedFile;
+        this.requestedChunkNo = chunkNo;
     }
 
     @Override
     public void run() {
-	try {
-		
-		BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-		System.out.println("Thread started with name:" + Thread.currentThread().getName());
-		String result = in.readLine();
-		String resultTrimmed = result.trim();
-		System.out.println("Received message from " + Thread.currentThread().getName() + " : " + resultTrimmed);
-		// resultArr[0] contains fileName, resultArr[1] contains chunkNumber
-		String[] resultArr = resultTrimmed.split(",");
-		String fileName = resultArr[0];
-		int chunkNumber = Integer.parseInt(resultArr[1]);
-		
-		if (resultArr.length == 2) {
-			processDownload(fileName, chunkNumber);
-//			reply.println(OfflineInterfaceCommand.VALID_DOWNLOAD);
+    	try {
+			processDownload(requestedFileName, Integer.valueOf(requestedChunkNo));
+		} catch (NumberFormatException | IOException e) {
+			System.out.println("Error with numberFormat or io exception");
+			e.printStackTrace();
 		}
-		else {
-//			reply.println(OfflineInterfaceCommand.INVALID_DOWNLOAD);
-		}
-	} catch (IOException e) {
-	    System.out.println("I/O exception: " + e);
-	    e.printStackTrace();
-	  } catch (Exception ex) {
-	    System.out.println("Exception in Thread Run. Exception : " + ex);
-	    ex.printStackTrace();
-	  }
     }
+    
+//    @Override
+//    public void run() {
+//	try {
+//		
+//		BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+//		System.out.println("Thread started with name:" + Thread.currentThread().getName());
+//		String result = in.readLine();
+//		String resultTrimmed = result.trim();
+//		System.out.println("Received message from " + Thread.currentThread().getName() + " : " + resultTrimmed);
+//		// resultArr[0] contains fileName, resultArr[1] contains chunkNumber
+//		String[] resultArr = resultTrimmed.split(",");
+//		String fileName = resultArr[0];
+//		int chunkNumber = Integer.parseInt(resultArr[1]);
+//		
+//		if (resultArr.length == 2) {
+//			processDownload(fileName, chunkNumber);
+////			reply.println(OfflineInterfaceCommand.VALID_DOWNLOAD);
+//		}
+//		else {
+////			reply.println(OfflineInterfaceCommand.INVALID_DOWNLOAD);
+//		}
+//	} catch (IOException e) {
+//	    System.out.println("I/O exception: " + e);
+//	    e.printStackTrace();
+//	  } catch (Exception ex) {
+//	    System.out.println("Exception in Thread Run. Exception : " + ex);
+//	    ex.printStackTrace();
+//	  }
+//    }
 
     private void processDownload(String fileName, int chunkNumber) throws IOException {
     	OutputStream os = null;
