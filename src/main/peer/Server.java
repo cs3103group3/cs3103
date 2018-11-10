@@ -108,7 +108,7 @@ public class Server extends Thread {
 	private void processConnection() {
 		
 		try {
-			serverSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
+			serverSocket = Peer.listeningSocket;
             out = new PrintWriter(serverSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 		} catch (IOException e) {
