@@ -34,12 +34,11 @@ public class HeartBeatListener extends Thread {
             while(true) {
                 Socket clientSocket = listeningSocket.accept();
                 String ipAddress = clientSocket.getInetAddress().getHostAddress();
-                String port = Integer.toString(clientSocket.getPort());
-                System.out.println("Received a heartbeat signal from [" + ipAddress + ": " + port + "]");
+                String heartBeatPort = Integer.toString(clientSocket.getPort());
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                if (Constant.HEARTBEAT_SIGNAL.equals(in.readLine())) {
-                	markPeerAsResponded(ipAddress, port);
-                }
+                String dataPort = in.readLine();
+                System.out.println("Received a heartbeat signal from [" + ipAddress + ": " + heartBeatPort + "], with dataport = " + dataPort);
+            	markPeerAsResponded(ipAddress, dataPort);
             }
 
         } catch(IOException ioe) {
