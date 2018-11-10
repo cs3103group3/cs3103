@@ -1,6 +1,8 @@
 package main.heartbeat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
@@ -30,12 +32,14 @@ public class HeartBeatListener extends Thread {
             executor = Executors.newFixedThreadPool(20);
 
             while(true) {
-                Socket clientSocket = listeningSocket.accept();    
-                System.out.println("Received a heartbeat signal");
+                Socket clientSocket = listeningSocket.accept();
                 String ipAddress = clientSocket.getInetAddress().getHostAddress();
                 String port = Integer.toString(clientSocket.getPort());
-                markPeerAsResponded(ipAddress, port);
-                
+                System.out.println("Received a heartbeat signal from [" + ipAddress + ": " + port + "]");
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                if (Constant.HEARTBEAT_SIGNAL.equals(in.readLine())) {
+                	markPeerAsResponded(ipAddress, port);
+                }
             }
 
         } catch(IOException ioe) {
