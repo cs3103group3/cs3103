@@ -7,7 +7,8 @@ public enum ErrorMessage {
     UNKNOWN_ERROR(520, "Unknown Error Occurred. "),
 	INVALID_NUMBEROFARGUMENTS(540, "Invalid number of arguments. "),
 	INCONSISTENT_CHECKSUM(555, "Your data was corrupted, please resend data. "),
-	CANNOT_CLOSE_SOCKET(558, "Unable to close socket. ");
+	CANNOT_CLOSE_SOCKET(558, "Unable to close socket. "),
+	CANNOT_CONNECT_TO_TRACKER(560, "Lost connection with tracker");
     
     private final int code;
     private final String message;

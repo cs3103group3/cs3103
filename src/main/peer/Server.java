@@ -65,11 +65,13 @@ public class Server extends Thread {
 		try {
 			while(threadRunning) {
 				clientInput = in.readLine();
-				System.out.println("clientInput: " + clientInput);
 				
 				if(clientInput != null) {
 					String[] clientInputArr = clientInput.split(Constant.COMMA);
 					sendMediateData(clientInputArr);
+				} else {
+					System.out.println(ErrorMessage.CANNOT_CONNECT_TO_TRACKER.getErrorMessage());
+					System.exit(1);
 				}
 			}
 		} catch (IOException e) {
