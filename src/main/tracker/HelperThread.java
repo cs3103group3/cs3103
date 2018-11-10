@@ -15,7 +15,6 @@ import java.util.Hashtable;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import main.heartbeat.HeartBeatInitiator;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commands.OfflineInterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
@@ -209,6 +208,7 @@ public class HelperThread extends Thread{
 	private synchronized void informServer(String[] strCommandArr, PrintWriter currentReply) {
 		String ipBroadcasted = this.clientSocket.getInetAddress().toString().replaceAll("/", "").trim();
 		String portNumber = Integer.toString(this.clientSocket.getPort());
+		Tuple peer = new Tuple(ipBroadcasted, portNumber);
 
 		System.out.println("ipBroadcasted: " + ipBroadcasted);
 		String[] recvData = strCommandArr[1].split(Constant.COMMA);
@@ -228,7 +228,7 @@ public class HelperThread extends Thread{
 		}
 
 		System.out.println("IP_RECEIVED: " + ipBroadcasted);
-		Tracker.aliveIpAddresses.add(ipBroadcasted);
+		Tracker.alivePeers.add(peer);
 
 		boolean hasExist =	checkExistFile(fileName);
 
