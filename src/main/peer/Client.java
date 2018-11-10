@@ -193,12 +193,12 @@ public class Client extends Thread {
 //    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
     			//returns a random IP and Port from list
     			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
-    			System.out.println("P2PserverIPAndPort is :" + serverIPAndPort);
+    			System.out.println("Peer's serverIP And Port is :" + serverIPAndPort);
     			String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
     			
     			// Send fileName and chunkNum to download
     			PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
-    	        outSocket.println(Constant.DOWNLOAD_FROM_PEER_COMMAND + Constant.WHITESPACE
+    	        outSocket.println(InterfaceCommand.FORWARD.getCommandCode() + Constant.WHITESPACE
     	        			+ serverIPAndPort + Constant.COMMA
     	        			+ fileName + Constant.COMMA 
     	        			+ i);
@@ -217,9 +217,9 @@ public class Client extends Thread {
     			return false;
     		} 
     	}
-    	fos.close();
-    	bos.close();
-    	socket.close();
+    	if (fos != null) fos.close();
+		if (bos != null) bos.close();
+		if (socket != null) socket.close();
     	return true;
     }
     

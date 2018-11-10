@@ -66,7 +66,8 @@ public class HelperThread extends Thread{
 			}
 			doClientCommand(clientInput, reply);
 		} catch (IOException e) {
-			System.out.println("IOException");
+			System.out.println("Error in running helperThread");
+			e.printStackTrace();
 		}
 	}
 
@@ -74,8 +75,9 @@ public class HelperThread extends Thread{
 	 * This method executes the 
 	 * commands the client requested
 	 * @param reply2 
+	 * @throws IOException 
 	 */
-	private void doClientCommand(String strCommand, PrintWriter currentReply) {
+	private void doClientCommand(String strCommand, PrintWriter currentReply) throws IOException {
 		InterfaceCommand command = InterfaceCommand.INVALID;
 		String [] strCommandArr;
 		try {
@@ -486,8 +488,7 @@ public class HelperThread extends Thread{
 			System.out.println("Current IP of tuple is : " + entry2.getKey().getIpAdd());
 			System.out.println("Current IP of tuple is : " + entry2.getKey().getPortNo());
 			System.out.println("Current Socket of tuple is " + entry2.getValue());
-			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())
-					&& opposingPeerTuple.getPortNo().equals(entry2.getKey().getPortNo())) {
+			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())) {
 				opposingSocket = entry2.getValue();
 			}
 		} 
@@ -497,7 +498,12 @@ public class HelperThread extends Thread{
 		} else {
 			System.out.println("Opposing Socket is : " + opposingSocket);
 		}
-
+		
+		/**
+		 * 	opposingSocket = Peer's listeningSocket
+		 * 	currentClientInputArr = opposingSocket.IP, opposingSocket.port, fileName, chunkNumber
+		 * 	downloaderSocket = clientSocket = Peer's downloading socket
+		 */
 		sendOpposingPeer(opposingSocket, currentClientInputArr, downloaderSocket);
 		addDataSocket(downloaderSocket);
 	}
@@ -525,8 +531,8 @@ public class HelperThread extends Thread{
 
 	/**
 	 * This method sends data to the opposing peer asking for fileName and chunk Number
-	 * @param opposingSocket
-	 * @param clientInputArr
+	 * @param opposingSocket = Peer's listeningSocket
+	 * @param clientInputArr = opposingSocket.IP, opposingSocket.port, fileName, chunkNumber
 	 */
 	private void sendOpposingPeer(Socket opposingSocket, String[] clientInputArr, Socket downloaderSocket) {
 		try {
@@ -556,14 +562,16 @@ public class HelperThread extends Thread{
 	 * public ip and port number
 	 * @param strCommandArr
 	 * @param currentReply
+	 * @throws IOException 
 	 */
-	private void mediate(String[] strCommandArr, PrintWriter currentReply) {
+	private void mediate(String[] strCommandArr, PrintWriter currentReply) throws IOException {
 		//strCommandArr is: 7 public address of A public port of A
 		String [] downloaderArr = strCommandArr[1].split(Constant.COMMA);
 		String downloaderAddress = downloaderArr[0];
 		String downloaderPort = downloaderArr[1];
 
-		System.out.println("Downloader address is " + downloaderAddress + "downloaderPort is : " + downloaderPort);
+		System.out.println("Downloader address is: " + downloaderAddress);
+		System.out.println("Downloader Port is: " + downloaderPort);
 		Tuple downloaderTuple = new Tuple(downloaderAddress, downloaderPort);
 		//Obtain the downloader's socket
 		Socket downloaderSocket = null;
@@ -581,7 +589,8 @@ public class HelperThread extends Thread{
 		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
 		Socket opposingNewSocket = clientSocket;
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
-		InputStream is;
+		InputStream is = null;
+		BufferedOutputStream dos =  null;
 		try {
 			System.out.println("Reading in data at helperThread");
 			//Read Data from opposing new Socket
@@ -591,13 +600,16 @@ public class HelperThread extends Thread{
 			System.out.println("Here");
 			byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 			//Write Data to downloader Socket
-			BufferedOutputStream dos
-			= new BufferedOutputStream(downloaderSocket.getOutputStream());
+			System.out.println("Here 2");
+			dos = new BufferedOutputStream(downloaderSocket.getOutputStream());
+			System.out.println("Here 3");
 			dos.write(newFileDataBytes);
+			System.out.println("Here 4");
 			dos.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error in mediating data");
-		}
+			e.printStackTrace();
+		} 
 	}
 }
