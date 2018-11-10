@@ -403,20 +403,16 @@ public class HelperThread extends Thread{
 		threadRunning = false;
 
 		String ipAddress = this.clientSocket.getInetAddress().getHostAddress();
-		String clientPortNo = String.valueOf(this.clientSocket.getPort());
+		String clientPortNo = strCommandArr[1];
 
-		boolean ipAndPortExists = checkIPAndPortNoExists(ipAddress, clientPortNo);
-		if(ipAndPortExists) {
+		try {
 			deleteAllRecords(ipAddress, clientPortNo);
+			clientSocket.close();
 			System.out.println("Exited and Deleted Successfully");
-			try {
-				clientSocket.close();
-			} catch (IOException e) {
-				System.out.println("Error closing socket");
-			}
-		} else {
-			System.out.println("IP address: " + ipAddress + ", port: " + clientPortNo + " does not exist.");
+		} catch (IOException e) {
+			System.out.println("Error closing socket");
 		}
+		
 	}
 
 	/**
@@ -463,15 +459,12 @@ public class HelperThread extends Thread{
 				Record record = recordList.get(i);
 				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
 				if (peer.getIpAdd().equals(ipAddress) && peer.getPortNo().equals(clientPortNo)) {
-					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " did not respond at HelperThread deleteAllRecords");
 					recordList.remove(i);
 					if (Tracker.recordTable.get(filename) == null) {
 						Tracker.recordTable.remove(filename);
 					}
 					Tracker.ipPortToSocketTable.remove(peer);
 					i--;
-				} else {
-					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " responded at HelperThread deleteAllRecords");
 				}
 			}
 		});

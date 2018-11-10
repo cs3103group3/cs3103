@@ -284,7 +284,7 @@ public class Client extends Thread {
         }
         
     	//Inform server that it is exiting
-		out.println(InterfaceCommand.QUIT.getCommandCode());
+		out.println(InterfaceCommand.QUIT.getCommandCode() + Constant.WHITESPACE + port);
 		//out.flush();
 		//in.close();
 		 
