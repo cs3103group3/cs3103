@@ -486,7 +486,8 @@ public class HelperThread extends Thread{
 			System.out.println("Current IP of tuple is : " + entry2.getKey().getIpAdd());
 			System.out.println("Current IP of tuple is : " + entry2.getKey().getPortNo());
 			System.out.println("Current Socket of tuple is " + entry2.getValue());
-			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())) {
+			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())
+					&& opposingPeerTuple.getPortNo().equals(entry2.getKey().getPortNo())) {
 				opposingSocket = entry2.getValue();
 			}
 		} 
@@ -590,13 +591,10 @@ public class HelperThread extends Thread{
 			System.out.println("Here");
 			byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 			//Write Data to downloader Socket
-			System.out.println("Here 2");
 			BufferedOutputStream dos
 			= new BufferedOutputStream(downloaderSocket.getOutputStream());
-			System.out.println("Here 3");
 			dos.write(newFileDataBytes);
-			System.out.println("Here 4");
-			dos.close();
+			dos.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error in mediating data");

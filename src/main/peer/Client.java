@@ -177,7 +177,6 @@ public class Client extends Thread {
     
     private boolean downloadFromEachPeer(ArrayList< ArrayList<String> > chunkPeerList, String fileName, int numChunks) throws IOException{
     	System.out.println("Connecting to P2P Server");
-    	Socket socket;
 //    	String filePath = Constant.FILE_DIR + "receive.txt";
 //    	File yourFile = new File("/Users/brehmerchan/Desktop/P2p/src/main/files/receive.txt");
     	File yourFile = new File(fileName);
@@ -186,14 +185,13 @@ public class Client extends Thread {
 		}
     	FileOutputStream fos = new FileOutputStream(yourFile);
     	BufferedOutputStream bos = new BufferedOutputStream(fos);
-    	
+		Socket socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
+
     	for (int i = 1; i <= numChunks; i++) {
     		try {
 //    			InetAddress serverIP = null;
 //    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
-    			
     			//returns a random IP and Port from list
-    			socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
     			String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
     			System.out.println("P2PserverIPAndPort is :" + serverIPAndPort);
     			String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
@@ -221,6 +219,7 @@ public class Client extends Thread {
     	}
     	fos.close();
     	bos.close();
+    	socket.close();
     	return true;
     }
     
