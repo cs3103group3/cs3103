@@ -299,6 +299,8 @@ public class HelperThread extends Thread{
 	private synchronized void findPeer(String[] strCommandArr, PrintWriter currentReply) {
 		String requestedFileName = strCommandArr[1];
 
+		String finderIP = clientSocket.getInetAddress().getHostAddress();
+		System.out.println("This client is finding peer: " + clientSocket.getInetAddress().getHostAddress());
 		if(strCommandArr.length <= 1) {
 			currentReply.print("Invalid Arguments");
 			currentReply.flush();
@@ -321,7 +323,10 @@ public class HelperThread extends Thread{
 					requestedData += "\n";
 				}
 
-				requestedData += requestedChunks.get(0).getMaxChunk();
+				System.out.println("Last line to send is : " + requestedChunks.get(0).getMaxChunk()
+						+ Constant.COMMA + finderIP);
+				requestedData += requestedChunks.get(0).getMaxChunk()
+						+ Constant.COMMA + finderIP;
 				requestedData += Constant.NEWLINE;
 				currentReply.println(requestedData + Constant.END_OF_STREAM);
 				currentReply.flush();
@@ -497,7 +502,8 @@ public class HelperThread extends Thread{
 			System.out.println("Current IP of tuple is : " + entry2.getKey().getIpAdd());
 			System.out.println("Current IP of tuple is : " + entry2.getKey().getPortNo());
 			System.out.println("Current Socket of tuple is " + entry2.getValue());
-			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())) {
+			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())
+					&& opposingPeerTuple.getPortNo().equals(entry2.getKey().getPortNo())) {
 				opposingSocket = entry2.getValue();
 			}
 		} 

@@ -41,6 +41,7 @@ public class Client extends Thread {
 
 	public static int port;
 
+	String myIP;
 	private static void displayMenu() {
 		System.out.println( "===============================================\n" +
 				"Welcome to CS3103 P2P Client\n" +
@@ -162,7 +163,13 @@ public class Client extends Thread {
 
 		// Inner-arrayList stores the peer IP's that are holding the specific chunk
 
-		int numChunks = Integer.parseInt(peersWithData.get(peersWithData.size() - 1));
+		String [] numChunkAndMyIP = peersWithData.get(peersWithData.size() - 1).split(Constant.COMMA);
+		
+		int numChunks = Integer.parseInt(numChunkAndMyIP[0]);
+		myIP = numChunkAndMyIP[1];
+		System.out.println("numChunks is " + numChunks);
+		System.out.println("myIP is " + myIP);
+
 		peersWithData.remove(peersWithData.size() - 1);
 		ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
 		chunkList = processPeersWithData(peersWithData, numChunks);
@@ -193,13 +200,14 @@ public class Client extends Thread {
 		FileOutputStream fos = new FileOutputStream(yourFile);
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		Socket socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
-
+		System.out.println("My public ip is " + myIP);
+		System.out.println("My port is : " + Peer.listeningPort);
 		for (int i = 1; i <= numChunks; i++) {
 			try {
 				//    			InetAddress serverIP = null;
 				//    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
 				//returns a random IP and Port from list
-				String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
+				String serverIPAndPort = getIPToConnect(chunkPeerList.get(i), myIP);
 				System.out.println("Peer's serverIP And Port is :" + serverIPAndPort);
 				String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
 
@@ -331,11 +339,18 @@ public class Client extends Thread {
 		return processedList;
 	}
 
-	private String getIPToConnect(ArrayList<String> ipList) {
+	private String getIPToConnect(ArrayList<String> ipList, String myIP) {
+		String myListeningPort = Integer.toString(Peer.listeningPort);
+		String myIPAndPort = myIP + Constant.COMMA + myListeningPort;
 		Random currRan = new SecureRandom();
 		//E.g. ipList is size 3, random peer is chosen from 0 to 2 index
+		System.out.println("iplist size is : " + ipList);
 		int peerChosen = currRan.nextInt(ipList.size());
 		//Return the ip address of the chosen peer
+		
+		while(myIPAndPort.equals(ipList.get(peerChosen))) {
+			peerChosen = currRan.nextInt(ipList.size());
+		}
 		return ipList.get(peerChosen);
 	}
 
