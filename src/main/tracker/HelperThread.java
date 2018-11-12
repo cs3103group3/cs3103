@@ -334,7 +334,8 @@ public class HelperThread extends Thread{
 				currentReply.flush();
 
 			} else {
-				currentReply.println("File Requested does not Exists" + Constant.END_OF_STREAM + Constant.NEWLINE);
+				currentReply.println("File Requested does not Exists");
+				currentReply.println(Constant.END_OF_STREAM);
 				currentReply.flush();
 			}
 		} else {
