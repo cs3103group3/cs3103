@@ -100,7 +100,6 @@ public class Server extends Thread {
 			tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 			PrintWriter out = new PrintWriter(tempSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(tempSocket.getInputStream()));
-			
 			if(!isLastChunk) {
 				out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP 
 						+ Constant.COMMA + downloaderPort 

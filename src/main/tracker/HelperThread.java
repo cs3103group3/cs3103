@@ -631,17 +631,17 @@ public class HelperThread extends Thread{
 		
 		//This socket is the socket of the one sending data
 		Socket opposingNewSocket = clientSocket;
-		Socket transferrerSocket = new Socket();
-		transferrerSocket.setReuseAddress(true);
-		transferrerSocket.setKeepAlive(true);
-		transferrerSocket = new Socket(transferrerAddress, transferrerPort);
+//		Socket transferrerSocket = new Socket();
+//		transferrerSocket.setReuseAddress(true);
+//		transferrerSocket.setKeepAlive(true);
+//		transferrerSocket = new Socket(transferrerAddress, transferrerPort);
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
 		InputStream is = null;
 		BufferedOutputStream dos =  null;
 		try {
 			//Read Data from opposing new Socket
-			System.out.println("transferrerSocket is : " + transferrerSocket);
-			is = transferrerSocket.getInputStream();
+			System.out.println("transferrerSocket is : " + opposingNewSocket);
+			is = opposingNewSocket.getInputStream();
 			System.out.println("Top");
 			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
 			System.out.println("Middle");
