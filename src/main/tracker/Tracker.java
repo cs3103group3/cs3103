@@ -8,10 +8,14 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import main.heartbeat.HeartBeatListener;
+//import main.heartbeat.HeartBeatListener;
+//import main.heartbeat.HeartBeatListener.TrackerCleanUp;
+import main.utilities.constants.Constant;
 import main.utilities.constants.NetworkConstant;
 
 /**
@@ -71,6 +75,8 @@ public class Tracker{
 		//        System.out.println("RecordTable: " + recordTable);
 		/*****************************/
 
+		Timer timer = new Timer();
+        timer.schedule(new TrackerCleanUp(), 0, Constant.HEARTBEAT_TRACKER_CLEANUP_INTERVAL);
 		listenRequest();
 	}
 
@@ -151,4 +157,28 @@ public class Tracker{
 		});
 		System.out.println("===============================================");
 	}
+	
+    
+}
+
+class TrackerCleanUp extends TimerTask {
+    public void run() {
+//        Tracker.removeUnresponsivePeersFromRecord(listOfRespondedPeerInfo);
+    	System.out.println("=====================recordTable==========================");
+		Tracker.recordTable.forEach((filename,recordList) -> { 
+			for (int i=0; i<recordList.size(); i++ ) {
+				Record record = recordList.get(i);
+				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
+				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
+			}
+		});
+		System.out.println("===============================================");
+		
+		System.out.println("=====================ipPortToSocketTable==========================");
+		Tracker.ipPortToSocketTable.forEach((peer,socket) -> {
+			System.out.println(peer.ipAdd + ": " +peer.portNo);
+		});
+		System.out.println("===============================================");
+        
+    }
 }
