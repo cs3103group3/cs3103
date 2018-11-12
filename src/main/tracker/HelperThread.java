@@ -118,7 +118,7 @@ public class HelperThread extends Thread{
 				mediate(strCommandArr, currentReply);
 				break;
 			case AddListeningSocket:
-				addSocket(this.clientSocket);
+				addSocket(this.clientSocket, strCommandArr);
 				break;
 			default:
 				//Error
@@ -535,10 +535,11 @@ public class HelperThread extends Thread{
 	 * This methods adds the newly created socket into the hashtable
 	 * @param downloaderSocket
 	 */
-	private void addSocket(Socket downloaderSocket) {
+	private void addSocket(Socket downloaderSocket, String[] commandArr) {
 		//Gets public ip, public port from downloader Socket
 		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
-		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
+//		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
+		String downloaderPublicPort = commandArr[1];
 		System.out.println("New socket is of ip : " + downloaderIP);
 		System.out.println("New Public port is : " +  downloaderPublicPort);
 		Tracker.ipPortToSocketTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);

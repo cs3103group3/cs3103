@@ -52,7 +52,8 @@ public class Server extends Thread {
 	
 	private void sendListeningSocketData() {
 		try {
-            out.println(InterfaceCommand.AddListeningSocket.getCommandCode());
+			String data = new String(Integer.toString(Peer.listeningPort));
+            out.println(InterfaceCommand.AddListeningSocket.getCommandCode() + Constant.WHITESPACE + data);
         } catch(Exception e) {
         	System.out.println("Exception while listing from server: " + e);
         	e.printStackTrace();

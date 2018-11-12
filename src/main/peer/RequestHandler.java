@@ -76,8 +76,6 @@ public class RequestHandler implements Runnable {
     	// TODO: append EOF char when sending last chunk
     	try {
     		byte[] fileByteArray = null;
-//    		String filePath = Constant.FILE_DIR + fileName;
-//    		FileInputStream fis = new FileInputStream("/Users/brehmerchan/Desktop/P2p/src/main/files/test.txt");
     		FileInputStream fis = new FileInputStream(fileName);
     		BufferedInputStream bis = new BufferedInputStream(fis);
     		try {
@@ -92,6 +90,7 @@ public class RequestHandler implements Runnable {
     				fileByteArray = new byte[Constant.CHUNK_SIZE];
     			}
     			
+    			System.out.println("bis available: " + bis.available());
 				bis.read(fileByteArray, 0, fileByteArray.length);
 				os = client.getOutputStream();
 				System.out.println("Sending " + fileName + ".chunk" + chunkNumber);
