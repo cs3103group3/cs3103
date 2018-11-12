@@ -1,5 +1,6 @@
 package main.tracker;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -641,13 +642,15 @@ public class HelperThread extends Thread{
 		//		Socket transferrerSocket = new Socket();
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
 		InputStream is = null;
+		BufferedInputStream bis = null;
 		BufferedOutputStream dos =  null;
 		try {
 			//Read Data from opposing new Socket
 			System.out.println("transferrerSocket is : " + opposingNewSocket);
 			is = opposingNewSocket.getInputStream();
+			bis = new BufferedInputStream(is);
 			System.out.println("Top");
-			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
+			int bytesRead = bis.read(fileDataBytes, 0, fileDataBytes.length);
 			System.out.println("Middle");
 
 			System.out.println("length of bytesRead " + bytesRead);
