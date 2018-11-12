@@ -264,6 +264,11 @@ public class Client extends Thread {
 		}
 
 		long fileSize =  file.length();
+		if (fileSize == 0) {
+            System.out.println(ErrorMessage.FILE_SIZE_ZERO + Constant.WHITESPACE + fileName);
+            return;
+        }
+
 		int totalNumChunk = (int) Math.ceil(fileSize*1.0/ Constant.CHUNK_SIZE);
 		String listeningPort = Integer.toString(Peer.listeningPort);
 		for (int chunkNum=1; chunkNum<=totalNumChunk; chunkNum++) {
