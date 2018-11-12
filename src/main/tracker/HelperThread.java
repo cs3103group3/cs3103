@@ -66,8 +66,8 @@ public class HelperThread extends Thread{
 				doClientCommand(clientInput, reply);
 			}
 		} catch (Exception e) {
-//			System.out.println("IOException at Run Function in Helper Thread");
-//			e.printStackTrace();
+			System.out.println("IOException at Run Function in Helper Thread");
+			e.printStackTrace();
 		}
 	}
 
@@ -533,6 +533,7 @@ public class HelperThread extends Thread{
 		System.out.println("data socket to be added is of ip : " + downloaderIP);
 		System.out.println("data socket to be added is of port is : " +  downloaderPublicPort);
 		Tracker.dataTransferTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
+		
 	}
 	/**
 	 * This methods adds the newly created socket into the hashtable
@@ -632,13 +633,12 @@ public class HelperThread extends Thread{
 		
 		Socket opposingNewSocket = clientSocket;
 		opposingNewSocket.setKeepAlive(true);
+		opposingNewSocket.setReuseAddress(true);
 		if(opposingNewSocket.isConnected()) {
 			System.out.println("Opposing new socket is connected");
 		}
+		
 		//		Socket transferrerSocket = new Socket();
-//		transferrerSocket.setReuseAddress(true);
-//		transferrerSocket.setKeepAlive(true);
-//		transferrerSocket = new Socket(transferrerAddress, transferrerPort);
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
 		InputStream is = null;
 		BufferedOutputStream dos =  null;

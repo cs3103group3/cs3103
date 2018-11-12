@@ -112,6 +112,7 @@ public class Server extends Thread {
 			System.out.println("tempSocket is " + tempSocket);
 			executor = Executors.newFixedThreadPool(20);
 			Runnable worker = new RequestHandler(tempSocket, requestedFile, chunkNo);
+			tempSocket.setKeepAlive(true);
 			executor.execute(worker);
 			//tempSocket.close();
 		} catch (IOException e) {

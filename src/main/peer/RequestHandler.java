@@ -91,10 +91,11 @@ public class RequestHandler implements Runnable {
     			}
     			
     			System.out.println("bis available: " + bis.available());
-				bis.read(fileByteArray, 0, fileByteArray.length);
+				int temp = bis.read(fileByteArray, 0, fileByteArray.length);
 				os = client.getOutputStream();
 				System.out.println("Sending " + fileName + ".chunk" + chunkNumber);
-		        os.write(fileByteArray,0,fileByteArray.length);
+				System.out.println("TEMP is : " + temp);
+				os.write(fileByteArray,0,fileByteArray.length);
 		        os.flush();
 		        System.out.println("Successfully sent!");
 			} catch (IOException e) {
