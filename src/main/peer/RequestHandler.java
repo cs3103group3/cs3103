@@ -104,6 +104,7 @@ public class RequestHandler implements Runnable {
 			} finally {
 				if (bis != null) bis.close();
 		        if (os != null) os.close();
+		        // closing outputStream closes associated socket
 			}
     		
     	} catch (FileNotFoundException e) {
