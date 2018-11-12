@@ -75,8 +75,8 @@ public class Tracker{
 	}
 
 	private static void listenRequest() {
-		HeartBeatListener heartbeatInitiator = new HeartBeatListener();
-		heartbeatInitiator.start();
+//		HeartBeatListener heartbeatInitiator = new HeartBeatListener();
+//		heartbeatInitiator.start();
 
 		ExecutorService executor= null;
 		//While server is still alive

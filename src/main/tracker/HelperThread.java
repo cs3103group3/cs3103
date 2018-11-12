@@ -630,15 +630,17 @@ public class HelperThread extends Thread{
 		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
 		
 		//This socket is the socket of the one sending data
-		Socket opposingNewSocket = clientSocket;
-		Socket transferrerSocket = new Socket();
+//		Socket opposingNewSocket = clientSocket;
+		Socket transferrerSocket = clientSocket;
+//		Socket transferrerSocket = new Socket();
 		transferrerSocket.setReuseAddress(true);
 		transferrerSocket.setKeepAlive(true);
-		transferrerSocket = new Socket(transferrerAddress, transferrerPort);
+		
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
 		InputStream is = null;
 		BufferedOutputStream dos =  null;
 		try {
+//			transferrerSocket = new Socket(transferrerAddress, transferrerPort);
 			//Read Data from opposing new Socket
 			System.out.println("transferrerSocket is : " + transferrerSocket);
 			is = transferrerSocket.getInputStream();
@@ -667,6 +669,7 @@ public class HelperThread extends Thread{
 		if(isLast) {
 			removeDataSocket(finalTuple, downloaderSocket);
 			dos.close();
+			transferrerSocket.close();
 		}
 	}
 	/**
