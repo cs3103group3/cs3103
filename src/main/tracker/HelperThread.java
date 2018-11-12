@@ -468,10 +468,16 @@ public class HelperThread extends Thread{
 //		}
 		
 		Tracker.recordTable.forEach((filename,recordList) -> {
+			System.out.println("fileName: " + filename);
+			System.out.println("recordList.size(): " + recordList.size());
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
+				System.out.println("i: " + i);
+				System.out.println("Record.IP: " + record.getipAdd() + ".");
+				System.out.println("Record.Port: " + record.getPortNumber() + ".");
 				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
 				if (peer.getIpAdd().equals(ipAddress) && peer.getPortNo().equals(clientPortNo)) {
+					System.out.println("removing: " + ipAddress + ',' + clientPortNo);
 					recordList.remove(i);
 					if (Tracker.recordTable.get(filename) == null) {
 						Tracker.recordTable.remove(filename);
@@ -481,6 +487,7 @@ public class HelperThread extends Thread{
 					i--;
 				}
 			}
+			System.out.println("Reached the end!");
 		});
 	}
 	/**
@@ -561,14 +568,15 @@ public class HelperThread extends Thread{
 	 */
 	private void closeListeningSocket(Tuple peer) {
 		Socket socketToClose = Tracker.ipPortToSocketTable.get(peer);
-		try {
-			socketToClose.close();
-		} catch (IOException e) {
-			System.out.println("Error closing listening socket.");
-			e.printStackTrace();
+		if (socketToClose != null) {
+			try {
+				socketToClose.close();
+			} catch (Exception e) {
+				System.out.println("Error closing listening socket.");
+				e.printStackTrace();
+			}
 		}
 	}
-
 
 	/**
 	 * This method sends data to the opposing peer asking for fileName and chunk Number
@@ -705,11 +713,13 @@ public class HelperThread extends Thread{
 	
 	private void closeDataSocket(Tuple downloaderTuple) {
 		Socket dataSocketToClose = Tracker.dataTransferTable.get(downloaderTuple);
-		try {
-			dataSocketToClose.close();
-		} catch (IOException e) {
-			System.out.println("Error closing dataSocket");
-			e.printStackTrace();
+		if (dataSocketToClose != null) {
+			try {
+				dataSocketToClose.close();
+			} catch (IOException e) {
+				System.out.println("Error closing dataSocket");
+				e.printStackTrace();
+			}
 		}
 	}
 	
