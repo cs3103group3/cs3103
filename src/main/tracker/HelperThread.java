@@ -595,8 +595,6 @@ public class HelperThread extends Thread{
 		String [] downloaderArr = strCommandArr[1].split(Constant.COMMA);
 		String downloaderAddress = downloaderArr[0];
 		String downloaderPort = downloaderArr[1];
-		String transferrerAddress = downloaderArr[2];
-		int transferrerPort = Integer.valueOf(downloaderArr[3]);
 		
 		boolean isLast = false;
 		

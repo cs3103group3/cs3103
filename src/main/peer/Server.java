@@ -102,15 +102,11 @@ public class Server extends Thread {
 			BufferedReader in = new BufferedReader(new InputStreamReader(tempSocket.getInputStream()));
 			if(!isLastChunk) {
 				out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP 
-						+ Constant.COMMA + downloaderPort 
-						+ Constant.COMMA + tempSocket.getInetAddress().getHostAddress()
-						+ Constant.COMMA + tempSocket.getLocalPort());
+						+ Constant.COMMA + downloaderPort);
 			} else {
 				out.println(InterfaceCommand.MEDIATE.getCommandCode() 
 						+ Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort
 						+ Constant.COMMA 
-						+ Constant.COMMA + tempSocket.getInetAddress().getHostAddress()
-						+ Constant.COMMA + tempSocket.getLocalPort()
 						+ Constant.LAST_CHUNK);
 			}
 			System.out.println("tempSocket is " + tempSocket);
