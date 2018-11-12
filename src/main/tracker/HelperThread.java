@@ -335,7 +335,8 @@ public class HelperThread extends Thread{
 				currentReply.flush();
 
 			} else {
-				currentReply.println("File Requested does not Exists" + Constant.END_OF_STREAM + Constant.NEWLINE);
+				currentReply.println("File Requested does not Exists");
+				currentReply.println(Constant.END_OF_STREAM);
 				currentReply.flush();
 			}
 		} else {
@@ -347,15 +348,18 @@ public class HelperThread extends Thread{
 				String requestedIP = findRequestedIP(requestedFileName, chunkNumber);
 
 				if(requestedIP.equals(INVALID_CHUNK)) { 
-					currentReply.println("Chunk of File Name Specified is invalid" + Constant.END_OF_STREAM + Constant.NEWLINE);
+					currentReply.println("Chunk of File Name Specified is invalid");
+					currentReply.println(Constant.END_OF_STREAM);
 					currentReply.flush();
 				} else {
-					currentReply.println(requestedIP + Constant.END_OF_STREAM);
+					currentReply.println(requestedIP);
+					currentReply.println(Constant.END_OF_STREAM);
 					currentReply.flush();
 				}
 
 			} else {
-				currentReply.println("File Requested does not Exists" + Constant.END_OF_STREAM + Constant.NEWLINE);
+				currentReply.println("File Requested does not Exists");
+				currentReply.println(Constant.END_OF_STREAM);
 				currentReply.flush();
 			}
 		}
