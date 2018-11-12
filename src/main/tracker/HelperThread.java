@@ -646,7 +646,10 @@ public class HelperThread extends Thread{
 			// TODO Auto-generated catch block
 			System.out.println("Error in mediating data");
 			e.printStackTrace();
-		} 
+		} finally {
+			if (is != null) is.close();
+		}
+		
 		Set<Entry<Tuple, Socket>> entrySet1 = Tracker.dataTransferTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet1) {
 			System.out.println("Before removal dataSocket " + entry2.getKey().getIpAdd());
