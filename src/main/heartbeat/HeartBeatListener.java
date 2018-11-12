@@ -54,7 +54,7 @@ public class HeartBeatListener extends Thread {
     
     class TrackerCleanUp extends TimerTask {
         public void run() {
-            Tracker.removeUnresponsivePeersFromRecord(listOfRespondedPeerInfo);
+//            Tracker.removeUnresponsivePeersFromRecord(listOfRespondedPeerInfo);
                         
             listOfRespondedPeerInfo = new HashSet<Tuple>();
         }
