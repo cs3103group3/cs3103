@@ -2,7 +2,8 @@ package main.utilities.feedbacks;
 
 public enum ErrorMessage {
     INVALID_COMMAND(0, "Invalid Command. "),
-    FILE_NOT_FOUND(401, "Requested file cannot not be found. "),
+    FILE_NOT_FOUND(401, "Requested file cannot not be found: "),
+    FILE_SIZE_ZERO(402, "File size must be greater than 0 bytes: "),
     UNKNOWN_HOST(500, "Unknown Host. "),
     UNKNOWN_ERROR(520, "Unknown Error Occurred. "),
 	INVALID_NUMBEROFARGUMENTS(540, "Invalid number of arguments. "),
