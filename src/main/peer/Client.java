@@ -202,6 +202,7 @@ public class Client extends Thread {
 		Socket socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 		System.out.println("My public ip is " + myIP);
 		System.out.println("My port is : " + Peer.listeningPort);
+		InputStream is = null;
 		for (int i = 1; i <= numChunks; i++) {
 			try {
 				//    			InetAddress serverIP = null;
@@ -229,7 +230,7 @@ public class Client extends Thread {
 				}
 
 				byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
-				InputStream is = socket.getInputStream();
+				is = socket.getInputStream();
 				int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
 				byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 
@@ -243,7 +244,7 @@ public class Client extends Thread {
 		}
 		if (fos != null) fos.close();
 		if (bos != null) bos.close();
-		if (socket != null) socket.close();
+		if (is != null) is.close();
 		return true;
 	}
 
