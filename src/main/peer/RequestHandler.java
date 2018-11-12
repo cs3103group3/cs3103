@@ -35,7 +35,7 @@ public class RequestHandler implements Runnable {
     public void run() {
     	try {
 			processDownload(requestedFileName, Integer.valueOf(requestedChunkNo));
-		} catch (NumberFormatException | IOException e) {
+		} catch (NumberFormatException | IOException | InterruptedException e) {
 			System.out.println("Error with numberFormat or io exception");
 			e.printStackTrace();
 		}
@@ -71,7 +71,7 @@ public class RequestHandler implements Runnable {
 //	  }
 //    }
 
-    private void processDownload(String fileName, int chunkNumber) throws IOException {
+    private void processDownload(String fileName, int chunkNumber) throws IOException, InterruptedException {
     	OutputStream os = null;
     	// TODO: append EOF char when sending last chunk
     	try {
@@ -102,6 +102,7 @@ public class RequestHandler implements Runnable {
 				System.out.println("IOException when reading file: " + e);
 				e.printStackTrace();
 			} finally {
+				Thread.sleep(10000);
 				if (bis != null) bis.close();
 		        if (os != null) os.close();
 			}
