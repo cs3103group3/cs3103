@@ -676,11 +676,23 @@ public class HelperThread extends Thread{
 			dos.close();
 		}
 	}
+	
+	private void closeDataSocket(Tuple downloaderTuple) {
+		Socket dataSocketToClose = Tracker.dataTransferTable.get(downloaderTuple);
+		try {
+			dataSocketToClose.close();
+		} catch (IOException e) {
+			System.out.println("Error closing dataSocket");
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * This method removes the socket that was opened up
 	 *  
 	 */
 	private void removeDataSocket(Tuple downloaderTuple, Socket downloaderSocket) {
+		closeDataSocket(downloaderTuple);
 		Tracker.dataTransferTable.remove(downloaderTuple, downloaderSocket);
 	}
 }
