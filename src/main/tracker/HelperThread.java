@@ -77,8 +77,9 @@ public class HelperThread extends Thread{
 	 * commands the client requested
 	 * @param reply2 
 	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
-	private void doClientCommand(String strCommand, PrintWriter currentReply) throws IOException {
+	private void doClientCommand(String strCommand, PrintWriter currentReply) throws IOException, InterruptedException {
 		InterfaceCommand command = InterfaceCommand.INVALID;
 		String [] strCommandArr;
 		try {
@@ -471,6 +472,7 @@ public class HelperThread extends Thread{
 					if (Tracker.recordTable.get(filename) == null) {
 						Tracker.recordTable.remove(filename);
 					}
+					closeListeningSocket(peer);
 					Tracker.ipPortToSocketTable.remove(peer);
 					i--;
 				}
@@ -548,6 +550,21 @@ public class HelperThread extends Thread{
 		System.out.println("New Public port is : " +  downloaderPublicPort);
 		Tracker.ipPortToSocketTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
 	}
+	
+	/**
+	 * This methods closes the listening socket in hashtable when receive quit command
+	 * @param Peer object containing IP and Port
+	 */
+	private void closeListeningSocket(Tuple peer) {
+		Socket socketToClose = Tracker.ipPortToSocketTable.get(peer);
+		try {
+			socketToClose.close();
+		} catch (IOException e) {
+			System.out.println("Error closing listening socket.");
+			e.printStackTrace();
+		}
+	}
+
 
 	/**
 	 * This method sends data to the opposing peer asking for fileName and chunk Number
@@ -591,8 +608,9 @@ public class HelperThread extends Thread{
 	 * @param strCommandArr
 	 * @param currentReply
 	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
-	private void mediate(String[] strCommandArr, PrintWriter currentReply) throws IOException {
+	private void mediate(String[] strCommandArr, PrintWriter currentReply) throws IOException, InterruptedException {
 		//strCommandArr is: 7 public address of A public port of A
 		String [] downloaderArr = strCommandArr[1].split(Constant.COMMA);
 		String downloaderAddress = downloaderArr[0];
@@ -665,7 +683,11 @@ public class HelperThread extends Thread{
 			// TODO Auto-generated catch block
 			System.out.println("Error in mediating data");
 			e.printStackTrace();
+		} finally {
+			Thread.sleep(10000);
+			if (is != null) is.close();
 		} 
+		
 		Set<Entry<Tuple, Socket>> entrySet1 = Tracker.dataTransferTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet1) {
 			System.out.println("Before removal dataSocket " + entry2.getKey().getIpAdd());
@@ -676,11 +698,23 @@ public class HelperThread extends Thread{
 			dos.close();
 		}
 	}
+	
+	private void closeDataSocket(Tuple downloaderTuple) {
+		Socket dataSocketToClose = Tracker.dataTransferTable.get(downloaderTuple);
+		try {
+			dataSocketToClose.close();
+		} catch (IOException e) {
+			System.out.println("Error closing dataSocket");
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * This method removes the socket that was opened up
 	 *  
 	 */
 	private void removeDataSocket(Tuple downloaderTuple, Socket downloaderSocket) {
+		closeDataSocket(downloaderTuple);
 		Tracker.dataTransferTable.remove(downloaderTuple, downloaderSocket);
 	}
 }
