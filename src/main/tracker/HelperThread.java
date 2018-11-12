@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -496,6 +497,8 @@ public class HelperThread extends Thread{
 		//Process the clientInput which is of the following format
 		//IPb,PortB,FileName,ChunkNumber
 		Tuple opposingPeerTuple = new Tuple(currentClientInputArr[0], currentClientInputArr[1]);
+		System.out.println("Opposing peer tuple is : "  + currentClientInputArr[0] + " " + currentClientInputArr[1]);
+		
 		System.out.println("Size of ipPortToSocket is :" + Tracker.ipPortToSocketTable.size());
 		Set<Entry<Tuple, Socket>> entrySet = Tracker.ipPortToSocketTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet) {
@@ -538,7 +541,6 @@ public class HelperThread extends Thread{
 	private void addSocket(Socket downloaderSocket, String[] commandArr) {
 		//Gets public ip, public port from downloader Socket
 		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
-//		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
 		String downloaderPublicPort = commandArr[1];
 		System.out.println("New socket is of ip : " + downloaderIP);
 		System.out.println("New Public port is : " +  downloaderPublicPort);
@@ -593,6 +595,8 @@ public class HelperThread extends Thread{
 		String [] downloaderArr = strCommandArr[1].split(Constant.COMMA);
 		String downloaderAddress = downloaderArr[0];
 		String downloaderPort = downloaderArr[1];
+		String transferrerAddress = downloaderArr[2];
+		int transferrerPort = Integer.valueOf(downloaderArr[3]);
 		
 		boolean isLast = false;
 		
@@ -622,15 +626,22 @@ public class HelperThread extends Thread{
 			System.out.println("Exception Obtaining downloader's Socket");
 			return;
 		}
+		
 		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
+		
+		//This socket is the socket of the one sending data
 		Socket opposingNewSocket = clientSocket;
+		Socket transferrerSocket = new Socket();
+		transferrerSocket.setReuseAddress(true);
+		transferrerSocket.setKeepAlive(true);
+		transferrerSocket = new Socket(transferrerAddress, transferrerPort);
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
 		InputStream is = null;
 		BufferedOutputStream dos =  null;
 		try {
 			//Read Data from opposing new Socket
-			System.out.println("OpposingNewSocket is : " + opposingNewSocket);
-			is = opposingNewSocket.getInputStream();
+			System.out.println("transferrerSocket is : " + transferrerSocket);
+			is = transferrerSocket.getInputStream();
 			System.out.println("Top");
 			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
 			System.out.println("Middle");

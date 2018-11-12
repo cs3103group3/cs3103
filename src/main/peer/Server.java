@@ -95,21 +95,27 @@ public class Server extends Thread {
 		}
 		ExecutorService executor = null;
 		Socket tempSocket;
-		//Creates a new Socket for file transfer
+		//Creates a new Socket towards the relay/tracker for file transfer
 		try {
 			tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 			PrintWriter out = new PrintWriter(tempSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(tempSocket.getInputStream()));
 			
 			if(!isLastChunk) {
-				out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort);
+				out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP 
+						+ Constant.COMMA + downloaderPort 
+						+ Constant.COMMA + tempSocket.getInetAddress().getHostAddress()
+						+ Constant.COMMA + tempSocket.getLocalPort());
 			} else {
 				out.println(InterfaceCommand.MEDIATE.getCommandCode() 
 						+ Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort
-						+ Constant.COMMA + Constant.LAST_CHUNK);
+						+ Constant.COMMA 
+						+ Constant.COMMA + tempSocket.getInetAddress().getHostAddress()
+						+ Constant.COMMA + tempSocket.getLocalPort()
+						+ Constant.LAST_CHUNK);
 			}
 			System.out.println("tempSocket is " + tempSocket);
-			executor = Executors.newFixedThreadPool(5);
+			executor = Executors.newFixedThreadPool(20);
 			Runnable worker = new RequestHandler(tempSocket, requestedFile, chunkNo);
 			executor.execute(worker);
 			//tempSocket.close();

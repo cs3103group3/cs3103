@@ -109,6 +109,5 @@ public class RequestHandler implements Runnable {
     		System.out.println("FileNotFoundException when finding file: " + e);
 			e.printStackTrace();
     	}
-    	
     }
 }
