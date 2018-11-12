@@ -469,6 +469,7 @@ public class HelperThread extends Thread{
 					if (Tracker.recordTable.get(filename) == null) {
 						Tracker.recordTable.remove(filename);
 					}
+					closeListeningSocket(peer);
 					Tracker.ipPortToSocketTable.remove(peer);
 					i--;
 				}
@@ -531,6 +532,7 @@ public class HelperThread extends Thread{
 		System.out.println("data socket to be added is of port is : " +  downloaderPublicPort);
 		Tracker.dataTransferTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
 	}
+	
 	/**
 	 * This methods adds the newly created socket into the hashtable
 	 * @param downloaderSocket
@@ -544,6 +546,20 @@ public class HelperThread extends Thread{
 		Tracker.ipPortToSocketTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
 	}
 
+	/**
+	 * This methods closes the listening socket in hashtable when receive quit command
+	 * @param Peer object containing IP and Port
+	 */
+	private void closeListeningSocket(Tuple peer) {
+		Socket socketToClose = Tracker.ipPortToSocketTable.get(peer);
+		try {
+			socketToClose.close();
+		} catch (IOException e) {
+			System.out.println("Error closing listening socket.");
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * This method sends data to the opposing peer asking for fileName and chunk Number
 	 * @param opposingSocket = Peer's listeningSocket
