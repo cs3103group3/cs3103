@@ -467,6 +467,8 @@ public class HelperThread extends Thread{
 //			}
 //		}
 		
+		// If Peer doesn't inform, there will be no record in recordTable, but dataSocket
+		// still exist in ipPortToSocketTable
 		Tracker.recordTable.forEach((filename,recordList) -> {
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
