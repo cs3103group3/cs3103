@@ -528,6 +528,7 @@ public class HelperThread extends Thread{
 
 	private void addDataSocket(Socket downloaderSocket) {
 		//Gets public ip, public port from downloader Socket
+		System.out.println("addDataSocket is: " + downloaderSocket);
 		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
 		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
 		System.out.println("data socket to be added is of ip : " + downloaderIP);
