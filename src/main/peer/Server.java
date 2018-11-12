@@ -123,9 +123,6 @@ public class Server extends Thread {
 			if (executor != null) {
 				executor.shutdown();
 			}
-			if (tempSocket != null) {
-				tempSocket.close();
-			}
 		}
 	}
 	
