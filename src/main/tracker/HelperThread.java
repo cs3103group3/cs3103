@@ -630,8 +630,14 @@ public class HelperThread extends Thread{
 		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
 		
 		//This socket is the socket of the one sending data
+
+		
 		Socket opposingNewSocket = clientSocket;
-//		Socket transferrerSocket = new Socket();
+		opposingNewSocket.setKeepAlive(true);
+		if(opposingNewSocket.isConnected()) {
+			System.out.println("Opposing new socket is connected");
+		}
+		//		Socket transferrerSocket = new Socket();
 //		transferrerSocket.setReuseAddress(true);
 //		transferrerSocket.setKeepAlive(true);
 //		transferrerSocket = new Socket(transferrerAddress, transferrerPort);
