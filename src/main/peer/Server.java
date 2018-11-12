@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
@@ -80,7 +81,7 @@ public class Server extends Thread {
 		}
 	}
 	
-	private void sendMediateData(String [] clientInputArr) {
+	private void sendMediateData(String [] clientInputArr) throws UnknownHostException, IOException {
 		String downloaderIP = clientInputArr[0];
 		String downloaderPort = clientInputArr[1];
 		String requestedFile = clientInputArr[2];
@@ -96,8 +97,8 @@ public class Server extends Thread {
 		ExecutorService executor = null;
 		Socket tempSocket;
 		//Creates a new Socket towards the relay/tracker for file transfer
+		tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 		try {
-			tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 			PrintWriter out = new PrintWriter(tempSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(tempSocket.getInputStream()));
 			if(!isLastChunk) {
@@ -110,9 +111,9 @@ public class Server extends Thread {
 						+ Constant.LAST_CHUNK);
 			}
 			System.out.println("tempSocket is " + tempSocket);
-			executor = Executors.newFixedThreadPool(20);
+			executor = Executors.newFixedThreadPool(200);
 			Runnable worker = new RequestHandler(tempSocket, requestedFile, chunkNo);
-			tempSocket.setKeepAlive(true);
+//			tempSocket.setKeepAlive(true);
 			executor.execute(worker);
 			//tempSocket.close();
 		} catch (IOException e) {
@@ -121,6 +122,9 @@ public class Server extends Thread {
 		}  finally {
 			if (executor != null) {
 				executor.shutdown();
+			}
+			if (tempSocket != null) {
+				tempSocket.close();
 			}
 		}
 	}

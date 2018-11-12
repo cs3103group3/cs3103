@@ -202,6 +202,7 @@ public class Client extends Thread {
 		Socket socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 		System.out.println("My public ip is " + myIP);
 		System.out.println("My port is : " + Peer.listeningPort);
+		PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
 		for (int i = 1; i <= numChunks; i++) {
 			try {
 				//    			InetAddress serverIP = null;
@@ -212,7 +213,6 @@ public class Client extends Thread {
 				String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
 
 				// Send fileName and chunkNum to download
-				PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
 
 				if(i != numChunks) {
 					outSocket.println(InterfaceCommand.FORWARD.getCommandCode() + Constant.WHITESPACE
