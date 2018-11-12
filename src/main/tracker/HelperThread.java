@@ -630,20 +630,24 @@ public class HelperThread extends Thread{
 		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
 		
 		//This socket is the socket of the one sending data
-//		Socket opposingNewSocket = clientSocket;
-		Socket transferrerSocket = clientSocket;
-//		Socket transferrerSocket = new Socket();
-		transferrerSocket.setReuseAddress(true);
-		transferrerSocket.setKeepAlive(true);
+
 		
+		Socket opposingNewSocket = clientSocket;
+		opposingNewSocket.setKeepAlive(true);
+		if(opposingNewSocket.isConnected()) {
+			System.out.println("Opposing new socket is connected");
+		}
+		//		Socket transferrerSocket = new Socket();
+//		transferrerSocket.setReuseAddress(true);
+//		transferrerSocket.setKeepAlive(true);
+//		transferrerSocket = new Socket(transferrerAddress, transferrerPort);
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
 		InputStream is = null;
 		BufferedOutputStream dos =  null;
 		try {
-//			transferrerSocket = new Socket(transferrerAddress, transferrerPort);
 			//Read Data from opposing new Socket
-			System.out.println("transferrerSocket is : " + transferrerSocket);
-			is = transferrerSocket.getInputStream();
+			System.out.println("transferrerSocket is : " + opposingNewSocket);
+			is = opposingNewSocket.getInputStream();
 			System.out.println("Top");
 			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
 			System.out.println("Middle");
@@ -669,7 +673,6 @@ public class HelperThread extends Thread{
 		if(isLast) {
 			removeDataSocket(finalTuple, downloaderSocket);
 			dos.close();
-			transferrerSocket.close();
 		}
 	}
 	/**
