@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
@@ -46,34 +45,6 @@ public class Tracker{
 		//			System.out.println("Unable to create Server Socket");
 		//			System.exit(1);
 		//		}
-		/*** TESTING! REMOVE LATER ***/
-		//        Tracker.aliveIpAddresses.add("110.14.24.5");
-		//        Record newRecord = new Record("110.14.24.5", "1", "5");
-		//        ArrayList<Record> newArrFile = new ArrayList<Record>();
-		//        newArrFile.add(newRecord);
-		//        recordTable.put("sandy.txt", newArrFile);
-		//        ArrayList<Record> currArrFile = recordTable.get("sandy.txt");
-		//        
-		//        Tracker.aliveIpAddresses.add("110.14.24.34");
-		//        Record addToExist = new Record("110.14.24.34", "1", "5");
-		//        currArrFile.add(addToExist);
-		//        recordTable.replace("sandy.txt", currArrFile);        
-		//        recordTable.put("sandy.txt", newArrFile);
-		//        
-		//        Tracker.aliveIpAddresses.add("110.14.24.34");
-		//        addToExist = new Record("110.14.24.34", "2", "5");
-		//        currArrFile.add(addToExist);
-		//        recordTable.replace("sandy.txt", currArrFile);        
-		//        recordTable.put("sandy.txt", newArrFile);
-		//        
-		//        Tracker.aliveIpAddresses.add("215.44.22.4");
-		//        newRecord = new Record("215.44.22.4", "2", "5");
-		//        newArrFile = new ArrayList<Record>();
-		//        newArrFile.add(newRecord);
-		//        recordTable.put("washington.txt", newArrFile);
-		//        
-		//        System.out.println("RecordTable: " + recordTable);
-		/*****************************/
 
 		Timer timer = new Timer();
         timer.schedule(new TrackerCleanUp(), 0, Constant.HEARTBEAT_TRACKER_CLEANUP_INTERVAL);

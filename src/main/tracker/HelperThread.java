@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -73,11 +72,7 @@ public class HelperThread extends Thread{
 	}
 
 	/**
-	 * This method executes the 
-	 * commands the client requested
-	 * @param reply2 
-	 * @throws IOException 
-	 * @throws InterruptedException 
+	 * This method executes the commands the client requested
 	 */
 	private void doClientCommand(String strCommand, PrintWriter currentReply) throws IOException, InterruptedException {
 		InterfaceCommand command = InterfaceCommand.INVALID;
@@ -454,19 +449,6 @@ public class HelperThread extends Thread{
 	 * 
 	 */
 	private void deleteAllRecords(String ipAddress, String clientPortNo) {
-		//First find all the entries that contains the associated ip address
-//		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
-//		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
-//			ArrayList<Record> currArr = entry2.getValue();
-//			for(int i = 0; i < currArr.size(); i ++) {
-//				if(currArr.get(i).getipAdd().equals(ipAddress) 
-//						&& currArr.get(i).getPortNumber().equals(clientPortNo)) {
-//					//Removes the respective ip address in the respective arraylist
-//					entry2.getValue().remove(i);
-//				}
-//			}
-//		}
-		
 		// If Peer doesn't inform, there will be no record in recordTable, but dataSocket
 		// still exist in ipPortToSocketTable
 		Tracker.recordTable.forEach((filename,recordList) -> {
@@ -485,6 +467,7 @@ public class HelperThread extends Thread{
 			}
 		});
 	}
+	
 	/**
 	 * This method listens and receive information about the opposing peer
 	 * then replies back with fileName + chunkNumber
@@ -544,6 +527,7 @@ public class HelperThread extends Thread{
 		Tracker.dataTransferTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
 		
 	}
+	
 	/**
 	 * This methods adds the newly created socket into the hashtable
 	 * @param downloaderSocket
@@ -609,6 +593,7 @@ public class HelperThread extends Thread{
 			e.printStackTrace();
 		}
 	}
+	
 	/**
 	 * This method mediates the transfer of files between 2 clients through their
 	 * public ip and port number
