@@ -160,13 +160,13 @@ public class Client extends Thread {
 		
 		int numChunks = Integer.parseInt(numChunkAndMyIP[0]);
 		myIP = numChunkAndMyIP[1];
-		System.out.println("numChunks is " + numChunks);
-		System.out.println("myIP is " + myIP);
+//		System.out.println("numChunks is " + numChunks);
+//		System.out.println("myIP is " + myIP);
 
 		peersWithData.remove(peersWithData.size() - 1);
 		ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
 		chunkList = processPeersWithData(peersWithData, numChunks);
-		System.out.println("chunklist.size(): " + chunkList.size());
+//		System.out.println("chunklist.size(): " + chunkList.size());
 
 		//        For debugging purposes
 		//        for (int i = 1; i <= numChunks; i++) {
@@ -193,8 +193,9 @@ public class Client extends Thread {
 		FileOutputStream fos = new FileOutputStream(yourFile);
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		Socket socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
-		System.out.println("My public ip is " + myIP);
-		System.out.println("My port is : " + Peer.listeningPort);
+//		System.out.println("My public ip is " + myIP);
+//		System.out.println("My port is : " + Peer.listeningPort);
+		System.out.println("My public address is: [" + myIP + ": " + Peer.listeningPort + "]");
 		PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
 		for (int i = 1; i <= numChunks; i++) {
 			try {
@@ -202,8 +203,9 @@ public class Client extends Thread {
 				//    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
 				//returns a random IP and Port from list
 				String serverIPAndPort = getIPToConnect(chunkPeerList.get(i), myIP);
-				System.out.println("Peer's serverIP And Port is :" + serverIPAndPort);
+//				System.out.println("Peer's serverIP And Port is :" + serverIPAndPort);
 				String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
+				System.out.println("Downloading chunk from [" + serverIPAndPortArr[0] + ": " + serverIPAndPortArr[1] +  "]");
 
 				// Send fileName and chunkNum to download
 
@@ -325,7 +327,7 @@ public class Client extends Thread {
 			//    		System.out.println("tempList: " + tempList);
 			//    		System.out.println("peerDataArr[0]: " + peerDataArr[0]);
 			String peerServerSocket = peerDataArr[0] + "," + peerDataArr[1];
-			System.out.println("Adding peerSeverSocket in processPeersWithData" + peerServerSocket);
+//			System.out.println("Adding peerSeverSocket in processPeersWithData" + peerServerSocket);
 			tempList.add(peerServerSocket);
 			processedList.set(currChunkNumber, tempList);
 		}
@@ -338,7 +340,7 @@ public class Client extends Thread {
 		String myIPAndPort = myIP + Constant.COMMA + myListeningPort;
 		Random currRan = new SecureRandom();
 		//E.g. ipList is size 3, random peer is chosen from 0 to 2 index
-		System.out.println("iplist size is : " + ipList);
+//		System.out.println("iplist size is : " + ipList);
 		int peerChosen = currRan.nextInt(ipList.size());
 		//Return the ip address of the chosen peer
 		

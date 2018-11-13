@@ -32,8 +32,8 @@ public class Peer {
 		try {
 			listeningSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 			listeningPort = listeningSocket.getLocalPort();
-			System.out.println("port of peer: " + listeningSocket.getPort());
-			System.out.println("local port of peer: " + listeningSocket.getLocalPort());
+//			System.out.println("port of peer: " + listeningSocket.getPort());
+//			System.out.println("local port of peer: " + listeningSocket.getLocalPort());
 		} catch (IOException e) {
 			System.out.println("Unable to create listening socket");
 			e.printStackTrace();
