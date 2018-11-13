@@ -82,7 +82,7 @@ public class Tracker{
 
 	public static void removeUnresponsivePeersFromRecord(Set<Tuple> listOfPeersWhoResponded) {
 		recordTable.forEach((filename,recordList) -> { 
-			System.out.println(filename + " and recordList size: " + recordList.size());
+//			System.out.println(filename + " and recordList size: " + recordList.size());
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
 				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());

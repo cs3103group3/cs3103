@@ -307,7 +307,8 @@ public class HelperThread extends Thread{
 		String requestedFileName = strCommandArr[1];
 
 		String finderIP = clientSocket.getInetAddress().getHostAddress();
-		System.out.println("This client is finding peer: " + clientSocket.getInetAddress().getHostAddress());
+//		System.out.println("This client is finding peer: " + clientSocket.getInetAddress().getHostAddress());
+		System.out.println("["+finderIP+"] is searching for peer...");
 		if(strCommandArr.length <= 1) {
 			currentReply.print("Invalid Arguments");
 			currentReply.flush();
@@ -330,8 +331,8 @@ public class HelperThread extends Thread{
 					requestedData += "\n";
 				}
 
-				System.out.println("Last line to send is : " + requestedChunks.get(0).getMaxChunk()
-						+ Constant.COMMA + finderIP);
+//				System.out.println("Last line to send is : " + requestedChunks.get(0).getMaxChunk()
+//						+ Constant.COMMA + finderIP);
 				requestedData += requestedChunks.get(0).getMaxChunk()
 						+ Constant.COMMA + finderIP;
 				requestedData += Constant.NEWLINE;
@@ -487,7 +488,7 @@ public class HelperThread extends Thread{
 	 * 
 	 */
 	private void forwardServer(String[] clientInputArr, PrintWriter currentReply) {
-		System.out.println("Entered ForwardServer");
+//		System.out.println("Entered ForwardServer");
 		Socket opposingSocket = null;
 
 		//
@@ -495,31 +496,33 @@ public class HelperThread extends Thread{
 
 		//New Socket that was opened up by the client
 		Socket downloaderSocket = clientSocket;
-		System.out.println("Downloader socket is : " + downloaderSocket);
+//		System.out.println("Downloader socket is : " + downloaderSocket);
 		//Expects to receive data from peer A
 		//String clientInput = in.readLine();
 
 		//Process the clientInput which is of the following format
 		//IPb,PortB,FileName,ChunkNumber
 		Tuple opposingPeerTuple = new Tuple(currentClientInputArr[0], currentClientInputArr[1]);
-		System.out.println("Opposing peer tuple is : "  + currentClientInputArr[0] + " " + currentClientInputArr[1]);
+//		System.out.println("Opposing peer tuple is : "  + currentClientInputArr[0] + " " + currentClientInputArr[1]);
 		
-		System.out.println("Size of ipPortToSocket is :" + Tracker.ipPortToSocketTable.size());
+//		System.out.println("Size of ipPortToSocket is :" + Tracker.ipPortToSocketTable.size());
 		Set<Entry<Tuple, Socket>> entrySet = Tracker.ipPortToSocketTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet) {
-			System.out.println("Current IP of tuple is : " + entry2.getKey().getIpAdd());
-			System.out.println("Current IP of tuple is : " + entry2.getKey().getPortNo());
-			System.out.println("Current Socket of tuple is " + entry2.getValue());
+//			System.out.println("Current IP of tuple is : " + entry2.getKey().getIpAdd());
+//			System.out.println("Current IP of tuple is : " + entry2.getKey().getPortNo());
+//			System.out.println("Current Socket of tuple is " + entry2.getValue());
 			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())
 					&& opposingPeerTuple.getPortNo().equals(entry2.getKey().getPortNo())) {
 				opposingSocket = entry2.getValue();
 			}
 		} 
 		if(opposingSocket == null) {
-			System.out.println("Unable to find opposing Socket");
+//			System.out.println("Unable to find opposing Socket");
+		    System.out.println("Unable to find ["+opposingPeerTuple.getIpAdd()+ ": " + opposingPeerTuple.getPortNo()+"]");
 			return;
 		} else {
-			System.out.println("Opposing Socket is : " + opposingSocket);
+//			System.out.println("Opposing Socket is : " + opposingSocket);
+		    System.out.println("Found peer: ["+opposingPeerTuple.getIpAdd()+ ": " + opposingPeerTuple.getPortNo()+"]");
 		}
 		
 		/**
@@ -535,8 +538,8 @@ public class HelperThread extends Thread{
 		//Gets public ip, public port from downloader Socket
 		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
 		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
-		System.out.println("data socket to be added is of ip : " + downloaderIP);
-		System.out.println("data socket to be added is of port is : " +  downloaderPublicPort);
+//		System.out.println("data socket to be added is of ip : " + downloaderIP);
+//		System.out.println("data socket to be added is of port is : " +  downloaderPublicPort);
 		Tracker.dataTransferTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
 		
 	}
@@ -549,8 +552,8 @@ public class HelperThread extends Thread{
 		//Gets public ip, public port from downloader Socket
 		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
 		String downloaderPublicPort = commandArr[1];
-		System.out.println("New socket is of ip : " + downloaderIP);
-		System.out.println("New Public port is : " +  downloaderPublicPort);
+//		System.out.println("New socket is of ip : " + downloaderIP);
+//		System.out.println("New Public port is : " +  downloaderPublicPort);
 		Tracker.ipPortToSocketTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
 	}
 	
@@ -597,7 +600,7 @@ public class HelperThread extends Thread{
 			}
 
 			//Sends to request peer B of the fileName + chunk Number + ipAdd + port No
-			System.out.println("Helping downloader to send information" + dataToSend);
+//			System.out.println("Helping downloader to send information" + dataToSend);
 
 			out.println(dataToSend);
 			out.flush();
@@ -623,13 +626,13 @@ public class HelperThread extends Thread{
 		
 		boolean isLast = false;
 		
-		System.out.println("downloadArr size is " + downloaderArr.length);
-		for(int i=0; i < downloaderArr.length ; i ++) {
-			System.out.println("At mediate, Printing out downloadArr" + downloaderArr[i]);
-		}
+//		System.out.println("downloadArr size is " + downloaderArr.length);
+//		for(int i=0; i < downloaderArr.length ; i ++) {
+//			System.out.println("At mediate, Printing out downloadArr" + downloaderArr[i]);
+//		}
 		
 		if(downloaderArr.length == 3) {
-			System.out.println("downloaderArr[2] " + downloaderArr[2]);
+//			System.out.println("downloaderArr[2] " + downloaderArr[2]);
 			isLast = true;
 		}
 		Tuple downloaderTuple = new Tuple(downloaderAddress, downloaderPort);
@@ -650,7 +653,7 @@ public class HelperThread extends Thread{
 			return;
 		}
 		
-		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
+//		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
 		
 		//This socket is the socket of the one sending data
 
@@ -659,7 +662,7 @@ public class HelperThread extends Thread{
 		opposingNewSocket.setKeepAlive(true);
 		opposingNewSocket.setReuseAddress(true);
 		if(opposingNewSocket.isConnected()) {
-			System.out.println("Opposing new socket is connected");
+//			System.out.println("Opposing new socket is connected");
 		}
 		
 		//		Socket transferrerSocket = new Socket();
@@ -669,17 +672,17 @@ public class HelperThread extends Thread{
 		BufferedOutputStream dos =  null;
 		try {
 			//Read Data from opposing new Socket
-			System.out.println("transferrerSocket is : " + opposingNewSocket);
+//			System.out.println("transferrerSocket is : " + opposingNewSocket);
 			is = opposingNewSocket.getInputStream();
 			bis = new BufferedInputStream(is);
-			System.out.println("Top");
+//			System.out.println("Top");
 			int bytesRead = bis.read(fileDataBytes, 0, fileDataBytes.length);
-			System.out.println("Middle");
+//			System.out.println("Middle");
 
-			System.out.println("length of bytesRead " + bytesRead);
+//			System.out.println("length of bytesRead " + bytesRead);
 			byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 			//Write Data to downloader Socket
-			System.out.println("Bottom");
+//			System.out.println("Bottom");
 
 			dos = new BufferedOutputStream(downloaderSocket.getOutputStream());
 			dos.write(newFileDataBytes);
@@ -695,8 +698,8 @@ public class HelperThread extends Thread{
 		
 		Set<Entry<Tuple, Socket>> entrySet1 = Tracker.dataTransferTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet1) {
-			System.out.println("Before removal dataSocket " + entry2.getKey().getIpAdd());
-			System.out.println("Before removal dataSocket " + entry2.getValue());
+//			System.out.println("Before removal dataSocket " + entry2.getKey().getIpAdd());
+//			System.out.println("Before removal dataSocket " + entry2.getValue());
 		} 
 		if(isLast) {
 			removeDataSocket(finalTuple, downloaderSocket);

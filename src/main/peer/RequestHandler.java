@@ -1,20 +1,13 @@
 package main.peer;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
-
-import main.utilities.commands.OfflineInterfaceCommand;
 import main.utilities.constants.Constant;
 
 public class RequestHandler implements Runnable {
@@ -90,11 +83,11 @@ public class RequestHandler implements Runnable {
     				fileByteArray = new byte[Constant.CHUNK_SIZE];
     			}
     			
-    			System.out.println("bis available: " + bis.available());
+//    			System.out.println("bis available: " + bis.available());
 				int temp = bis.read(fileByteArray, 0, fileByteArray.length);
 				os = client.getOutputStream();
-				System.out.println("Sending " + fileName + ".chunk" + chunkNumber);
-				System.out.println("TEMP is : " + temp);
+				System.out.println("Sending (" + fileName + ", " + chunkNumber +")");
+//				System.out.println("TEMP is : " + temp);
 				os.write(fileByteArray,0,fileByteArray.length);
 		        os.flush();
 		        System.out.println("Successfully sent!");

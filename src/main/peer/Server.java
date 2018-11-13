@@ -107,7 +107,7 @@ public class Server extends Thread {
 						+ Constant.COMMA 
 						+ Constant.LAST_CHUNK);
 			}
-			System.out.println("tempSocket is " + tempSocket);
+//			System.out.println("tempSocket is " + tempSocket);
 			executor = Executors.newFixedThreadPool(200);
 			Runnable worker = new RequestHandler(tempSocket, requestedFile, chunkNo);
 //			tempSocket.setKeepAlive(true);
