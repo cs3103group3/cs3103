@@ -1,9 +1,6 @@
 package main.peer;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -19,6 +16,8 @@ public class Peer {
 	
     public static void main(String args[]) {
     	processConnection();
+    	startHeartBeat();
+    	
         Server server = new Server();
         Client client = new Client();
         
@@ -39,6 +38,11 @@ public class Peer {
 			System.out.println("Unable to create listening socket");
 			e.printStackTrace();
 		}
+    }
+    
+    private static void startHeartBeat() {
+        HeartBeatSender heartBeatSender = new HeartBeatSender(listeningPort);
+        heartBeatSender.start();
     }
     
     public static void cleanUp(Server server, Client client) {

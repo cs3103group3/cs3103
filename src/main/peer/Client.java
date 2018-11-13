@@ -6,21 +6,16 @@ import java.util.Random;
 import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.net.*;
-import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 
 import main.heartbeat.HeartBeatSender;
-import main.tracker.Record;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
 import main.utilities.constants.NetworkConstant;
@@ -35,12 +30,7 @@ public class Client extends Thread {
 	PrintWriter out;
 	BufferedReader in;
 
-	HeartBeatSender heartBeatSender;
-
-	boolean hasClientInformedTracker;
-
-	public static int port;
-
+	String myIP;
 	private static void displayMenu() {
 		System.out.println( "===============================================\n" +
 				"Welcome to CS3103 P2P Client\n" +
@@ -99,6 +89,10 @@ public class Client extends Thread {
 			e.printStackTrace();
 			return true;  // So as not to quit the program, proceed as normal
 		}        
+	}
+	
+	private void list() throws UnknownHostException, IOException {
+	    list(new String[] {"1"});
 	}
 
 	private void list(String[] userInputArr) throws UnknownHostException, IOException {
@@ -162,11 +156,17 @@ public class Client extends Thread {
 
 		// Inner-arrayList stores the peer IP's that are holding the specific chunk
 
-		int numChunks = Integer.parseInt(peersWithData.get(peersWithData.size() - 1));
+		String [] numChunkAndMyIP = peersWithData.get(peersWithData.size() - 1).split(Constant.COMMA);
+		
+		int numChunks = Integer.parseInt(numChunkAndMyIP[0]);
+		myIP = numChunkAndMyIP[1];
+//		System.out.println("numChunks is " + numChunks);
+//		System.out.println("myIP is " + myIP);
+
 		peersWithData.remove(peersWithData.size() - 1);
 		ArrayList< ArrayList<String> > chunkList = new ArrayList< ArrayList<String> >();
 		chunkList = processPeersWithData(peersWithData, numChunks);
-		System.out.println("chunklist.size(): " + chunkList.size());
+//		System.out.println("chunklist.size(): " + chunkList.size());
 
 		//        For debugging purposes
 		//        for (int i = 1; i <= numChunks; i++) {
@@ -193,18 +193,21 @@ public class Client extends Thread {
 		FileOutputStream fos = new FileOutputStream(yourFile);
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		Socket socket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
-
+//		System.out.println("My public ip is " + myIP);
+//		System.out.println("My port is : " + Peer.listeningPort);
+		System.out.println("My public address is: [" + myIP + ": " + Peer.listeningPort + "]");
+		PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
 		for (int i = 1; i <= numChunks; i++) {
 			try {
 				//    			InetAddress serverIP = null;
 				//    			serverIP = InetAddress.getByName(getIPToConnect(chunkPeerList.get(i)).replaceAll("/", ""));
 				//returns a random IP and Port from list
-				String serverIPAndPort = getIPToConnect(chunkPeerList.get(i));
-				System.out.println("Peer's serverIP And Port is :" + serverIPAndPort);
+				String serverIPAndPort = getIPToConnect(chunkPeerList.get(i), myIP);
+//				System.out.println("Peer's serverIP And Port is :" + serverIPAndPort);
 				String[] serverIPAndPortArr = serverIPAndPort.split(Constant.COMMA);
+				System.out.println("Downloading chunk from [" + serverIPAndPortArr[0] + ": " + serverIPAndPortArr[1] +  "]");
 
 				// Send fileName and chunkNum to download
-				PrintWriter outSocket = new PrintWriter(socket.getOutputStream(), true);
 
 				if(i != numChunks) {
 					outSocket.println(InterfaceCommand.FORWARD.getCommandCode() + Constant.WHITESPACE
@@ -240,7 +243,7 @@ public class Client extends Thread {
 	}
 
 	private void inform(String[] userInputArr) throws UnknownHostException, IOException {
-		System.out.println("At inform");
+		System.out.println("Informing...");
 
 		String confirmationString = SuccessMessage.NEW_CHUNK_ADDED_TO_TRACKER.toString();
 		if (userInputArr.length != 2) {
@@ -268,7 +271,7 @@ public class Client extends Thread {
 			long checksum = CheckAccuracy.calculateChecksum(payload);
 			String data = checksum + Constant.COMMA + payload;
 			String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
-			System.out.println(sendData);
+//			System.out.println(sendData);
 			out.println(sendData);
 
 			String temp = in.readLine();
@@ -282,12 +285,8 @@ public class Client extends Thread {
 			}
 		}
 
-		if(!hasClientInformedTracker){
-			heartBeatSender.start();
-			hasClientInformedTracker = true;
-		}
-
 		System.out.println(confirmationString);
+		list();
 	}
 
 	private void quit(String[] userInputArr) throws UnknownHostException, IOException {
@@ -297,7 +296,7 @@ public class Client extends Thread {
 		}
 
 		//Inform server that it is exiting
-		out.println(InterfaceCommand.QUIT.getCommandCode() + Constant.WHITESPACE + port);
+		out.println(InterfaceCommand.QUIT.getCommandCode() + Constant.WHITESPACE + Peer.listeningPort);
 		//out.flush();
 		//in.close();
 
@@ -328,7 +327,7 @@ public class Client extends Thread {
 			//    		System.out.println("tempList: " + tempList);
 			//    		System.out.println("peerDataArr[0]: " + peerDataArr[0]);
 			String peerServerSocket = peerDataArr[0] + "," + peerDataArr[1];
-			System.out.println("Adding peerSeverSocket in processPeersWithData" + peerServerSocket);
+//			System.out.println("Adding peerSeverSocket in processPeersWithData" + peerServerSocket);
 			tempList.add(peerServerSocket);
 			processedList.set(currChunkNumber, tempList);
 		}
@@ -336,11 +335,18 @@ public class Client extends Thread {
 		return processedList;
 	}
 
-	private String getIPToConnect(ArrayList<String> ipList) {
+	private String getIPToConnect(ArrayList<String> ipList, String myIP) {
+		String myListeningPort = Integer.toString(Peer.listeningPort);
+		String myIPAndPort = myIP + Constant.COMMA + myListeningPort;
 		Random currRan = new SecureRandom();
 		//E.g. ipList is size 3, random peer is chosen from 0 to 2 index
+//		System.out.println("iplist size is : " + ipList);
 		int peerChosen = currRan.nextInt(ipList.size());
 		//Return the ip address of the chosen peer
+		
+		while(myIPAndPort.equals(ipList.get(peerChosen))) {
+			peerChosen = currRan.nextInt(ipList.size());
+		}
 		return ipList.get(peerChosen);
 	}
 
@@ -352,13 +358,6 @@ public class Client extends Thread {
 
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-			heartBeatSender = new HeartBeatSender();
-
-			hasClientInformedTracker = false;
-
-			port = Peer.listeningPort;
-
 		} catch (IOException e) {
 			System.out.println("Unable to create client socket");
 			e.printStackTrace();
