@@ -12,8 +12,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-//import main.heartbeat.HeartBeatListener;
-//import main.heartbeat.HeartBeatListener.TrackerCleanUp;
+import main.heartbeat.HeartBeatListener;
 import main.utilities.constants.Constant;
 import main.utilities.constants.NetworkConstant;
 
@@ -52,8 +51,8 @@ public class Tracker{
 	}
 
 	private static void listenRequest() {
-//		HeartBeatListener heartbeatInitiator = new HeartBeatListener();
-//		heartbeatInitiator.start();
+		HeartBeatListener heartbeatListener = new HeartBeatListener();
+		heartbeatListener.start();
 
 		ExecutorService executor= null;
 		//While server is still alive
@@ -99,7 +98,7 @@ public class Tracker{
 		});
 		
 		removeFileWithEmptyRecords();
-		printEverythInsideRecordAndIpToSocketTable();
+//		printEverythInsideRecordAndIpToSocketTable();
 	}
 
 	public static void removeFileWithEmptyRecords() {
@@ -111,23 +110,23 @@ public class Tracker{
 		}
 	}
 	
-	public static void printEverythInsideRecordAndIpToSocketTable(){
-		System.out.println("=====================recordTable==========================");
-		recordTable.forEach((filename,recordList) -> { 
-			for (int i=0; i<recordList.size(); i++ ) {
-				Record record = recordList.get(i);
-				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
-				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
-			}
-		});
-		System.out.println("===============================================");
-		
-		System.out.println("=====================ipPortToSocketTable==========================");
-		ipPortToSocketTable.forEach((peer,socket) -> {
-			System.out.println(peer.ipAdd + ": " +peer.portNo);
-		});
-		System.out.println("===============================================");
-	}
+//	public static void printEverythInsideRecordAndIpToSocketTable(){
+//		System.out.println("=====================recordTable==========================");
+//		recordTable.forEach((filename,recordList) -> { 
+//			for (int i=0; i<recordList.size(); i++ ) {
+//				Record record = recordList.get(i);
+//				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
+//				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
+//			}
+//		});
+//		System.out.println("===============================================");
+//		
+//		System.out.println("=====================ipPortToSocketTable==========================");
+//		ipPortToSocketTable.forEach((peer,socket) -> {
+//			System.out.println(peer.ipAdd + ": " +peer.portNo);
+//		});
+//		System.out.println("===============================================");
+//	}
 	
     
 }

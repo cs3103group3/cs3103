@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.*;
 import java.security.SecureRandom;
 
+import main.heartbeat.HeartBeatSender;
 import main.utilities.commands.InterfaceCommand;
 import main.utilities.commons.CheckAccuracy;
 import main.utilities.constants.NetworkConstant;
@@ -29,7 +30,7 @@ public class Client extends Thread {
 	PrintWriter out;
 	BufferedReader in;
 
-//	HeartBeatSender heartBeatSender;
+	HeartBeatSender heartBeatSender;
 
 	boolean hasClientInformedTracker;
 
@@ -284,10 +285,10 @@ public class Client extends Thread {
 			}
 		}
 
-//		if(!hasClientInformedTracker){
-//			heartBeatSender.start();
-//			hasClientInformedTracker = true;
-//		}
+		if(!hasClientInformedTracker){
+			heartBeatSender.start();
+			hasClientInformedTracker = true;
+		}
 
 		System.out.println(confirmationString);
 	}
@@ -362,7 +363,7 @@ public class Client extends Thread {
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-//			heartBeatSender = new HeartBeatSender();
+			heartBeatSender = new HeartBeatSender();
 
 			hasClientInformedTracker = false;
 
