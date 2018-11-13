@@ -4,14 +4,16 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import main.heartbeat.HeartBeatListener;
+import main.utilities.constants.Constant;
 import main.utilities.constants.NetworkConstant;
 
 /**
@@ -42,42 +44,19 @@ public class Tracker{
 		//			System.out.println("Unable to create Server Socket");
 		//			System.exit(1);
 		//		}
-		/*** TESTING! REMOVE LATER ***/
-		//        Tracker.aliveIpAddresses.add("110.14.24.5");
-		//        Record newRecord = new Record("110.14.24.5", "1", "5");
-		//        ArrayList<Record> newArrFile = new ArrayList<Record>();
-		//        newArrFile.add(newRecord);
-		//        recordTable.put("sandy.txt", newArrFile);
-		//        ArrayList<Record> currArrFile = recordTable.get("sandy.txt");
-		//        
-		//        Tracker.aliveIpAddresses.add("110.14.24.34");
-		//        Record addToExist = new Record("110.14.24.34", "1", "5");
-		//        currArrFile.add(addToExist);
-		//        recordTable.replace("sandy.txt", currArrFile);        
-		//        recordTable.put("sandy.txt", newArrFile);
-		//        
-		//        Tracker.aliveIpAddresses.add("110.14.24.34");
-		//        addToExist = new Record("110.14.24.34", "2", "5");
-		//        currArrFile.add(addToExist);
-		//        recordTable.replace("sandy.txt", currArrFile);        
-		//        recordTable.put("sandy.txt", newArrFile);
-		//        
-		//        Tracker.aliveIpAddresses.add("215.44.22.4");
-		//        newRecord = new Record("215.44.22.4", "2", "5");
-		//        newArrFile = new ArrayList<Record>();
-		//        newArrFile.add(newRecord);
-		//        recordTable.put("washington.txt", newArrFile);
-		//        
-		//        System.out.println("RecordTable: " + recordTable);
-		/*****************************/
 
+//		Timer timer = new Timer();
+//        timer.schedule(new TrackerCleanUp(), 0, Constant.HEARTBEAT_TRACKER_CLEANUP_INTERVAL);
+		listenHeartBeat();
 		listenRequest();
+	}
+	
+	private static void listenHeartBeat() {
+	    HeartBeatListener heartbeatListener = new HeartBeatListener();
+        heartbeatListener.start();
 	}
 
 	private static void listenRequest() {
-		HeartBeatListener heartbeatInitiator = new HeartBeatListener();
-		heartbeatInitiator.start();
-
 		ExecutorService executor= null;
 		//While server is still alive
 		try {
@@ -103,12 +82,12 @@ public class Tracker{
 
 	public static void removeUnresponsivePeersFromRecord(Set<Tuple> listOfPeersWhoResponded) {
 		recordTable.forEach((filename,recordList) -> { 
-			System.out.println(filename + " and recordList size: " + recordList.size());
+//			System.out.println(filename + " and recordList size: " + recordList.size());
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
 				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
 				if (!listOfPeersWhoResponded.contains(peer)) {
-					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " did not respond");
+//					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " did not respond");
 					recordList.remove(i);
 					if (recordTable.get(filename) == null) {
 						recordTable.remove(filename);
@@ -116,7 +95,7 @@ public class Tracker{
 					ipPortToSocketTable.remove(peer);
 					i--;
 				} else {
-					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " responded");
+//					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " responded");
 				}
 			}
 		});
@@ -135,7 +114,7 @@ public class Tracker{
 	}
 	
 	public static void printEverythInsideRecordAndIpToSocketTable(){
-		System.out.println("=====================recordTable==========================");
+		System.out.println("===============================recordTable========================");
 		recordTable.forEach((filename,recordList) -> { 
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
@@ -143,12 +122,36 @@ public class Tracker{
 				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
 			}
 		});
-		System.out.println("===============================================");
+		System.out.println("==================================================================");
 		
 		System.out.println("=====================ipPortToSocketTable==========================");
 		ipPortToSocketTable.forEach((peer,socket) -> {
 			System.out.println(peer.ipAdd + ": " +peer.portNo);
 		});
-		System.out.println("===============================================");
+		System.out.println("==================================================================");
 	}
+	
+    
 }
+
+//class TrackerCleanUp extends TimerTask {
+//    public void run() {
+////        Tracker.removeUnresponsivePeersFromRecord(listOfRespondedPeerInfo);
+//    	System.out.println("=====================recordTable==========================");
+//		Tracker.recordTable.forEach((filename,recordList) -> { 
+//			for (int i=0; i<recordList.size(); i++ ) {
+//				Record record = recordList.get(i);
+//				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
+//				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
+//			}
+//		});
+//		System.out.println("===============================================");
+//		
+//		System.out.println("=====================ipPortToSocketTable==========================");
+//		Tracker.ipPortToSocketTable.forEach((peer,socket) -> {
+//			System.out.println(peer.ipAdd + ": " +peer.portNo);
+//		});
+//		System.out.println("===============================================");
+//        
+//    }
+//}

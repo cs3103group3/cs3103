@@ -1,5 +1,6 @@
 package main.tracker;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class HelperThread extends Thread{
 
 			while(threadRunning && clientSocket.isConnected()) {
 				clientInput = in.readLine().trim();
-				System.out.println("Client has entered command: " + clientInput);
+//				System.out.println("Client has entered command: " + clientInput);
 				doClientCommand(clientInput, reply);
 			}
 		} catch (Exception e) {
@@ -71,12 +72,9 @@ public class HelperThread extends Thread{
 	}
 
 	/**
-	 * This method executes the 
-	 * commands the client requested
-	 * @param reply2 
-	 * @throws IOException 
+	 * This method executes the commands the client requested
 	 */
-	private void doClientCommand(String strCommand, PrintWriter currentReply) throws IOException {
+	private void doClientCommand(String strCommand, PrintWriter currentReply) throws IOException, InterruptedException {
 		InterfaceCommand command = InterfaceCommand.INVALID;
 		String [] strCommandArr;
 		try {
@@ -119,7 +117,7 @@ public class HelperThread extends Thread{
 				mediate(strCommandArr, currentReply);
 				break;
 			case AddListeningSocket:
-				addSocket(this.clientSocket);
+				addSocket(this.clientSocket, strCommandArr);
 				break;
 			default:
 				//Error
@@ -142,6 +140,8 @@ public class HelperThread extends Thread{
 		//		ArrayList<Record> testArrList = new ArrayList<Record>();
 		//		testArrList.add(new Record("192.128.122.211", "1"));
 		//		currentList.put("Test.txt", testArrList);
+	    
+	    System.out.println("Sending directory to Client");
 		if(currentList.isEmpty()) {
 			currentReply.println(OfflineInterfaceCommand.EMPTY_RECORD);
 			currentReply.println(Constant.END_OF_STREAM);
@@ -150,6 +150,7 @@ public class HelperThread extends Thread{
 			String result = "";
 			Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
 			//Prints out currentList
+			currentReply.println("The list of files on Tracker are:");
 			for(Entry<String, ArrayList<Record>> entry1 : entrySet) {
 				result += entry1.getKey();
 				result += Constant.NEWLINE;
@@ -158,6 +159,7 @@ public class HelperThread extends Thread{
 			currentReply.println(result);
 			currentReply.flush();
 		}
+		System.out.println("Directory Sent!");
 	}
 
 	/**
@@ -177,6 +179,8 @@ public class HelperThread extends Thread{
 	private synchronized void searchEntry(String[] strCommandArr, Hashtable<String, ArrayList<Record>> currentList, PrintWriter currentReply) {
 		String fileRequested = strCommandArr[1];
 		boolean foundFile = false;
+		
+		System.out.println("Searching for <" + fileRequested + ">...");
 		Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			if(fileRequested.equals(entry2.getKey())) {
@@ -187,9 +191,11 @@ public class HelperThread extends Thread{
 		if(foundFile) {
 			currentReply.println(SuccessMessage.FILE_FOUND);
 			currentReply.flush();
+			System.out.println("<" + fileRequested + "> found!");
 		} else {
 			currentReply.println(ErrorMessage.FILE_NOT_FOUND);
 			currentReply.flush();
+			System.out.println("<" + fileRequested + "> not found!");
 		}
 	}
 
@@ -219,7 +225,7 @@ public class HelperThread extends Thread{
 		String chunkNum = recvData[2];
 		String fileName = recvData[3];
 		String portNumber = recvData[4];
-		System.out.println("ipBroadcasted=> " + ipBroadcasted + ": " + portNumber);
+//		System.out.println("ipBroadcasted=> " + ipBroadcasted + ": " + portNumber);
 
 		String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName + Constant.COMMA + portNumber;
 
@@ -230,7 +236,8 @@ public class HelperThread extends Thread{
 			return;
 		}
 
-		System.out.println("IP_RECEIVED: " + ipBroadcasted);
+//		System.out.println("IP_RECEIVED: " + ipBroadcasted);
+		System.out.println("[" + ipBroadcasted + ": " + portNumber + "] informed " + "(" + fileName + "," + chunkNum + ")");
 
 		boolean hasExist =	checkExistFile(fileName);
 
@@ -300,6 +307,9 @@ public class HelperThread extends Thread{
 	private synchronized void findPeer(String[] strCommandArr, PrintWriter currentReply) {
 		String requestedFileName = strCommandArr[1];
 
+		String finderIP = clientSocket.getInetAddress().getHostAddress();
+//		System.out.println("This client is finding peer: " + clientSocket.getInetAddress().getHostAddress());
+		System.out.println("["+finderIP+"] is searching for peer...");
 		if(strCommandArr.length <= 1) {
 			currentReply.print("Invalid Arguments");
 			currentReply.flush();
@@ -322,13 +332,17 @@ public class HelperThread extends Thread{
 					requestedData += "\n";
 				}
 
-				requestedData += requestedChunks.get(0).getMaxChunk();
+//				System.out.println("Last line to send is : " + requestedChunks.get(0).getMaxChunk()
+//						+ Constant.COMMA + finderIP);
+				requestedData += requestedChunks.get(0).getMaxChunk()
+						+ Constant.COMMA + finderIP;
 				requestedData += Constant.NEWLINE;
 				currentReply.println(requestedData + Constant.END_OF_STREAM);
 				currentReply.flush();
 
 			} else {
-				currentReply.println("File Requested does not Exists" + Constant.END_OF_STREAM + Constant.NEWLINE);
+				currentReply.println("File Requested does not Exists");
+				currentReply.println(Constant.END_OF_STREAM);
 				currentReply.flush();
 			}
 		} else {
@@ -340,15 +354,18 @@ public class HelperThread extends Thread{
 				String requestedIP = findRequestedIP(requestedFileName, chunkNumber);
 
 				if(requestedIP.equals(INVALID_CHUNK)) { 
-					currentReply.println("Chunk of File Name Specified is invalid" + Constant.END_OF_STREAM + Constant.NEWLINE);
+					currentReply.println("Chunk of File Name Specified is invalid");
+					currentReply.println(Constant.END_OF_STREAM);
 					currentReply.flush();
 				} else {
-					currentReply.println(requestedIP + Constant.END_OF_STREAM);
+					currentReply.println(requestedIP);
+					currentReply.println(Constant.END_OF_STREAM);
 					currentReply.flush();
 				}
 
 			} else {
-				currentReply.println("File Requested does not Exists" + Constant.END_OF_STREAM + Constant.NEWLINE);
+				currentReply.println("File Requested does not Exists");
+				currentReply.println(Constant.END_OF_STREAM);
 				currentReply.flush();
 			}
 		}
@@ -409,7 +426,8 @@ public class HelperThread extends Thread{
 				String ipAddress = this.clientSocket.getInetAddress().getHostAddress();
 				deleteAllRecords(ipAddress, clientPortNo);
 				clientSocket.close();
-				System.out.println("Exited and Deleted Successfully");
+				System.out.println("["+ipAddress+": "+clientPortNo+"] has exited.");
+				System.out.println("All related data has been deleted successfully.");
 			}
 		}  catch (IOException e) {
 			System.out.println("IOException at Exit Server in Helper Thread");
@@ -443,19 +461,6 @@ public class HelperThread extends Thread{
 	 * 
 	 */
 	private void deleteAllRecords(String ipAddress, String clientPortNo) {
-		//First find all the entries that contains the associated ip address
-//		Set<Entry<String, ArrayList<Record>>> entrySet = Tracker.recordTable.entrySet();
-//		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
-//			ArrayList<Record> currArr = entry2.getValue();
-//			for(int i = 0; i < currArr.size(); i ++) {
-//				if(currArr.get(i).getipAdd().equals(ipAddress) 
-//						&& currArr.get(i).getPortNumber().equals(clientPortNo)) {
-//					//Removes the respective ip address in the respective arraylist
-//					entry2.getValue().remove(i);
-//				}
-//			}
-//		}
-		
 		Tracker.recordTable.forEach((filename,recordList) -> {
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
@@ -465,19 +470,26 @@ public class HelperThread extends Thread{
 					if (Tracker.recordTable.get(filename) == null) {
 						Tracker.recordTable.remove(filename);
 					}
+					closeListeningSocket(peer);
 					Tracker.ipPortToSocketTable.remove(peer);
 					i--;
 				}
 			}
 		});
+		
+		// Remove from ipPortTable regardless of peer has inform data or not
+		Tuple peer = new Tuple(ipAddress, clientPortNo);
+		Tracker.ipPortToSocketTable.remove(peer);
+		
 	}
+	
 	/**
 	 * This method listens and receive information about the opposing peer
 	 * then replies back with fileName + chunkNumber
 	 * 
 	 */
 	private void forwardServer(String[] clientInputArr, PrintWriter currentReply) {
-		System.out.println("Entered ForwardServer");
+//		System.out.println("Entered ForwardServer");
 		Socket opposingSocket = null;
 
 		//
@@ -485,29 +497,33 @@ public class HelperThread extends Thread{
 
 		//New Socket that was opened up by the client
 		Socket downloaderSocket = clientSocket;
-		System.out.println("Downloader socket is : " + downloaderSocket);
+//		System.out.println("Downloader socket is : " + downloaderSocket);
 		//Expects to receive data from peer A
 		//String clientInput = in.readLine();
 
 		//Process the clientInput which is of the following format
 		//IPb,PortB,FileName,ChunkNumber
 		Tuple opposingPeerTuple = new Tuple(currentClientInputArr[0], currentClientInputArr[1]);
-		System.out.println("Size of ipPortToSocket is :" + Tracker.ipPortToSocketTable.size());
+//		System.out.println("Opposing peer tuple is : "  + currentClientInputArr[0] + " " + currentClientInputArr[1]);
+		
+//		System.out.println("Size of ipPortToSocket is :" + Tracker.ipPortToSocketTable.size());
 		Set<Entry<Tuple, Socket>> entrySet = Tracker.ipPortToSocketTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet) {
-			System.out.println("Current IP of tuple is : " + entry2.getKey().getIpAdd());
-			System.out.println("Current IP of tuple is : " + entry2.getKey().getPortNo());
-			System.out.println("Current Socket of tuple is " + entry2.getValue());
-			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())) {
+//			System.out.println("Current IP of tuple is : " + entry2.getKey().getIpAdd());
+//			System.out.println("Current IP of tuple is : " + entry2.getKey().getPortNo());
+//			System.out.println("Current Socket of tuple is " + entry2.getValue());
+			if(opposingPeerTuple.getIpAdd().equals(entry2.getKey().getIpAdd())
+					&& opposingPeerTuple.getPortNo().equals(entry2.getKey().getPortNo())) {
 				opposingSocket = entry2.getValue();
 			}
 		} 
 		if(opposingSocket == null) {
-			System.out.println("Unable to find opposing Socket");
-//			clientRetry();
+//			System.out.println("Unable to find opposing Socket");
+		    System.out.println("Unable to find ["+opposingPeerTuple.getIpAdd()+ ": " + opposingPeerTuple.getPortNo()+"]");
 			return;
 		} else {
-			System.out.println("Opposing Socket is : " + opposingSocket);
+//			System.out.println("Opposing Socket is : " + opposingSocket);
+		    System.out.println("Found peer: ["+opposingPeerTuple.getIpAdd()+ ": " + opposingPeerTuple.getPortNo()+"]");
 		}
 		
 		/**
@@ -523,21 +539,39 @@ public class HelperThread extends Thread{
 		//Gets public ip, public port from downloader Socket
 		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
 		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
-		System.out.println("data socket to be added is of ip : " + downloaderIP);
-		System.out.println("data socket to be added is of port is : " +  downloaderPublicPort);
+//		System.out.println("data socket to be added is of ip : " + downloaderIP);
+//		System.out.println("data socket to be added is of port is : " +  downloaderPublicPort);
 		Tracker.dataTransferTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
+		
 	}
+	
 	/**
 	 * This methods adds the newly created socket into the hashtable
 	 * @param downloaderSocket
 	 */
-	private void addSocket(Socket downloaderSocket) {
+	private void addSocket(Socket downloaderSocket, String[] commandArr) {
 		//Gets public ip, public port from downloader Socket
 		String downloaderIP = downloaderSocket.getInetAddress().toString().replaceAll("/", "");
-		String downloaderPublicPort = String.valueOf(downloaderSocket.getPort());
-		System.out.println("New socket is of ip : " + downloaderIP);
-		System.out.println("New Public port is : " +  downloaderPublicPort);
+		String downloaderPublicPort = commandArr[1];
+//		System.out.println("New socket is of ip : " + downloaderIP);
+//		System.out.println("New Public port is : " +  downloaderPublicPort);
 		Tracker.ipPortToSocketTable.put(new Tuple(downloaderIP, downloaderPublicPort), downloaderSocket);
+	}
+	
+	/**
+	 * This methods closes the listening socket in hashtable when receive quit command
+	 * @param Peer object containing IP and Port
+	 */
+	private void closeListeningSocket(Tuple peer) {
+		Socket socketToClose = Tracker.ipPortToSocketTable.get(peer);
+		if (socketToClose != null) {
+			try {
+				socketToClose.close();
+			} catch (Exception e) {
+				System.out.println("Error closing listening socket.");
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -567,7 +601,7 @@ public class HelperThread extends Thread{
 			}
 
 			//Sends to request peer B of the fileName + chunk Number + ipAdd + port No
-			System.out.println("Helping downloader to send information" + dataToSend);
+//			System.out.println("Helping downloader to send information" + dataToSend);
 
 			out.println(dataToSend);
 			out.flush();
@@ -576,14 +610,16 @@ public class HelperThread extends Thread{
 			e.printStackTrace();
 		}
 	}
+	
 	/**
 	 * This method mediates the transfer of files between 2 clients through their
 	 * public ip and port number
 	 * @param strCommandArr
 	 * @param currentReply
 	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
-	private void mediate(String[] strCommandArr, PrintWriter currentReply) throws IOException {
+	private void mediate(String[] strCommandArr, PrintWriter currentReply) throws IOException, InterruptedException {
 		//strCommandArr is: 7 public address of A public port of A
 		String [] downloaderArr = strCommandArr[1].split(Constant.COMMA);
 		String downloaderAddress = downloaderArr[0];
@@ -591,13 +627,13 @@ public class HelperThread extends Thread{
 		
 		boolean isLast = false;
 		
-		System.out.println("downloadArr size is " + downloaderArr.length);
-		for(int i=0; i < downloaderArr.length ; i ++) {
-			System.out.println("At mediate, Printing out downloadArr" + downloaderArr[i]);
-		}
+//		System.out.println("downloadArr size is " + downloaderArr.length);
+//		for(int i=0; i < downloaderArr.length ; i ++) {
+//			System.out.println("At mediate, Printing out downloadArr" + downloaderArr[i]);
+//		}
 		
 		if(downloaderArr.length == 3) {
-			System.out.println("downloaderArr[2] " + downloaderArr[2]);
+//			System.out.println("downloaderArr[2] " + downloaderArr[2]);
 			isLast = true;
 		}
 		Tuple downloaderTuple = new Tuple(downloaderAddress, downloaderPort);
@@ -618,17 +654,38 @@ public class HelperThread extends Thread{
 //			clientRetry();
 			return;
 		}
-		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
+		
+//		System.out.println("Sending data to this downloader's new socket" + downloaderSocket);
+		
+		//This socket is the socket of the one sending data
+
+		
 		Socket opposingNewSocket = clientSocket;
+		opposingNewSocket.setKeepAlive(true);
+		opposingNewSocket.setReuseAddress(true);
+		if(opposingNewSocket.isConnected()) {
+//			System.out.println("Opposing new socket is connected");
+		}
+		
+		//		Socket transferrerSocket = new Socket();
 		byte[] fileDataBytes = new byte[Constant.CHUNK_SIZE];
 		InputStream is = null;
+		BufferedInputStream bis = null;
 		BufferedOutputStream dos =  null;
 		try {
 			//Read Data from opposing new Socket
+//			System.out.println("transferrerSocket is : " + opposingNewSocket);
 			is = opposingNewSocket.getInputStream();
-			int bytesRead = is.read(fileDataBytes, 0, fileDataBytes.length);
+			bis = new BufferedInputStream(is);
+//			System.out.println("Top");
+			int bytesRead = bis.read(fileDataBytes, 0, fileDataBytes.length);
+//			System.out.println("Middle");
+
+//			System.out.println("length of bytesRead " + bytesRead);
 			byte[] newFileDataBytes = Arrays.copyOf(fileDataBytes, bytesRead);
 			//Write Data to downloader Socket
+//			System.out.println("Bottom");
+
 			dos = new BufferedOutputStream(downloaderSocket.getOutputStream());
 			dos.write(newFileDataBytes);
 			dos.flush();
@@ -637,17 +694,30 @@ public class HelperThread extends Thread{
 			System.out.println("Error in mediating data");
 			e.printStackTrace();
 		} finally {
+			Thread.sleep(10000);
 			if (is != null) is.close();
-		}
-
+		} 
+		
 		Set<Entry<Tuple, Socket>> entrySet1 = Tracker.dataTransferTable.entrySet();
 		for(Entry<Tuple, Socket> entry2 : entrySet1) {
-			System.out.println("Before removal dataSocket " + entry2.getKey().getIpAdd());
-			System.out.println("Before removal dataSocket " + entry2.getValue());
+//			System.out.println("Before removal dataSocket " + entry2.getKey().getIpAdd());
+//			System.out.println("Before removal dataSocket " + entry2.getValue());
 		} 
 		if(isLast) {
 			removeDataSocket(finalTuple, downloaderSocket);
 			dos.close();
+		}
+	}
+	
+	private void closeDataSocket(Tuple downloaderTuple) {
+		Socket dataSocketToClose = Tracker.dataTransferTable.get(downloaderTuple);
+		if (dataSocketToClose != null) {
+			try {
+				dataSocketToClose.close();
+			} catch (IOException e) {
+				System.out.println("Error closing dataSocket");
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -656,6 +726,7 @@ public class HelperThread extends Thread{
 	 *  
 	 */
 	private void removeDataSocket(Tuple downloaderTuple, Socket downloaderSocket) {
+		closeDataSocket(downloaderTuple);
 		Tracker.dataTransferTable.remove(downloaderTuple, downloaderSocket);
 	}
 	

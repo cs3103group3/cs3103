@@ -6,14 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
-import main.tracker.Record;
-import main.utilities.commons.CheckAccuracy;
 import main.utilities.commands.InterfaceCommand;
-import main.utilities.commands.OfflineInterfaceCommand;
 import main.utilities.constants.Constant;
 import main.utilities.constants.NetworkConstant;
 import main.utilities.feedbacks.ErrorMessage;
@@ -52,7 +50,8 @@ public class Server extends Thread {
 	
 	private void sendListeningSocketData() {
 		try {
-            out.println(InterfaceCommand.AddListeningSocket.getCommandCode());
+			String data = new String(Integer.toString(Peer.listeningPort));
+            out.println(InterfaceCommand.AddListeningSocket.getCommandCode() + Constant.WHITESPACE + data);
         } catch(Exception e) {
         	System.out.println("Exception while listing from server: " + e);
         	e.printStackTrace();
@@ -79,7 +78,7 @@ public class Server extends Thread {
 		}
 	}
 	
-	private void sendMediateData(String [] clientInputArr) {
+	private void sendMediateData(String [] clientInputArr) throws UnknownHostException, IOException {
 		String downloaderIP = clientInputArr[0];
 		String downloaderPort = clientInputArr[1];
 		String requestedFile = clientInputArr[2];
@@ -94,22 +93,24 @@ public class Server extends Thread {
 		}
 		ExecutorService executor = null;
 		Socket tempSocket;
-		//Creates a new Socket for file transfer
+		//Creates a new Socket towards the relay/tracker for file transfer
+		tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 		try {
-			tempSocket = new Socket(InetAddress.getByName(NetworkConstant.TRACKER_HOSTNAME), NetworkConstant.TRACKER_LISTENING_PORT);
 			PrintWriter out = new PrintWriter(tempSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(tempSocket.getInputStream()));
-			
 			if(!isLastChunk) {
-				out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort);
+				out.println(InterfaceCommand.MEDIATE.getCommandCode() + Constant.WHITESPACE + downloaderIP 
+						+ Constant.COMMA + downloaderPort);
 			} else {
 				out.println(InterfaceCommand.MEDIATE.getCommandCode() 
 						+ Constant.WHITESPACE + downloaderIP + Constant.COMMA + downloaderPort
-						+ Constant.COMMA + Constant.LAST_CHUNK);
+						+ Constant.COMMA 
+						+ Constant.LAST_CHUNK);
 			}
-			System.out.println("tempSocket is " + tempSocket);
-			executor = Executors.newFixedThreadPool(5);
+//			System.out.println("tempSocket is " + tempSocket);
+			executor = Executors.newFixedThreadPool(200);
 			Runnable worker = new RequestHandler(tempSocket, requestedFile, chunkNo);
+//			tempSocket.setKeepAlive(true);
 			executor.execute(worker);
 			//tempSocket.close();
 		} catch (IOException e) {

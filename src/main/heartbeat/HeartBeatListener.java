@@ -52,7 +52,7 @@ public class HeartBeatListener extends Thread {
         listOfRespondedPeerInfo.add(peerInfo);
     }
     
-    class TrackerCleanUp extends TimerTask {
+    public class TrackerCleanUp extends TimerTask {
         public void run() {
             Tracker.removeUnresponsivePeersFromRecord(listOfRespondedPeerInfo);
                         

@@ -24,7 +24,7 @@ public class CheckAccuracy {
 		// get the current checksum value
 		long checksumValue = checksum.getValue();
 		 
-		System.out.println("CRC32 checksum of " + data  + " is: " + checksumValue);
+//		System.out.println("CRC32 checksum of " + data  + " is: " + checksumValue);
 		return checksumValue;
 	}
 }
