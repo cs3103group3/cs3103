@@ -6,14 +6,18 @@ import java.net.Socket;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import main.peer.Client;
 import main.utilities.constants.Constant;
 import main.utilities.constants.NetworkConstant;
 
 public class HeartBeatSender extends Thread{
-	 private Timer timer;
+	private Timer timer;
+	
+	private int port;
+	private Socket outgoingSocket;
 	 
-	 private Socket outgoingSocket;
+	public HeartBeatSender(int port) {
+	    this.port = port;
+	}
 	    
     public void run() { 
     	timer = new Timer();
@@ -25,7 +29,7 @@ public class HeartBeatSender extends Thread{
         try {
             outgoingSocket = new Socket(NetworkConstant.TRACKER_HOSTNAME, NetworkConstant.HEARTBEAT_TRACKER_LISTENING_PORT);
             PrintWriter out = new PrintWriter(outgoingSocket.getOutputStream(), true);
-            out.println(Client.port);
+            out.println(port);
             out.flush();
             outgoingSocket.close();
         } catch(IOException ioe) {

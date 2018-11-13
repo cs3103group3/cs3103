@@ -30,12 +30,6 @@ public class Client extends Thread {
 	PrintWriter out;
 	BufferedReader in;
 
-	HeartBeatSender heartBeatSender;
-
-	boolean hasClientInformedTracker;
-
-	public static int port;
-
 	String myIP;
 	private static void displayMenu() {
 		System.out.println( "===============================================\n" +
@@ -285,11 +279,6 @@ public class Client extends Thread {
 			}
 		}
 
-		if(!hasClientInformedTracker){
-			heartBeatSender.start();
-			hasClientInformedTracker = true;
-		}
-
 		System.out.println(confirmationString);
 	}
 
@@ -300,7 +289,7 @@ public class Client extends Thread {
 		}
 
 		//Inform server that it is exiting
-		out.println(InterfaceCommand.QUIT.getCommandCode() + Constant.WHITESPACE + port);
+		out.println(InterfaceCommand.QUIT.getCommandCode() + Constant.WHITESPACE + Peer.listeningPort);
 		//out.flush();
 		//in.close();
 
@@ -362,13 +351,6 @@ public class Client extends Thread {
 
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-			heartBeatSender = new HeartBeatSender();
-
-			hasClientInformedTracker = false;
-
-			port = Peer.listeningPort;
-
 		} catch (IOException e) {
 			System.out.println("Unable to create client socket");
 			e.printStackTrace();

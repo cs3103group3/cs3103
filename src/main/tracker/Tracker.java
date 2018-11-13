@@ -45,15 +45,18 @@ public class Tracker{
 		//			System.exit(1);
 		//		}
 
-		Timer timer = new Timer();
-        timer.schedule(new TrackerCleanUp(), 0, Constant.HEARTBEAT_TRACKER_CLEANUP_INTERVAL);
+//		Timer timer = new Timer();
+//        timer.schedule(new TrackerCleanUp(), 0, Constant.HEARTBEAT_TRACKER_CLEANUP_INTERVAL);
+		listenHeartBeat();
 		listenRequest();
+	}
+	
+	private static void listenHeartBeat() {
+	    HeartBeatListener heartbeatListener = new HeartBeatListener();
+        heartbeatListener.start();
 	}
 
 	private static void listenRequest() {
-		HeartBeatListener heartbeatListener = new HeartBeatListener();
-		heartbeatListener.start();
-
 		ExecutorService executor= null;
 		//While server is still alive
 		try {
@@ -98,7 +101,7 @@ public class Tracker{
 		});
 		
 		removeFileWithEmptyRecords();
-//		printEverythInsideRecordAndIpToSocketTable();
+		printEverythInsideRecordAndIpToSocketTable();
 	}
 
 	public static void removeFileWithEmptyRecords() {
@@ -110,32 +113,9 @@ public class Tracker{
 		}
 	}
 	
-//	public static void printEverythInsideRecordAndIpToSocketTable(){
-//		System.out.println("=====================recordTable==========================");
-//		recordTable.forEach((filename,recordList) -> { 
-//			for (int i=0; i<recordList.size(); i++ ) {
-//				Record record = recordList.get(i);
-//				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
-//				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
-//			}
-//		});
-//		System.out.println("===============================================");
-//		
-//		System.out.println("=====================ipPortToSocketTable==========================");
-//		ipPortToSocketTable.forEach((peer,socket) -> {
-//			System.out.println(peer.ipAdd + ": " +peer.portNo);
-//		});
-//		System.out.println("===============================================");
-//	}
-	
-    
-}
-
-class TrackerCleanUp extends TimerTask {
-    public void run() {
-//        Tracker.removeUnresponsivePeersFromRecord(listOfRespondedPeerInfo);
-    	System.out.println("=====================recordTable==========================");
-		Tracker.recordTable.forEach((filename,recordList) -> { 
+	public static void printEverythInsideRecordAndIpToSocketTable(){
+		System.out.println("=====================recordTable==========================");
+		recordTable.forEach((filename,recordList) -> { 
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
 				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
@@ -145,10 +125,33 @@ class TrackerCleanUp extends TimerTask {
 		System.out.println("===============================================");
 		
 		System.out.println("=====================ipPortToSocketTable==========================");
-		Tracker.ipPortToSocketTable.forEach((peer,socket) -> {
+		ipPortToSocketTable.forEach((peer,socket) -> {
 			System.out.println(peer.ipAdd + ": " +peer.portNo);
 		});
 		System.out.println("===============================================");
-        
-    }
+	}
+	
+    
 }
+
+//class TrackerCleanUp extends TimerTask {
+//    public void run() {
+////        Tracker.removeUnresponsivePeersFromRecord(listOfRespondedPeerInfo);
+//    	System.out.println("=====================recordTable==========================");
+//		Tracker.recordTable.forEach((filename,recordList) -> { 
+//			for (int i=0; i<recordList.size(); i++ ) {
+//				Record record = recordList.get(i);
+//				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
+//				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
+//			}
+//		});
+//		System.out.println("===============================================");
+//		
+//		System.out.println("=====================ipPortToSocketTable==========================");
+//		Tracker.ipPortToSocketTable.forEach((peer,socket) -> {
+//			System.out.println(peer.ipAdd + ": " +peer.portNo);
+//		});
+//		System.out.println("===============================================");
+//        
+//    }
+//}
