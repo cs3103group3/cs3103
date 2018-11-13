@@ -449,8 +449,6 @@ public class HelperThread extends Thread{
 	 * 
 	 */
 	private void deleteAllRecords(String ipAddress, String clientPortNo) {
-		// If Peer doesn't inform, there will be no record in recordTable, but dataSocket
-		// still exist in ipPortToSocketTable
 		Tracker.recordTable.forEach((filename,recordList) -> {
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
@@ -466,6 +464,11 @@ public class HelperThread extends Thread{
 				}
 			}
 		});
+		
+		// Remove from ipPortTable regardless of peer has inform data or not
+		Tuple peer = new Tuple(ipAddress, clientPortNo);
+		Tracker.ipPortToSocketTable.remove(peer);
+		
 	}
 	
 	/**
