@@ -87,7 +87,7 @@ public class Tracker{
 				Record record = recordList.get(i);
 				Tuple peer = new Tuple(record.getipAdd(), record.getPortNumber());
 				if (!listOfPeersWhoResponded.contains(peer)) {
-					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " did not respond");
+//					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " did not respond");
 					recordList.remove(i);
 					if (recordTable.get(filename) == null) {
 						recordTable.remove(filename);
@@ -95,7 +95,7 @@ public class Tracker{
 					ipPortToSocketTable.remove(peer);
 					i--;
 				} else {
-					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " responded");
+//					System.out.println("peer: " + peer.ipAdd + ":" + peer.portNo + " responded");
 				}
 			}
 		});
@@ -114,7 +114,7 @@ public class Tracker{
 	}
 	
 	public static void printEverythInsideRecordAndIpToSocketTable(){
-		System.out.println("=====================recordTable==========================");
+		System.out.println("===============================recordTable========================");
 		recordTable.forEach((filename,recordList) -> { 
 			for (int i=0; i<recordList.size(); i++ ) {
 				Record record = recordList.get(i);
@@ -122,13 +122,13 @@ public class Tracker{
 				System.out.println("Filename: " + filename + ", Peer: " + record.getipAdd() + ": " + record.getPortNumber() + ", chunk: " + record.chunkNumber);
 			}
 		});
-		System.out.println("===============================================");
+		System.out.println("==================================================================");
 		
 		System.out.println("=====================ipPortToSocketTable==========================");
 		ipPortToSocketTable.forEach((peer,socket) -> {
 			System.out.println(peer.ipAdd + ": " +peer.portNo);
 		});
-		System.out.println("===============================================");
+		System.out.println("==================================================================");
 	}
 	
     

@@ -90,6 +90,10 @@ public class Client extends Thread {
 			return true;  // So as not to quit the program, proceed as normal
 		}        
 	}
+	
+	private void list() throws UnknownHostException, IOException {
+	    list(new String[] {"1"});
+	}
 
 	private void list(String[] userInputArr) throws UnknownHostException, IOException {
 		if (userInputArr.length != 1) {
@@ -237,7 +241,7 @@ public class Client extends Thread {
 	}
 
 	private void inform(String[] userInputArr) throws UnknownHostException, IOException {
-		System.out.println("At inform");
+		System.out.println("Informing...");
 
 		String confirmationString = SuccessMessage.NEW_CHUNK_ADDED_TO_TRACKER.toString();
 		if (userInputArr.length != 2) {
@@ -265,7 +269,7 @@ public class Client extends Thread {
 			long checksum = CheckAccuracy.calculateChecksum(payload);
 			String data = checksum + Constant.COMMA + payload;
 			String sendData = InterfaceCommand.INFORM.getCommandCode() + Constant.WHITESPACE + data;
-			System.out.println(sendData);
+//			System.out.println(sendData);
 			out.println(sendData);
 
 			String temp = in.readLine();
@@ -280,6 +284,7 @@ public class Client extends Thread {
 		}
 
 		System.out.println(confirmationString);
+		list();
 	}
 
 	private void quit(String[] userInputArr) throws UnknownHostException, IOException {

@@ -62,7 +62,7 @@ public class HelperThread extends Thread{
 
 			while(threadRunning && clientSocket.isConnected()) {
 				clientInput = in.readLine().trim();
-				System.out.println("Client has entered command: " + clientInput);
+//				System.out.println("Client has entered command: " + clientInput);
 				doClientCommand(clientInput, reply);
 			}
 		} catch (Exception e) {
@@ -139,6 +139,8 @@ public class HelperThread extends Thread{
 		//		ArrayList<Record> testArrList = new ArrayList<Record>();
 		//		testArrList.add(new Record("192.128.122.211", "1"));
 		//		currentList.put("Test.txt", testArrList);
+	    
+	    System.out.println("Sending directory to Client");
 		if(currentList.isEmpty()) {
 			currentReply.println(OfflineInterfaceCommand.EMPTY_RECORD);
 			currentReply.println(Constant.END_OF_STREAM);
@@ -147,6 +149,7 @@ public class HelperThread extends Thread{
 			String result = "";
 			Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
 			//Prints out currentList
+			currentReply.println("The list of files on Tracker are:");
 			for(Entry<String, ArrayList<Record>> entry1 : entrySet) {
 				result += entry1.getKey();
 				result += Constant.NEWLINE;
@@ -155,6 +158,7 @@ public class HelperThread extends Thread{
 			currentReply.println(result);
 			currentReply.flush();
 		}
+		System.out.println("Directory Sent!");
 	}
 
 	/**
@@ -174,6 +178,8 @@ public class HelperThread extends Thread{
 	private synchronized void searchEntry(String[] strCommandArr, Hashtable<String, ArrayList<Record>> currentList, PrintWriter currentReply) {
 		String fileRequested = strCommandArr[1];
 		boolean foundFile = false;
+		
+		System.out.println("Searching for <" + fileRequested + ">...");
 		Set<Entry<String, ArrayList<Record>>> entrySet = currentList.entrySet();
 		for(Entry<String, ArrayList<Record>> entry2 : entrySet) {
 			if(fileRequested.equals(entry2.getKey())) {
@@ -184,9 +190,11 @@ public class HelperThread extends Thread{
 		if(foundFile) {
 			currentReply.println(SuccessMessage.FILE_FOUND);
 			currentReply.flush();
+			System.out.println("<" + fileRequested + "> found!");
 		} else {
 			currentReply.println(ErrorMessage.FILE_NOT_FOUND);
 			currentReply.flush();
+			System.out.println("<" + fileRequested + "> not found!");
 		}
 	}
 
@@ -216,7 +224,7 @@ public class HelperThread extends Thread{
 		String chunkNum = recvData[2];
 		String fileName = recvData[3];
 		String portNumber = recvData[4];
-		System.out.println("ipBroadcasted=> " + ipBroadcasted + ": " + portNumber);
+//		System.out.println("ipBroadcasted=> " + ipBroadcasted + ": " + portNumber);
 
 		String payload = totalNumChunk + Constant.COMMA + chunkNum + Constant.COMMA + fileName + Constant.COMMA + portNumber;
 
@@ -227,7 +235,8 @@ public class HelperThread extends Thread{
 			return;
 		}
 
-		System.out.println("IP_RECEIVED: " + ipBroadcasted);
+//		System.out.println("IP_RECEIVED: " + ipBroadcasted);
+		System.out.println("[" + ipBroadcasted + ": " + portNumber + "] informed " + "(" + fileName + "," + chunkNum + ")");
 
 		boolean hasExist =	checkExistFile(fileName);
 
@@ -415,7 +424,8 @@ public class HelperThread extends Thread{
 				String ipAddress = this.clientSocket.getInetAddress().getHostAddress();
 				deleteAllRecords(ipAddress, clientPortNo);
 				clientSocket.close();
-				System.out.println("Exited and Deleted Successfully");
+				System.out.println("["+ipAddress+": "+clientPortNo+"] has exited.");
+				System.out.println("All related data has been deleted successfully.");
 			}
 		}  catch (IOException e) {
 			System.out.println("IOException at Exit Server in Helper Thread");
