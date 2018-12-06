@@ -23,11 +23,11 @@ Report can be found [here](docs/Report.pdf)
 ![Network Topology](docs/img/topology.png)
 1. Whenever a peer joins the network, it will open a listening socket to listen to any data sent from Tracker
 2. A command channel will also be established with Tracker upon joining the network. This channel is used to send commands and requests to Tracker, such as informing Tracker of its available file chunks
-3. When a peer wish to download a file, it sends a request through the command channel. Tracker reply with a list of candidate peers for it to choose from via the listening channel. After selection, the peer will establish a temporary connection to Tracker.
+3. When a peer wishes to download a file, it sends a request through the command channel. Tracker will then reply with a list of candidate peers for it to choose from via the listening channel. After selection, the peer will establish a temporary connection to Tracker.
 
-For example, Peer C had chosen to download from Peer A, hence it establish a connection with Tracker
+For example, Peer C had chosen to download from Peer A, hence it establishes a connection with Tracker
 
-4. Since the file size is large, Peer C may choose to download from multiple peers. Hence, for each peer, Peer C will establish a temporary connection to Tracker.
-5. With the port information it received through the temporary connection with Peer C, Tracker will ask Peer A establish a temporary connection with it and send data through that channel. Tracker will connect the temporary channels from Peer A and Peer C, acting as a relaying agent while data flow through it.
-6. Likewise for Peer B.
-7. Upon completion of sending of data, all peers will tear down the temporary channels.
+4. Since the file size is large, Peer C may choose to download from multiple peers. Hence, for each peer, Peer C will establish a temporary connection with Tracker.
+5. With the port information it received through the temporary connection with Peer C, Tracker will ask Peer A to establish a temporary connection with it and send data through that channel. Tracker will connect the temporary channels from Peer A and Peer C, acting as a relaying agent while data flow through it.
+6. Likewise for Peer B and Peer C.
+7. Upon completion of sending of data, all peers will tear down their temporary channels.
